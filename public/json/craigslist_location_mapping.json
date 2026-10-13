@@ -1,0 +1,238 @@
+[
+    {
+        "location": "city of toronto",
+        "domain": "toronto"
+    },
+    {
+        "location": "durham region",
+        "domain": "toronto"
+    },
+    {
+        "location": "york region",
+        "domain": "toronto"
+    },
+    {
+        "location": "brampton-caledon",
+        "domain": "toronto"
+    },
+    {
+        "location": "mississauga",
+        "domain": "toronto"
+    },
+    {
+        "location": "oakville-milton",
+        "domain": "toronto"
+    },
+    {
+        "location": "barrie",
+        "domain": "barrie"
+    },
+    {
+        "location": "belleville",
+        "domain": "belleville"
+    },
+    {
+        "location": "brantford",
+        "domain": "brantford"
+    },
+    {
+        "location": "chatham",
+        "domain": "chatham"
+    },
+    {
+        "location": "cornwall",
+        "domain": "cornwall"
+    },
+    {
+        "location": "guelph",
+        "domain": "guelph"
+    },
+    {
+        "location": "hamilton",
+        "domain": "hamilton"
+    },
+    {
+        "location": "kingston",
+        "domain": "kingston"
+    },
+    {
+        "location": "kitchener",
+        "domain": "kitchener"
+    },
+    {
+        "location": "london",
+        "domain": "londonon"
+    },
+    {
+        "location": "montreal",
+        "domain": "montreal"
+    },
+    {
+        "location": "newbrunswick",
+        "domain": "newbrunswick"
+    },
+    {
+        "location": "ottawa",
+        "domain": "ottawa"
+    },
+    {
+        "location": "owensound",
+        "domain": "owensound"
+    },
+    {
+        "location": "niagara",
+        "domain": "niagara"
+    },
+    {
+        "location": "peterborough",
+        "domain": "peterborough"
+    },
+    {
+        "location": "sarnia",
+        "domain": "sarnia"
+    },
+    {
+        "location": "soo",
+        "domain": "soo"
+    },
+    {
+        "location": "sudbury",
+        "domain": "sudbury"
+    },
+    {
+        "location": "thunderbay",
+        "domain": "thunderbay"
+    },
+    {
+        "location": "windsor",
+        "domain": "windsor"
+    },
+    {
+        "location": "calgary",
+        "domain": "calgary"
+    },
+    {
+        "location": "edmonton",
+        "domain": "edmonton"
+    },
+    {
+        "location": "ftmcmurray",
+        "domain": "ftmcmurray"
+    },
+    {
+        "location": "lethbridge",
+        "domain": "lethbridge"
+    },
+    {
+        "location": "hat",
+        "domain": "hat"
+    },
+    {
+        "location": "peace",
+        "domain": "peace"
+    },
+    {
+        "location": "reddeer",
+        "domain": "reddeer"
+    },
+    {
+        "location": "cariboo",
+        "domain": "cariboo"
+    },
+    {
+        "location": "comoxvalley",
+        "domain": "comoxvalley"
+    },
+    {
+        "location": "abbotsford",
+        "domain": "abbotsford"
+    },
+    {
+        "location": "kamloops",
+        "domain": "kamloops"
+    },
+    {
+        "location": "kelowna",
+        "domain": "kelowna"
+    },
+    {
+        "location": "kootenays",
+        "domain": "kootenays"
+    },
+    {
+        "location": "nanaimo",
+        "domain": "nanaimo"
+    },
+    {
+        "location": "skeena",
+        "domain": "skeena"
+    },
+    {
+        "location": "sunshine",
+        "domain": "sunshine"
+    },
+    {
+        "location": "victoria",
+        "domain": "victoria"
+    },
+    {
+        "location": "whistler",
+        "domain": "whistler"
+    },
+    {
+        "location": "halifax",
+        "domain": "halifax"
+    },
+    {
+        "location": "winnipeg",
+        "domain": "winnipeg"
+    },
+    {
+        "location": "newbrunswick",
+        "domain": "newbrunswick"
+    },
+    {
+        "location": "newfoundland",
+        "domain": "newfoundland"
+    },
+    {
+        "location": "yellowknife",
+        "domain": "yellowknife"
+    },
+    {
+        "location": "pei",
+        "domain": "pei"
+    },
+    {
+        "location": "quebec",
+        "domain": "quebec"
+    },
+    {
+        "location": "saguenay",
+        "domain": "saguenay"
+    },
+    {
+        "location": "sherbrooke",
+        "domain": "sherbrooke"
+    },
+    {
+        "location": "troisrivieres",
+        "domain": "troisrivieres"
+    },
+    {
+        "location": "saskatoon",
+        "domain": "saskatoon"
+    },
+    {
+        "location": "regina",
+        "domain": "regina"
+    },
+    {
+        "location": "whitehorse",
+        "domain": "whitehorse"
+    },
+    {
+        "location": "princegeorge",
+        "domain": "princegeorge"
+    }
+]

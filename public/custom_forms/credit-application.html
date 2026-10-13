@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Credit Application | Zop Dealer</title>
+        <!-- META -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="keywords" content="fullscreen image, grid layout, flexbox grid, transition" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+         
+         <!-- STYLESHEET -->
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <!--  HEAD END  -->
+    </head>
+    <!--  BODY START  -->
+    
+    <body>
+        
+        <!-- LAYER-1 START -->
+        <section class="section-3">
+            <!-- CONTAINER START --> 
+            <div class="container">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                    <div class="head-text p-top-50">                 
+                        <h3>Credit Application</h3>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-30">
+                                    <label>1. <strong>Vehicle Info</strong></label>
+                                    <div class="border-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><strong>Year</strong></p>
+                                    <input type="number" class="form-control" placeholder="" id="service-year"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                     <p><strong>Make</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-make"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                     <p><strong>Model</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-model"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20" style="position: relative;">
+                                    <p><strong>Odometer</strong></p>
+                                    <input type="number" class="form-control" placeholder="" id="trade-odometer"/>
+                                    <span class="right-text"> Kms</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-30">
+                                    <label>2. <strong>Requested Service(s)</strong></label>
+                                    <div class="border-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Oil Change" value="Oil Change" /><span class="left-sp">Oil Change</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Tire Rotation" value="Tire Rotation" /><span class="left-sp">Tire Rotation</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Coolant Flush" value="Coolant Flush" /><span class="left-sp">Coolant Flush</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Transmission Flush" value="Transmission Flush" /><span class="left-sp">Transmission Flush</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Tire Balance" value="Tire Balance" /><span class="left-sp">Tire Balance</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Air Conditioner Service" value="Air Conditioner Service" /><span class="left-sp">Air Conditioner Service</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Filter Replacement" value="Filter Replacement" /><span class="left-sp">Filter Replacement</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Front End Alignment" value="Front End Alignment" /><span class="left-sp">Front End Alignment</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Replace / Adjust Brakes" value="Replace / Adjust Brakes" /><span class="left-sp">Replace / Adjust Brakes</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Muffler / Exhaust Repair" value="Muffler / Exhaust Repair" /><span class="left-sp">Muffler / Exhaust Repair</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Vehicle Checkup / Inspection" value="Vehicle Checkup / Inspection" /><span class="left-sp">Vehicle Checkup / Inspection</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Electrical Service" value="Electrical Service" /><span class="left-sp">Electrical Service</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Maintenance" value="Maintenance" /><span class="left-sp">Maintenance (Wipers, Headlights, Etc)</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Other" value="Other" /><span class="left-sp">Other (Please Describe Below)</span></p>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-20">
+                                    <p><strong>Comments</strong></p>
+                                    <textarea rows="8" class="form-control" placeholder="" id="service-comments"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-30">
+                                    <label>3. <strong>Personal Info & Appointment</strong></label>
+                                    <div class="border-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>First Name</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-first-name"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">    
+                                <div class="p-top-20">
+                                    <p><strong>Last name</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-last-name"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Email</strong></p>
+                                    <input type="email" class="form-control" placeholder="" id="service-email"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Phone</strong></p>
+                                    <input type="number" class="form-control" placeholder="" id="service-phone-number"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Preferred Appointment Date</strong></p>
+                                    <input type="date" class="form-control" placeholder="" id="service-preferred-date"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Preferred Appointment Time</strong></p>
+                                    <input type="time" class="form-control" placeholder="" id="service-preferred-time"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="service-check" name="condition"/><span class="left-sp">By clicking Get Approved, I consent to the collection, use and disclosure of my personal information as described in this paragraph. I agree that the personal information provided above may be used and disclosed by Zop Demo and/or its agents or service providers (collectively, the "Dealer") as necessary to obtain credit, financial and related personal information (including a credit or consumer information report) about me from any credit bureau or credit reporting agency, and to advise me on credit availability in connection with product and/or service purchase financing. I further agree that the personal information provided above may be disclosed to the provider of Dealer’s website hosting or related services for the purpose of enabling Dealer to access my personal information for marketing purposes. Personal information I provide and credit information obtained may also be retained by Dealer and used to facilitate the application process should I subsequently choose to apply for credit through Dealer.</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                            <div class="hero-btn p-top-20 p-bottom-50">
+                                <button class="serach-btn" style="padding:0px;"><a href="#" style="padding:16px 60px;">Book Service Now</a></button>
+                            </div>
+                        </div>         
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                    <div class="fixed-progress">
+                    <div class="progress">
+                      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="dotted-1"></div>
+                        <div class="dotted-2"></div>
+                        <div class="dotted-3"></div>
+                        <div class="dotted-4"></div>
+                        <div class="dotted-5"></div>
+                    </div>
+                    </div>
+                    <div class="step form-width-c" style="display: block;">
+                        <div class="head-text wow p-bottom-70 p-top-70 fadeIn raw">
+<!--
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class=" p-top-50 p-bottom-50" >
+                                        <h2>Let’s Build your new website.</h2>
+                                    </div>
+                                </div>
+                            </div>
+-->
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" p-top-20" >
+                                        <h3 class="title-box">Email</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>What is your email ID?</label>
+                                        <input type="email" class="form-control" name="zop-email" id="zop_email" />  
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-line"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" m-top-20" >
+                                        <h3 class="title-box">Phone</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>What is your phone number?</label>
+                                        <input type="number" class="form-control" name="zop-phone" id="zop_phone" /> 
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-line"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" m-top-20" >
+                                        <h3 class="title-box">Full Name</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>What is your full name?</label>
+                                        <input type="text" class="form-control" name="zop-name" id="zop_name" /> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step form-width-c " style="display: none ;">
+                        <div class="head-text set-box p-bottom-70 p-top-70  raw">
+                            <div class="set-box-show"></div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" m-top-20" >
+                                        <h3 class="title-box">Background Information</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>What is your organizations or website name?</label>
+                                        <input type="text" placeholder="www.zopmedia.com" class="form-control" name="zop-website" id="zop_website" />  
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>Briefly describe what your business does and your target audience</label>
+                                        <input type="number" class="form-control" name="zop-phone" id="zop_phone" /> 
+                                        <p class="">E.g. We provide dental services to consumers in San Diego. </p>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>What is the primary objective of your landing page?</label>
+                                        <p class="p-top-10"><input type="radio" name="zop-primary" class="editable-icon-1" id="zop_promotions"  value="Promotions, Offers, Services" /><span class="left-text editable-icon1">Promotions, Offers, Services</span></p>
+                                        <p class="p-top-10"><input type="radio" name="zop-primary" class="editable-icon-2" id="zop_lead-generation"  value="Lead Generation"  /><span class="left-text editable-icon2">Lead Generation</span></p>
+                                        <p class="p-top-10 p-bottom-10"><input type="radio" class="editable-icon-3" name="zop-primary" id="zop_other"  value="other" /><span class="left-text editable-icon3">other</span></p>
+                                        <div class="hide-feild">
+                                        <input type="text" class="form-control" name="zop-primary" id="zop_primary" /> 
+                                        </div>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>If you have an existing website, please list it here.</label>
+                                        <input type="text" class="form-control" name="zop-existing-website" id="zop_existing-website" /> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step form-width-c" style="display: none ;">
+                        <div class="head-text set-box p-top-70 p-bottom-70  raw">
+                            <div class="set-box-show"></div>
+                            <div class="set-box-show-2"></div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" m-top-20" >
+                                        <h3 class="title-box">Visual style</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>What style or theme do you want to use?</label>
+                                        <textarea type="text" placeholder="" class="form-control" rows="3" name="zop-theme" id="zop_theme" ></textarea>
+                                        <p>Tip: Providing any thoughts on colors, illustration or photography will help guide designers.</p>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>What websites can designers draw inspiration from?</label>
+                                        <p>List websites you like and describe what you like about them.</p>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>Website address</label>
+                                        <p class="p-top-10 add-link"><i class="fas fa-link"></i><a class="left-text">https://www.zopmedia.com</a><span class="left-text">remove</span></p>
+                                        <p class="p-top-10 p-bottom-10 add-link"><i class="fas fa-link"></i><a class="left-text">https://www.zopmedia.com</a><span class="left-text">remove</span></p>
+                                        <input type="text" class="form-control" name="zop-website-address" id="zop_website-address" />
+                                        <p>E.g. www.honest.com</p>
+                                        <div class="hero-btn black-box hidden-box p-top-10 " data-wow-duration="1.2s" style="visibility: visible; animation-duration: 1.2s; animation-name: fadeInUp;">
+                                        <button class="creat-btn editable-input"><a href="#">Add another website</a></button>
+                                        </div>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>What do you like about this site?</label>
+                                        <textarea type="text" class="form-control" name="zop-about-site" id="zop_about-site" rows="3"></textarea> 
+                                        <p>E.g. I like the homepage of the website, the colors and imagery used as well as the menu and buttons.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step form-width-c" style="display: none ;">
+                        <div class="head-text set-box p-top-70 p-bottom-70  raw">
+                            <div class="set-box-show"></div>
+                            <div class="set-box-show-2"></div>
+                            <div class="set-box-show-3"></div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" m-top-20" >
+                                        <h3 class="title-box">Content details</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>How many pages do you need designed for your website?</label>
+                                         <div class="control">
+                                            <button class="bttn bttn-left" id="minus">
+                                               <span>-</span>
+                                            </button>
+                                            <input type="number" class="input" id="input">
+                                            <button class="bttn bttn-right" id="plus">
+                                              <span>+</span>
+                                            </button>
+                                        </div>
+                                        <p><input type="checkbox" id="zop-about-us" value="About us"/><span class="left-text">About us</span></p>
+                                        <p><input type="checkbox" id="zop-services" value="Services"/><span class="left-text">Services</span></p>
+                                        <p><input type="checkbox" id="zop-staff-directory" value="Staff Directory"/><span class="left-text">Staff Directory</span></p>
+                                        <p><input type="checkbox" id="zop-reviews" value="Reviews/ Testimonials"/><span class="left-text">Reviews/ Testimonials</span></p>
+                                        <p><input type="checkbox" id="zop-contact-us" value="Contact us"/><span class="left-text">Contact us</span></p>
+                                        <p class="p-bottom-10"><input type="checkbox" id="zop-add-more" value="Add More"/><span class="left-text">Add More</span></p>
+                                        <div class="more-add">
+                                        <input type="text" class="form-control" name="zop-add-more-page" id="zop_add-more-page" placeholder="Page Name" />
+                                        <p>E.g. Page Name, Page Name, Page Name</p>
+                                        </div>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>What would you like on each page?</label>
+                                        <textarea type="text" class="form-control" rows="3" name="zop-each-page" id="zop_each-page"></textarea>
+                                        
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>List any color, themes or other elements that you don't want include.</label>
+                                        <textarea type="text" class="form-control" name="zop-list-color" id="zop_list-color" rows="3"></textarea> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step form-width-c" style="display: none ;">
+                        <div class="head-text set-box p-top-70 p-bottom-70  raw">
+                            <div class="set-box-show"></div>
+                            <div class="set-box-show-2"></div>
+                            <div class="set-box-show-3"></div>
+                            <div class="set-box-show-4"></div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                    <div class=" m-top-20" >
+                                        <h3 class="title-box">Other</h3>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                    <div class="head-form " >
+                                        <label>Is there anything else you would like to communicate to the designers?</label>
+                                        <textarea type="text" class="form-control" name="zop-communicatet-designers" id="zop_communicatet-designers" rows="3"></textarea> 
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>Allow the use of stock images in your contest? <i class="fas fa-question-circle"></i></label>
+                                        <select id="zop-stock-images" name="zop-stock-images"  placeholder="Select"  class="form-control">
+                                        <option disabled="disabled" value="">Select</option>
+                                        <option value="yes">Yes, allow designers to recommend stock images</option>
+                                        <option value="no">No, I will provide my own images</option>
+                                        <option value="not-sure">I'm not sure</option>
+                                        </select>
+                                        <p>There may be additional costs for designs that use stock images. Designers will include details for stock images, so you can buy stock at the end of your contest. <a>Learn more about stock</a></p>
+                                    </div>
+                                    <div class="head-form  p-top-20" >
+                                        <label>Do you have any images, sketches or documents that might be helpful?</label>
+                                        <input type="file" class="form-file" placeholder="Choose file" id="zop-sketches" value=""/>
+                                        <p>E.g. Your current logo, fonts, photos, illustrations, content, layout ideas etc.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-btn-c">
+                        <div style="max-width:1000px; margin:auto;">
+                            <div class="row">
+                                <div class="col-md-5 col-sm-5">
+                                    <div class="left save-btn-list">
+                            <div class="left-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="right-content">
+                            <h6 class="">100% money back guarantee</h6>
+                            <p>A design you love or your money back</p>
+                            </div>
+                        </div>
+                                </div>
+                                <div class="col-md-7 col-sm-7">
+                                    <div class="right p-bottom-30">
+                            <button class="action back btn btn-info previous-btn" style="display: inline-block;">Previous</button>
+                            <button class="action next btn btn-info" style="display: inline-block;">Continue </button>
+                            <a href="Getting-Started-2.php"><button class="action submit btn  sumit-btn" style="display: none;">Submit</button></a>
+                        </div>
+                                </div>
+                            </div>
+                        </div>
+                  </div>
+                </div>
+            </div>  
+            <!-- CONTAINER END -->
+        </section>
+        
+        <!-- LAYER 1 END -->
+        
+        
+        <!---- JAVA SCRIPT FILE ----->
+        <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        
+    </body>
+    
+    <!---- BODY END ---->
+</html>

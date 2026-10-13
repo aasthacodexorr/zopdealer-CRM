@@ -1,0 +1,26 @@
+[
+  {
+    "location": "city of vancouver",
+    "domain": "vancouver"
+  },
+  {
+    "location": "north shore",
+    "domain": "vancouver"
+  },
+  {
+    "location": "burnaby/newwest",
+    "domain": "vancouver"
+  },
+  {
+    "location": "delta/surrey/langley",
+    "domain": "vancouver"
+  },
+  {
+    "location": "tricities/pitt/maple",
+    "domain": "vancouver"
+  },
+  {
+    "location": "richmond",
+    "domain": "vancouver"
+  }
+]

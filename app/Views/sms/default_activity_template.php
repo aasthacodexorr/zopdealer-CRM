@@ -1,0 +1,1 @@
+<?php echo $activity_type; ?> REMINDER - on <?php echo $start_date; ?> <?php if(!empty($attendee_names)){ echo 'with ' . $attendee_names; } ?> - <?php echo $title; ?> Thx Zop

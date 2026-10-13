@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say voice="alice">
+     This number does not have the capability of receiving calls. 
+     Please call the phone number listed on the dealership website.
+     Thank You. Have a pleasant day.
+    </Say>
+</Response>

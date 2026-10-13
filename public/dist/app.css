@@ -1,0 +1,176 @@
+.page-loader {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 1000000;
+  background: white;
+  padding-top: 20%;
+}
+
+.lds-grid {
+  display: block;
+  margin: auto;
+  position: relative;
+  width: 128px;
+  height: 128px;
+}
+
+.lds-grid div {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #cef;
+  -webkit-animation: lds-grid 1.2s linear infinite;
+          animation: lds-grid 1.2s linear infinite;
+}
+
+.lds-grid div:nth-child(1) {
+  top: 12px;
+  left: 12px;
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+}
+
+.lds-grid div:nth-child(2) {
+  top: 12px;
+  left: 52px;
+  -webkit-animation-delay: -0.4s;
+          animation-delay: -0.4s;
+}
+
+.lds-grid div:nth-child(3) {
+  top: 12px;
+  left: 90px;
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s;
+}
+
+.lds-grid div:nth-child(4) {
+  top: 52px;
+  left: 12px;
+  -webkit-animation-delay: -0.4s;
+          animation-delay: -0.4s;
+}
+
+.lds-grid div:nth-child(5) {
+  top: 52px;
+  left: 52px;
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s;
+}
+
+.lds-grid div:nth-child(6) {
+  top: 52px;
+  left: 90px;
+  -webkit-animation-delay: -1.2s;
+          animation-delay: -1.2s;
+}
+
+.lds-grid div:nth-child(7) {
+  top: 90px;
+  left: 12px;
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s;
+}
+
+.lds-grid div:nth-child(8) {
+  top: 90px;
+  left: 52px;
+  -webkit-animation-delay: -1.2s;
+          animation-delay: -1.2s;
+}
+
+.lds-grid div:nth-child(9) {
+  top: 90px;
+  left: 90px;
+  -webkit-animation-delay: -1.6s;
+          animation-delay: -1.6s;
+}
+
+@-webkit-keyframes lds-grid {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes lds-grid {
+  0%, 100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.custom-footer-fixed-action-bar {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-bottom: 0 !important;
+  justify-content: right;
+  background: #e7e7e7 !important;
+  z-index: 3;
+}
+
+.copy-hover {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+  -webkit-text-decoration-style: dashed;
+          text-decoration-style: dashed;
+}
+
+.copy-hover:hover {
+  cursor: pointer;
+  background: #fcfcfc;
+}
+
+/** DATE PICKER CSS **/
+
+.mx-icon-calendar,
+.mx-icon-clear {
+  top: 50% !important;
+}
+
+.mx-input-wrapper .mx-input {
+  box-shadow: none;
+}
+
+div.mx-datepicker {
+  width: 100%;
+}
+
+.mx-datepicker.is-invalid {
+  border: 1px solid red;
+}
+
+.mx-table.mx-table-date thead tr th {
+  position: initial;
+}
+
+/** Custom Alerts **/
+
+.alert-light-success {
+  background-color: #e6f4ea;
+  border: 1px solid #28c76f;
+  color: #155724;
+}
+
+.alert-light-warning {
+  background-color: #fff4e5;
+  border: 1px solid #ff9f43;
+  color: #7a4e0b;
+}
+
+.alert-light-danger {
+  background-color: #fdecea;
+  border: 1px solid #ea5455;
+  color: #842029;
+}
+

@@ -1,0 +1,162 @@
+#pr
+CI_ENVIRONMENT = production
+OAuth0_DOMAIN = 
+OAuth0_CLIENT_ID = 
+OAuth0_REDIRECT_URI = 
+OAuth0_AUD = 
+OAuth0_CLIENT_SECRET = 
+tenant.prefix = "TENANT_"
+
+OAuth2_DOMAIN = zopauth.com
+OAuth2_CLIENT_ID = zopsoftware
+OAuth2_CLIENT_SECRET = 
+OAuth2_REDIRECT_URI = 
+
+database.default.username = 
+database.default.password = 
+database.default.database = 
+database.default.hostname = 
+
+rabbit.host     = 
+rabbit.port     = 5672
+rabbit.user     = 
+rabbit.pass     = 
+rabbit.vhost    = 
+rabbit.exchange = 
+rabbit.queue = 
+rabbit.inventory_process_queue = 
+
+
+
+google.recaptcha.private = 
+google.recaptcha.public = 
+
+
+mailbox.smtp.host = 
+mailbox.smtp.username = 
+mailbox.smtp.password = 
+mailbox.smtp.port = 587
+mailbox.smtp.configset = 
+
+image.cdn = "https://zopsoftware-asset.b-cdn.net"
+syndication.image.cdn = "https://zopsoftware-asset-original.b-cdn.net"
+syndication.image.cdn.optimize  = "https://zopsoftware-asset.b-cdn.net"
+
+bunny.storage.zone = 
+bunny.storage.key = 
+bunny.storage.region = 'ny'
+
+internal.email_address = 'noreply@zopnotify.com'
+internal.name = 'NoReply'
+
+
+notification.server.url = 
+
+twilio.phone = 
+twilio.sid = 
+twilio.auth_token = 
+
+notification.smtp.host = 
+notification.smtp.username = 
+notification.smtp.password = 
+notification.smtp.port = 
+
+
+password.encryption = 
+email.validate.url = 
+
+inventory.purge = 
+
+typesense.token = 
+typesense.api = 
+
+zx.api.ct = 
+zx.api.st = 
+zx.api.oid = 
+zx.api.rt = 
+
+autotrader.host=
+autotrader.user=
+autotrader.pass=
+autotrader.file=
+autotrader.folder=
+
+autotrader.npv.host=
+autotrader.npv.user=
+autotrader.npv.pass=
+autotrader.npv.file=
+autotrader.npv.folder=
+autotrader.npv.tempfile=
+
+
+siriusxm.host=
+siriusxm.user=
+siriusxm.pass=
+siriusxm.file=
+siriusxm.folder=
+siriusxm.cid=
+siriusxm.fingerprint=
+
+fb.app.id =
+fb.app.secret =
+fb.callback.url = 
+ig.callback.url = 
+
+KBB.API_URL = 
+KBB.API_KEY = 
+
+pla.host=
+pla.user=
+pla.pass=
+pla.file=
+
+STRIPE.PUBLIC_KEY = 
+STRIPE.SECRET_KEY = 
+
+fbads.appid = 
+fbads.secret = 
+#fbads.token =
+fbads.token=
+fbads.version ='19.0'
+fb.ads.sender.email=
+fb.ads.sender.name=
+
+clients.show =
+
+google.callback.url = 
+
+zop.urlshortner.username = 
+zop.urlshortner.password = 
+zop.urlshortner.api_url =
+
+fb.reviews.id =
+fb.reviews.secret =
+fb.reviews.url = 
+
+captcha.solver.api.key = 
+clients.delete = 
+
+dealertrack.url = 
+dealertrack.dms.id = 
+dealertrack.dms.key = 
+dealertrack.dms.auth.url = 
+dealertrack.dms.auth.user = 
+dealertrack.dms.auth.password = 
+dealertrack.dms.transfer.key = 
+dealertrack.dms.transfer.url = 
+dealertrack.dms.transfer.fingerprint = 
+
+MAIN_DOMAIN = 
+
+google.console.maps.key = 
+
+encryption.key = 
+
+testdrive.package_automatepro=
+testdrive.package_advanced=
+testdrive.package_hyperboost=
+
+pbs.username=
+pbs.password=
+aistudio.host = 
+zopai.host = 

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Service Appointment | Zop Dealer</title>
+        <!-- META -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="keywords" content="fullscreen image, grid layout, flexbox grid, transition" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+         
+         <!-- STYLESHEET -->
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <!--  HEAD END  -->
+    </head>
+    <!--  BODY START  -->
+    
+    <body>
+        
+        <!-- LAYER-1 START -->
+        <section class="section-3">
+            <!-- CONTAINER START --> 
+            <div class="container">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                    <div class="head-text p-top-50">                 
+                        <h3>Schedule Service</h3>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-30">
+                                    <label>1. <strong>Vehicle Info</strong></label>
+                                    <div class="border-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><strong>Year</strong></p>
+                                    <input type="number" class="form-control" placeholder="" id="service-year"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                     <p><strong>Make</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-make"/>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                     <p><strong>Model</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-model"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20" style="position: relative;">
+                                    <p><strong>Odometer</strong></p>
+                                    <input type="number" class="form-control" placeholder="" id="trade-odometer"/>
+                                    <span class="right-text"> Kms</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-30">
+                                    <label>2. <strong>Requested Service(s)</strong></label>
+                                    <div class="border-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Oil Change" value="Oil Change" /><span class="left-sp">Oil Change</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Tire Rotation" value="Tire Rotation" /><span class="left-sp">Tire Rotation</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Coolant Flush" value="Coolant Flush" /><span class="left-sp">Coolant Flush</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Transmission Flush" value="Transmission Flush" /><span class="left-sp">Transmission Flush</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Tire Balance" value="Tire Balance" /><span class="left-sp">Tire Balance</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Air Conditioner Service" value="Air Conditioner Service" /><span class="left-sp">Air Conditioner Service</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Filter Replacement" value="Filter Replacement" /><span class="left-sp">Filter Replacement</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Front End Alignment" value="Front End Alignment" /><span class="left-sp">Front End Alignment</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Replace / Adjust Brakes" value="Replace / Adjust Brakes" /><span class="left-sp">Replace / Adjust Brakes</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Muffler / Exhaust Repair" value="Muffler / Exhaust Repair" /><span class="left-sp">Muffler / Exhaust Repair</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Vehicle Checkup / Inspection" value="Vehicle Checkup / Inspection" /><span class="left-sp">Vehicle Checkup / Inspection</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Electrical Service" value="Electrical Service" /><span class="left-sp">Electrical Service</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Maintenance" value="Maintenance" /><span class="left-sp">Maintenance (Wipers, Headlights, Etc)</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-4">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="requested-service-check" name="Other" value="Other" /><span class="left-sp">Other (Please Describe Below)</span></p>
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-20">
+                                    <p><strong>Comments</strong></p>
+                                    <textarea rows="8" class="form-control" placeholder="" id="service-comments"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-30">
+                                    <label>3. <strong>Personal Info & Appointment</strong></label>
+                                    <div class="border-bottom"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>First Name</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-first-name"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">    
+                                <div class="p-top-20">
+                                    <p><strong>Last name</strong></p>
+                                    <input type="text" class="form-control" placeholder="" id="service-last-name"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Email</strong></p>
+                                    <input type="email" class="form-control" placeholder="" id="service-email"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Phone</strong></p>
+                                    <input type="number" class="form-control" placeholder="" id="service-phone-number"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Preferred Appointment Date</strong></p>
+                                    <input type="date" class="form-control" placeholder="" id="service-preferred-date"/>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
+                                <div class="p-top-20">
+                                    <p><strong>Preferred Appointment Time</strong></p>
+                                    <input type="time" class="form-control" placeholder="" id="service-preferred-time"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <div class="p-top-20">
+                                    <p><input type="checkbox" id="service-check" name="condition"/><span class="left-sp">By clicking Get Approved, I consent to the collection, use and disclosure of my personal information as described in this paragraph. I agree that the personal information provided above may be used and disclosed by Zop Demo and/or its agents or service providers (collectively, the "Dealer") as necessary to obtain credit, financial and related personal information (including a credit or consumer information report) about me from any credit bureau or credit reporting agency, and to advise me on credit availability in connection with product and/or service purchase financing. I further agree that the personal information provided above may be disclosed to the provider of Dealer’s website hosting or related services for the purpose of enabling Dealer to access my personal information for marketing purposes. Personal information I provide and credit information obtained may also be retained by Dealer and used to facilitate the application process should I subsequently choose to apply for credit through Dealer.</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                            <div class="hero-btn p-top-20 p-bottom-50">
+                                <button class="serach-btn" style="padding:0px;"><a href="#" style="padding:16px 60px;">Book Service Now</a></button>
+                            </div>
+                        </div>         
+                    </div>
+                </div>
+            </div>  
+            <!-- CONTAINER END -->
+        </section>
+        
+        <!-- LAYER 1 END -->
+        
+        
+        <!---- JAVA SCRIPT FILE ----->
+        <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        
+    </body>
+    
+    <!---- BODY END ---->
+</html>

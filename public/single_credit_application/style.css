@@ -1,0 +1,215 @@
+/*---------FONT FAMILY START--------*/
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+
+*{
+    outline: none!important;
+}
+body{
+    font-family: 'Lato', sans-serif;
+    background-color: #ffffff;
+}
+.head-text{
+    margin: auto;
+    padding: 30px;
+    overflow: hidden;
+}
+.p-top-50{
+    padding-top:50px;
+}
+.p-bottom-50{
+    padding-bottom:50px;
+}
+.p-top-20{
+    padding-top:25px;
+}
+.p-top-30{
+    padding-top:35px;
+}
+.no-padding{
+    padding: 0px;
+}
+/*
+.container{
+    width: 90%;
+}
+*/
+.head-text h3 {
+    color: #333449;
+    font-size:30px;
+    margin: 0px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+.head-text .form-control {
+    border-radius:0px;
+    color: #000;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    font-size: 16px;
+    min-height: 50px;
+}
+.serach-btn, .creat-btn {
+    border: none;
+    background-color: transparent;
+    display: inline-flex;
+}
+.serach-btn a {
+    font-size: 18px;
+    color: #ffffff;
+    background-color: #ee4424;
+    font-family: 'Lato', sans-serif;
+    padding: 20px 40px;
+    text-decoration: none;
+    border-radius: 0px;
+    position: relative;
+    -webkit-transition: all 0.5s ease-out 0s;
+    -moz-transition: all 0.5s ease-out 0s;
+    -ms-transition: all 0.5s ease-out 0s;
+    -o-transition: all 0.5s ease-out 0s;
+    transition: all 0.5s ease-out 0s;
+    border-radius:0px;
+}
+.serach-btn a:hover{
+    background-color:#292929;
+}
+.head-text label {
+    font-size: 20px;
+    line-height: 1.3;
+    font-family: "Lato",sans-serif !important;
+    color: #fff;
+}
+.head-text label strong{
+    font-family: "Lato",sans-serif !important;
+}
+.head-text p strong{
+    color: #fff;
+    font-family: "Lato",sans-serif !important;
+}
+.border-bottom{
+    border-bottom: 1px solid #adadad;
+}
+.condition-check{
+    padding-right: 10px;
+}
+.select-box {
+    position: relative;
+}
+.select-box-text {
+    border: 1px solid #ccc;
+    padding: 10px 20px 0px;
+    border-radius: 4px;
+    text-align: center;
+}
+.zop-condition {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    opacity: 0;
+    z-index: 9;
+}
+.zop-condition:checked ~ .select-box-text{
+    background-color: #000;
+    border-color: #000;
+}
+.zop-condition:checked ~ .select-box-text p{
+    color: #fff;
+}
+span.right-text {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    padding: 13px;
+    background-color: #e9ecef;
+    color: #696969;
+    font-size: 16px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-left: 1px solid #ccc;
+}
+span.left-sp {
+    padding-left: 20px;
+    display: flex;
+    margin-top: -21px;
+}
+.p-bottom-50{
+    padding-bottom: 50px;
+}
+button.action.back.btn.btn-info.previous-btn {
+    font-size: 18px;
+    color: #000;
+    background-color: #dfdfdd;
+    font-family: 'Lato', sans-serif;
+    padding: 18px 40px;
+    border: 2px solid #dfdfdd;;
+    text-decoration: none;
+    border-radius: 0px;
+    position: relative;
+    -webkit-transition: all 0.5s ease-out 0s;
+    -moz-transition: all 0.5s ease-out 0s;
+    -ms-transition: all 0.5s ease-out 0s;
+    -o-transition: all 0.5s ease-out 0s;
+    transition: all 0.5s ease-out 0s;
+}
+button.action.back.btn.btn-info.previous-btn:hover{
+    background-color: transparent;
+    border-color: #000;
+}
+button.action.next.btn.btn-info, button.action.submit.btn.sumit-btn {
+    font-size: 18px;
+    color: #ffffff;
+    border:none;
+    background-color: #0fb7bd;
+    font-family: 'Lato', sans-serif;
+    padding: 20px 50px;
+    text-decoration: none;
+    border-radius: 0px;
+    position: relative;
+    -webkit-transition: all 0.5s ease-out 0s;
+    -moz-transition: all 0.5s ease-out 0s;
+    -ms-transition: all 0.5s ease-out 0s;
+    -o-transition: all 0.5s ease-out 0s;
+    transition: all 0.5s ease-out 0s;
+
+}
+.radio-btn-self{
+    padding-left: 0px;
+}
+.radio-btn-self li{
+    display: inline-block;
+    padding-right: 15px;
+    color: #fff;
+    font-size: 16px;
+}
+.radio-btn-self li input{
+    margin-right: 5px;
+}
+.hide-feild, .hide-feild-trade {
+    display: none;
+}
+.hide-feild.hide-feild-show, .hide-feild-trade.hide-feild-show-trade {
+    display: block;
+}
+input.btn.btn-primary.serach-btn{
+    font-size: 18px;
+    color: #ffffff;
+    background-color: #ce242b;
+    font-family: 'Inter', sans-serif;
+    padding: 12px 40px;
+    text-decoration: none;
+    border-radius: 0px;
+    position: relative;
+}
+.head-text .form-control.error{
+    border-color: red;
+}
+.head-text .form-control.error~label{
+    font-size: 12px;
+    color: red;
+    margin: 0px;
+}

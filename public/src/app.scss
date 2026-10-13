@@ -1,0 +1,72 @@
+@import "_pageloader.scss";
+
+.custom-footer-fixed-action-bar {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-bottom: 0 !important;
+  justify-content: right;
+  background: #e7e7e7 !important;
+  z-index: 3;
+}
+
+.copy-hover {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  &:hover {
+    cursor: pointer;
+    background: #fcfcfc;
+  }
+}
+
+/** DATE PICKER CSS **/
+
+.mx-icon-calendar,
+.mx-icon-clear {
+  top: 50% !important;
+}
+
+.mx-input-wrapper {
+  .mx-input {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+}
+
+div.mx-datepicker {
+  width: 100%;
+}
+
+.mx-datepicker.is-invalid {
+  border: 1px solid red;
+}
+
+.mx-table.mx-table-date {
+  thead {
+    tr {
+      th {
+        position: initial;
+      }
+    }
+  }
+}
+
+/** Custom Alerts **/
+.alert-light-success {
+    background-color: #e6f4ea;
+    border: 1px solid #28c76f;
+    color: #155724;
+}
+
+.alert-light-warning {
+    background-color: #fff4e5;
+    border: 1px solid #ff9f43;
+    color: #7a4e0b;
+}
+
+.alert-light-danger {
+    background-color: #fdecea;
+    border: 1px solid #ea5455;
+    color: #842029;
+}

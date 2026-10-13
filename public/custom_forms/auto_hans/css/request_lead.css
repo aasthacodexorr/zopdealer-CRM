@@ -1,0 +1,69 @@
+
+        .maincontent .summary-information2 {
+            background: #ddd;
+            padding: 0px;
+            margin: 0 -7px 25px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        h4.reqinformation-used.req-info-icon {
+            background-color: #ee4424 !important;
+            color: #fff;
+            height: 50px;
+            font-size: 20px;
+            font-weight: 700 !important;
+            padding: 14px 0 0 15px;
+            margin: 0px;
+        }
+
+        div#div_rmi {
+            padding: 10px 15px;
+        }
+
+        div#div_rmi .input-group .stat-input-field {
+            width: 100%;
+            margin: 5px 0px;
+            height: 50px;
+            padding: 0px 10px;
+            font-size: 16px;
+            height: 50px;
+            border: none;
+        }
+
+        div#div_rmi .input-group {
+            display: block;
+        }
+
+        button#link_contact_seller {
+            background-color: #ee4424;
+            color: #fff;
+            border-radius: 0px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding: 0px 40px;
+            height: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 40px;
+            cursor: pointer;
+            white-space: nowrap;
+            border: none;
+        }
+
+        button#link_contact_seller:hover {
+            background-color: #535353;
+        }
+
+        .text-btn {
+            float: left;
+            display: inline;
+            width: 90%;
+            margin-left: 7px;
+            font-size: 13px;
+            line-height: 24px;
+            font-weight: 400;
+            color: #000;
+            margin-top: -5px;
+        }
+    

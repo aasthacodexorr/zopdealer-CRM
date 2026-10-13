@@ -1,0 +1,1 @@
+Hello {Customer First Name}, Thank You for your business. Please provide your feeback on {Personalized Short Review Link} - {Business Name}
