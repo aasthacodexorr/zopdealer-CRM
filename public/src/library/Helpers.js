@@ -191,4 +191,17 @@ export default {
       }
     );
   },
+  truncate(text, length, clamp = "...") {
+    if (!text && text !== 0) return "";
+    clamp = clamp || "...";
+    var node = typeof document !== "undefined" ? document.createElement("div") : null;
+    let content = "";
+    if (node) {
+      node.innerHTML = text;
+      content = node.textContent;
+    } else {
+      content = String(text).replace(/<[^>]*>/g, "");
+    }
+    return content.length > length ? content.slice(0, length) + clamp : content;
+  },
 };

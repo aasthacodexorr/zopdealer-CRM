@@ -473,7 +473,7 @@ export default {
 
     this.getAllUsers();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_customer", null);
     Event.vue.$off("save_customer_insurance", null);
     Event.vue.$off("change_customer", null);

@@ -404,7 +404,7 @@ export default {
       },
     }).mask(document.getElementById("policy_phone"));
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_customer_insurance_complete", null);
   },
 };

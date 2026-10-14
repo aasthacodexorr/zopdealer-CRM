@@ -57,8 +57,11 @@
                                       )
                                     "
                                     >{{
-                                      digital_vehicle_inspection_view.header
-                                        | truncate(25, "...")
+                                      $helpers.truncate(
+                                        digital_vehicle_inspection_view.header,
+                                        25,
+                                        "..."
+                                      )
                                     }}</span
                                   ><router-link
                                     tag="td"
@@ -101,8 +104,11 @@
                                         )
                                       "
                                       >{{
-                                        digital_vehicle_inspection_view.header
-                                          | truncate(25, "...")
+                                        $helpers.truncate(
+                                          digital_vehicle_inspection_view.header,
+                                          25,
+                                          "..."
+                                        )
                                       }}</span
                                     ><router-link
                                       tag="td"

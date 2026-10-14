@@ -194,8 +194,9 @@
                                   v-for="(
                                     section, main_index
                                   ) in vehicle_inspection_report.sections"
+                                  :key="section.name"
                                 >
-                                  <tr :key="section.name" class="thead-dark">
+                                  <tr class="thead-dark">
                                     <th scope="col" colspan="3">
                                       {{ section.name }}
                                     </th>

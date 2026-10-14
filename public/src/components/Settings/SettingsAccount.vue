@@ -332,7 +332,7 @@ export default {
     SettingsAccountFbinsights,
     SettingsAccountLogo,
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("change_rpa_settings", null);
   },
 };

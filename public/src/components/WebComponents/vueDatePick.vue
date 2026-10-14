@@ -364,7 +364,7 @@ export default {
 
     },
 
-    beforeDestroy() {
+    beforeUnmount() {
 
         this.removeCloseEvents();
         this.teardownPosition();

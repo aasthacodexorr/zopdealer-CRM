@@ -38,7 +38,7 @@
                 >
               </div>
               <div class="message-summary">
-                {{ single_conversation.body | truncate(150, "...") }}
+                {{ $helpers.truncate(single_conversation.body, 150, "...") }}
               </div>
             </li>
           </ul>
@@ -526,7 +526,7 @@ export default {
 
     this.getAllConversations();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.socket.hasListeners("notification")) {
       this.socket.removeListener("notification", this.socketListener);
     }

@@ -141,7 +141,7 @@
         }
       });
     },
-    beforeDestroy() {
+    beforeUnmount() {
       Event.vue.$off("search_listing_page", null);
     },
   };

@@ -50,7 +50,11 @@
                                     class="d-inline-block flex-fill"
                                     @click="changePaymentView(payment_view.id)"
                                     >{{
-                                      payment_view.header | truncate(25, "...")
+                                      $helpers.truncate(
+                                        payment_view.header,
+                                        25,
+                                        "..."
+                                      )
                                     }}</span
                                   ><router-link
                                     tag="td"
@@ -89,8 +93,11 @@
                                         changePaymentView(payment_view.id)
                                       "
                                       >{{
-                                        payment_view.header
-                                          | truncate(25, "...")
+                                        $helpers.truncate(
+                                          payment_view.header,
+                                          25,
+                                          "..."
+                                        )
                                       }}</span
                                     ><router-link
                                       tag="td"

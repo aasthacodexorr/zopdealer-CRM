@@ -116,7 +116,7 @@ export default {
         });
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("email_count", null);
   }
 };

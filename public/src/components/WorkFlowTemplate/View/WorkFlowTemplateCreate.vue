@@ -710,7 +710,7 @@ export default {
       }
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_workflow_template", null);
   },
 };

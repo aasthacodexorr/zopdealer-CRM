@@ -104,7 +104,7 @@
           <label
             class="d-block"
             style="font-weight: 600; letter-spacing: 1px"
-            >{{ each_note.title | truncate(50, "...") }}</label
+            >{{ $helpers.truncate(each_note.title, 50, "...") }}</label
           >
         </div>
 
@@ -398,7 +398,7 @@ export default {
       vm.$data.isOpen = true;
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("change_selected_lead_response_id_for_snapshot", null);
   },
 };

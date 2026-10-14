@@ -965,7 +965,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_complete", null);
     Event.vue.$off("autopopulate_location_default", null);
     Event.vue.$off("change_customer", null);

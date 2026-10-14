@@ -170,14 +170,11 @@ if (typeof Object.assign != "function") {
 // export
 export default {
   name: "TextEditor",
-  data() {
-    return {
-      _options: {},
-      _content: "",
-      defaultOptions,
-    };
-  },
   props: {
+    modelValue: {
+      type: String,
+      default: undefined,
+    },
     content: String,
     value: String,
     editor_style: {
@@ -204,14 +201,27 @@ export default {
       required: true,
     },
   },
+  emits: ["update:modelValue", "input", "change", "blur", "focus", "ready"],
+  data() {
+    return {
+      _options: {},
+      _content: "",
+      defaultOptions,
+    };
+  },
   mounted() {
     this.initialize();
   },
-  beforeDestroy() {
-    this.quill = null;
-    delete this.quill;
+  beforeUnmount() {
+    this.cleanUp();
   },
   methods: {
+    cleanUp() {
+      if (this.quill) {
+        this.quill = null;
+        delete this.quill;
+      }
+    },
     // Init Quill instance
     initialize() {
       if (this.$el) {
@@ -228,8 +238,20 @@ export default {
 
         this.quill.enable(false);
         // Set editor content
-        if (this.value || this.content) {
-          this.quill.pasteHTML(this.value || this.content);
+        const initialContent =
+          this.modelValue !== undefined
+            ? this.modelValue
+            : this.value !== undefined
+            ? this.value
+            : this.content;
+        if (initialContent) {
+          this.quill.pasteHTML(initialContent);
+          let html =
+            this.$refs.editor && this.$refs.editor.children[0]
+              ? this.$refs.editor.children[0].innerHTML
+              : "";
+          if (html === "<p><br></p>") html = "";
+          this._content = html || initialContent;
         }
         // Disabled editor
         if (!this.disabled) {
@@ -249,43 +271,65 @@ export default {
           const quill = this.quill;
           const text = this.quill.getText();
           if (html === "<p><br></p>") html = "";
-          this._content = html;
-          this.$emit("input", this._content);
+          if (html !== this._content) {
+            this._content = html;
+            this.$emit("update:modelValue", this._content);
+            this.$emit("input", this._content);
+          }
           this.$emit("change", { html, text, quill });
         });
         // Emit ready event
         this.$emit("ready", this.quill);
       }
     },
-  },
-  watch: {
-    // Watch content change
-    content(newVal, oldVal) {
-      if (this.quill) {
-        if (newVal && newVal !== this._content) {
-          this._content = newVal;
-          this.quill.pasteHTML(newVal);
-        } else if (!newVal) {
+    updateContent(newVal) {
+      if (!this.quill) return;
+      if (newVal && newVal !== this._content) {
+        const delta = this.quill.clipboard.convert(newVal);
+        this.quill.setContents(delta);
+        let html =
+          this.$refs.editor && this.$refs.editor.children[0]
+            ? this.$refs.editor.children[0].innerHTML
+            : "";
+        if (html === "<p><br></p>") html = "";
+        this._content = html || newVal;
+      } else if (!newVal) {
+        if (this._content !== "") {
+          this._content = "";
           this.quill.setText("");
         }
       }
     },
+  },
+  watch: {
+    // Watch modelValue change (Vue 3 v-model)
+    modelValue(newVal) {
+      this.updateContent(newVal);
+    },
     // Watch content change
-    value(newVal, oldVal) {
-      if (this.quill) {
-        if (newVal && newVal !== this._content) {
-          this._content = newVal;
-          const html = newVal;
-          const delta = this.quill.clipboard.convert(html);
-          this.quill.setContents(delta);
-          // this.quill.pasteHTML(newVal);
-        } else if (!newVal) {
-          this.quill.setText("");
+    content(newVal) {
+      if (this.modelValue === undefined && this.value === undefined) {
+        if (this.quill) {
+          if (newVal && newVal !== this._content) {
+            this._content = newVal;
+            this.quill.pasteHTML(newVal);
+          } else if (!newVal) {
+            if (this._content !== "") {
+              this._content = "";
+              this.quill.setText("");
+            }
+          }
         }
+      }
+    },
+    // Watch value change (Vue 2 v-model / :value)
+    value(newVal) {
+      if (this.modelValue === undefined) {
+        this.updateContent(newVal);
       }
     },
     // Watch disabled change
-    disabled(newVal, oldVal) {
+    disabled(newVal) {
       if (this.quill) {
         this.quill.enable(!newVal);
       }

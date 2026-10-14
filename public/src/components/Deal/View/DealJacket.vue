@@ -705,7 +705,7 @@ export default {
         }
     );
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("document_tagging_save", null);
   }
 };

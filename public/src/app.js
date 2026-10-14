@@ -1,22 +1,28 @@
-window.Vue = require("vue");
+import Vue, { createApp, configureCompat } from "vue";
+window.Vue = Vue;
 window._ = require("lodash");
 window.axios = require("axios");
+
+// Configure Vue compat mode (MODE: 2 defaults to Vue 2 behavior for unmigrated components)
+configureCompat({
+  MODE: 2,
+});
 
 import VueClipboard from "vue-clipboard2";
 Vue.use(VueClipboard);
 
 import Helpers from "./library/Helpers.js";
 const plugin = {
-  install() {
+  install(app) {
     Vue.helpers = Helpers;
     Vue.prototype.$helpers = Helpers;
+    if (app && app.config && app.config.globalProperties) {
+      app.config.globalProperties.$helpers = Helpers;
+    }
   },
 };
-
 Vue.use(plugin);
 
-import VueRouter from "vue-router";
-Vue.use(VueRouter);
 
 import VueCookies from "vue-cookies";
 Vue.use(VueCookies);
@@ -26,7 +32,31 @@ import "sweetalert2/dist/sweetalert2.min.css";
 Vue.use(VueSweetalert2);
 
 import vueDebounce from "vue-debounce";
-Vue.use(vueDebounce);
+const rawDebounce = typeof vueDebounce === "function" ? vueDebounce() : (vueDebounce.default ? vueDebounce.default() : vueDebounce);
+const debounceDirective = {
+  ...rawDebounce,
+  bind(el, binding, vnode) {
+    if (rawDebounce && rawDebounce.created) {
+      rawDebounce.created(el, binding, vnode);
+    }
+  },
+  inserted(el, binding, vnode) {
+    if (rawDebounce && rawDebounce.mounted) {
+      rawDebounce.mounted(el, binding, vnode);
+    }
+  },
+  created(el, binding, vnode) {
+    if (rawDebounce && rawDebounce.created) {
+      rawDebounce.created(el, binding, vnode);
+    }
+  },
+  mounted(el, binding, vnode) {
+    if (rawDebounce && rawDebounce.mounted) {
+      rawDebounce.mounted(el, binding, vnode);
+    }
+  },
+};
+Vue.directive("debounce", debounceDirective);
 
 import VueGtag from "vue-gtag";
 Vue.use(VueGtag, {
@@ -34,35 +64,9 @@ Vue.use(VueGtag, {
 });
 
 const truncate = function(text, length, clamp) {
-  clamp = clamp || "...";
-  var node = document.createElement("div");
-  node.innerHTML = text;
-  var content = node.textContent;
-  return content.length > length ? content.slice(0, length) + clamp : content;
+  return Helpers.truncate(text, length, clamp);
 };
 Vue.filter("truncate", truncate);
-
-Vue.directive("uppercase", {
-  inserted(el) {
-    const handler = function() {
-      const formattedValue = el.value.toUpperCase();
-      if (el.value !== formattedValue) {
-        el.value = formattedValue;
-
-        // Compatible event dispatch for Vue 2 / older browsers
-        const event = document.createEvent("HTMLEvents");
-        event.initEvent("input", true, false);
-        el.dispatchEvent(event);
-      }
-    };
-    el.__uppercaseHandler__ = handler;
-    el.addEventListener("input", handler);
-  },
-  unbind(el) {
-    el.removeEventListener("input", el.__uppercaseHandler__);
-    delete el.__uppercaseHandler__;
-  },
-});
 
 function triggerInputEvent(element) {
   const event = document.createEvent("Event");
@@ -70,11 +74,37 @@ function triggerInputEvent(element) {
   element.dispatchEvent(event);
 }
 
-Vue.directive("integer", {
-  bind(el) {
+const uppercaseDirective = {
+  mounted(el) {
+    const handler = function() {
+      const formattedValue = el.value.toUpperCase();
+      if (el.value !== formattedValue) {
+        el.value = formattedValue;
+        triggerInputEvent(el);
+      }
+    };
+    el.__uppercaseHandler__ = handler;
+    el.addEventListener("input", handler);
+  },
+  unmounted(el) {
+    if (el.__uppercaseHandler__) {
+      el.removeEventListener("input", el.__uppercaseHandler__);
+      delete el.__uppercaseHandler__;
+    }
+  },
+  inserted(el) {
+    this.mounted(el);
+  },
+  unbind(el) {
+    this.unmounted(el);
+  },
+};
+Vue.directive("uppercase", uppercaseDirective);
+
+const integerDirective = {
+  beforeMount(el) {
     const handleInput = () => {
       const originalValue = el.value;
-
       const sanitizedValue = originalValue
         .replace(/[^\d-]/g, "")
         .replace(/(?!^)-/g, "");
@@ -87,7 +117,6 @@ Vue.directive("integer", {
 
     const handleBlur = () => {
       let default_value = el?.dataset?.defaultValue ?? 1;
-
       if (el.value === "" || el.value === "-") {
         el.value = default_value;
         triggerInputEvent(el);
@@ -100,33 +129,43 @@ Vue.directive("integer", {
     el.addEventListener("input", handleInput);
     el.addEventListener("blur", handleBlur);
   },
-
-  inserted(el) {
+  mounted(el) {
     if (el.value === "" || el.value === "-") {
       el.value = "1";
       triggerInputEvent(el);
     }
   },
-
-  unbind(el) {
-    el.removeEventListener("input", el.__integerInputHandler__);
-    el.removeEventListener("blur", el.__integerBlurHandler__);
-
-    delete el.__integerInputHandler__;
-    delete el.__integerBlurHandler__;
+  unmounted(el) {
+    if (el.__integerInputHandler__) {
+      el.removeEventListener("input", el.__integerInputHandler__);
+      delete el.__integerInputHandler__;
+    }
+    if (el.__integerBlurHandler__) {
+      el.removeEventListener("blur", el.__integerBlurHandler__);
+      delete el.__integerBlurHandler__;
+    }
   },
-});
-
-Vue.directive("decimal", {
   bind(el) {
+    this.beforeMount(el);
+  },
+  inserted(el) {
+    this.mounted(el);
+  },
+  unbind(el) {
+    this.unmounted(el);
+  },
+};
+Vue.directive("integer", integerDirective);
+
+const decimalDirective = {
+  beforeMount(el) {
     const handleInput = () => {
       const originalValue = el.value;
 
       let sanitizedValue = originalValue
-        .replace(/[^\d.-]/g, "") // allow digits, minus and decimal point
-        .replace(/(?!^)-/g, ""); // allow minus only at the beginning
+        .replace(/[^\d.-]/g, "")
+        .replace(/(?!^)-/g, "");
 
-      // Allow only one decimal point
       const parts = sanitizedValue.split(".");
       if (parts.length > 2) {
         sanitizedValue = `${parts.shift()}.${parts.join("")}`;
@@ -158,31 +197,64 @@ Vue.directive("decimal", {
     el.addEventListener("input", handleInput);
     el.addEventListener("blur", handleBlur);
   },
-
-  inserted(el) {
+  mounted(el) {
     if (el.value === "" || el.value === "-") {
       el.value = "1";
       triggerInputEvent(el);
     }
   },
-
-  unbind(el) {
-    el.removeEventListener("input", el.__decimalInputHandler__);
-    el.removeEventListener("blur", el.__decimalBlurHandler__);
-
-    delete el.__decimalInputHandler__;
-    delete el.__decimalBlurHandler__;
+  unmounted(el) {
+    if (el.__decimalInputHandler__) {
+      el.removeEventListener("input", el.__decimalInputHandler__);
+      delete el.__decimalInputHandler__;
+    }
+    if (el.__decimalBlurHandler__) {
+      el.removeEventListener("blur", el.__decimalBlurHandler__);
+      delete el.__decimalBlurHandler__;
+    }
   },
-});
+  bind(el) {
+    this.beforeMount(el);
+  },
+  inserted(el) {
+    this.mounted(el);
+  },
+  unbind(el) {
+    this.unmounted(el);
+  },
+};
+Vue.directive("decimal", decimalDirective);
 
 import router from "./router";
 import MainFooter from "./components/Layout/Footer.vue";
 import MainHeader from "./components/Layout/Header.vue";
 import SideBar from "./components/Layout/Menu.vue";
 import store from "./store";
+import VSelectAdapter from "./components/Common/VSelectAdapter.vue";
+Vue.component("v-select", VSelectAdapter);
+import DatePickerAdapter from "./components/Common/DatePickerAdapter.vue";
+Vue.component("date-picker", DatePickerAdapter);
+Vue.component("DatePicker", DatePickerAdapter);
+import StarRatingAdapter from "./components/Common/StarRatingAdapter.vue";
+Vue.component("star-rating", StarRatingAdapter);
+Vue.component("StarRating", StarRatingAdapter);
+import SliderAdapter from "./components/Common/SliderAdapter.vue";
+Vue.component("vue-slider", SliderAdapter);
+Vue.component("VueSlider", SliderAdapter);
+import RouterLinkAdapter from "./components/Common/RouterLinkAdapter.vue";
+Vue.component("router-link", RouterLinkAdapter);
+Vue.component("RouterLink", RouterLinkAdapter);
+import RouterViewAdapter from "./components/Common/RouterViewAdapter.vue";
+Vue.component("router-view", RouterViewAdapter);
+Vue.component("RouterView", RouterViewAdapter);
 
-// import VueQuill from 'vue-quill';
-// Vue.use(VueQuill);
+Vue.prototype.$router = router;
+Object.defineProperty(Vue.prototype, "$route", {
+  get() {
+    return router.currentRoute.value;
+  },
+  configurable: true,
+});
 
 /***Declaring variables here **/
 const base_url = window.location.origin;
@@ -199,19 +271,64 @@ let global = {
 window.global = global;
 
 /**
- * Event Definition
- * **/
-window.Event = new (class {
+ * Universal EventBus Implementation (Compatible with Vue 2 and Vue 3)
+ **/
+class EventBus {
   constructor() {
-    this.vue = new Vue();
+    this.events = Object.create(null);
+    this.vue = {
+      $emit: (event, ...args) => this.fire(event, ...args),
+      $on: (event, callback) => this.listen(event, callback),
+      $off: (event, callback) => this.off(event, callback),
+      $once: (event, callback) => {
+        const onceWrapper = (...args) => {
+          this.off(event, onceWrapper);
+          callback(...args);
+        };
+        this.listen(event, onceWrapper);
+      },
+    };
   }
-  fire(event, data = null) {
-    this.vue.$emit(event, data);
+
+  fire(event, ...args) {
+    if (!this.events[event]) return;
+    const listeners = [...this.events[event]];
+    for (let i = 0; i < listeners.length; i++) {
+      try {
+        listeners[i](...args);
+      } catch (err) {
+        console.error(`Error in event listener for "${event}":`, err);
+      }
+    }
   }
+
   listen(event, callback) {
-    this.vue.$on(event, callback);
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(callback);
+    return () => this.off(event, callback);
   }
-})();
+
+  off(event, callback) {
+    if (!event) {
+      this.events = Object.create(null);
+      return;
+    }
+    if (!callback) {
+      delete this.events[event];
+      return;
+    }
+    if (this.events[event]) {
+      this.events[event] = this.events[event].filter((cb) => cb !== callback);
+      if (this.events[event].length === 0) {
+        delete this.events[event];
+      }
+    }
+  }
+}
+
+window.Event = new EventBus();
 
 router.beforeEach((to, from, next) => {
   if (!window.hasOwnProperty("cdn")) {
@@ -228,7 +345,7 @@ router.beforeEach((to, from, next) => {
   }
 
   //this will check for all the path
-  if (window.$cookies.isKey("_token")) {
+  if (window.$cookies && window.$cookies.isKey("_token")) {
     let auth = base_url + "/api/admin/details";
     axios({
       method: "get",
@@ -239,67 +356,58 @@ router.beforeEach((to, from, next) => {
       },
     })
       .then(function(response) {
-        // console.log(response);
-        //check if the user is from the subdomain or from zopdealer.
-        // If both of these conditions do not satisfy throw error.
         window.global.app_metadata = response.data.app_metadata;
         window.global.user_metadata = response.data.user_metadata;
         window.global.guest = false;
         window.global.user = response.data;
         if (to.path == "/api/admin/login") {
-          //If user types login url then send it to dashboard
           next("/");
         } else {
-          //goto the next route
           next();
         }
       })
       .catch((error) => {
-        //Error remove the token.
-        window.$cookies.set("_token", "", "0", "/", true);
-        window.$cookies.set("_access_token", "", "0", "/", true);
+        if (window.$cookies) {
+          window.$cookies.set("_token", "", "0", "/", true);
+          window.$cookies.set("_access_token", "", "0", "/", true);
+        }
         window.global.user = "";
         window.global.guest = true;
         if (to.path == "/api/admin/login") {
-          //If user going to login let him go
           next();
         } else {
-          //Other urls cannot be access without login so force him to login.
           window.location = base_url + "/api/admin/login";
         }
       });
   } else {
     if (to.path == "/api/admin/login") {
-      //If user going to login let him go
       next();
     } else {
-      //Other urls cannot be access without login so force him to login.
       window.location = base_url + "/api/admin/login";
     }
   }
 });
 
-new Vue({
-  el: "#app",
+const RootComponent = {
   components: {
     SideBar,
     MainHeader,
     MainFooter,
   },
-  data: {
-    global: window.global,
+  data() {
+    return {
+      global: window.global,
+    };
   },
   router,
   store,
   computed: {
     application() {
       let application_name = "";
-      if (this.global.hasOwnProperty("hostname")) {
-        //find first dot and then remove the complete string.
+      if (this.global && this.global.hasOwnProperty("hostname")) {
         let hostname = this.global.hostname;
         hostname = hostname.split(".");
         if (hostname.length > 2 && hostname[0] != "www") {
-          //check if the user belongs to the same tenant or is it zopdealer employee
           application_name =
             hostname[0] == this.global.app_metadata.organization ||
             this.global.app_metadata.organization == "zopdealer"
@@ -311,21 +419,54 @@ new Vue({
         }
         return application_name;
       }
+      return "";
     },
     app_metadata() {
       let app_metadata = {};
-      if (this.global.hasOwnProperty("app_metadata")) {
+      if (this.global && this.global.hasOwnProperty("app_metadata")) {
         app_metadata = this.global.app_metadata;
       }
       return app_metadata;
     },
     user_metadata() {
       let user_metadata = {};
-      if (this.global.hasOwnProperty("user_metadata")) {
+      if (this.global && this.global.hasOwnProperty("user_metadata")) {
         user_metadata = this.global.user_metadata;
       }
       return user_metadata;
     },
   },
   created() {},
-});
+};
+
+const app = createApp(RootComponent);
+
+app.use(router);
+
+// Ensure global properties are bound to Vue 3 app instance
+app.config.globalProperties.$helpers = Helpers;
+if (window.$cookies) {
+  app.config.globalProperties.$cookies = window.$cookies;
+}
+
+app.component("SideBar", SideBar);
+app.component("MainHeader", MainHeader);
+app.component("MainFooter", MainFooter);
+app.component("v-select", VSelectAdapter);
+app.component("date-picker", DatePickerAdapter);
+app.component("DatePicker", DatePickerAdapter);
+app.component("star-rating", StarRatingAdapter);
+app.component("StarRating", StarRatingAdapter);
+app.component("vue-slider", SliderAdapter);
+app.component("VueSlider", SliderAdapter);
+app.component("RouterLink", RouterLinkAdapter);
+app.component("router-link", RouterLinkAdapter);
+app.component("RouterView", RouterViewAdapter);
+app.component("router-view", RouterViewAdapter);
+
+app.directive("uppercase", uppercaseDirective);
+app.directive("integer", integerDirective);
+app.directive("decimal", decimalDirective);
+app.directive("debounce", debounceDirective);
+
+app.mount("#app");

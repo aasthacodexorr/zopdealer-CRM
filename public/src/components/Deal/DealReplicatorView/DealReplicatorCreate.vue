@@ -242,7 +242,7 @@ export default {
       vm.save();
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_deal_template", null);
   },
 };

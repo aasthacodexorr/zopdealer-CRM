@@ -68,7 +68,7 @@
       <div class="col-12 p-0 pb-25">
         <label for="">Trim</label>
         <span class="float-right" style="font-weight: 600">{{
-          form.trim | truncate(20, "...")
+          $helpers.truncate(form.trim, 20, "...")
         }}</span>
       </div>
       <div class="col-12 p-0 pb-25">
@@ -182,7 +182,7 @@
           <label
             class="d-block"
             style="font-weight: 600; letter-spacing: 1px"
-            >{{ each_note.title | truncate(50, "...") }}</label
+            >{{ $helpers.truncate(each_note.title, 50, "...") }}</label
           >
         </div>
 
@@ -573,7 +573,7 @@ export default {
       vm.$data.isOpen = true;
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("change_selected_inventory_id_for_snapshot", null);
   },
 };

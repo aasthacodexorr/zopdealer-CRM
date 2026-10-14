@@ -50,7 +50,7 @@
                                     class="d-inline-block flex-fill"
                                     @click="changeReportView(lead_view.id)"
                                     >{{
-                                      lead_view.header | truncate(25, "...")
+                                      $helpers.truncate(lead_view.header, 25, "...")
                                     }}</span
                                   ><router-link
                                     tag="td"
@@ -87,7 +87,7 @@
                                       class="d-inline-block flex-fill"
                                       @click="changeReportView(lead_view.id)"
                                       >{{
-                                        lead_view.header | truncate(25, "...")
+                                        $helpers.truncate(lead_view.header, 25, "...")
                                       }}</span
                                     ><router-link
                                       tag="td"

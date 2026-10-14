@@ -204,7 +204,7 @@ export default {
       vm.getVehicleInformationForVIN(vin);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off(`load_available_trims_for_a_vin_${this.elementId}`, null);
   },
 };

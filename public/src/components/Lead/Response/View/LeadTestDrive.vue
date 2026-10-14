@@ -144,7 +144,7 @@ export default {
   async created() {
     await this.getLeadTestDrives(this.module, this.module_id);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("testdrive_count", null);
   },
 };

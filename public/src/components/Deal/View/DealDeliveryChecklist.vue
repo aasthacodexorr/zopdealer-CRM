@@ -78,8 +78,9 @@
                                 <template
                                   v-for="(section,
                                   main_index) in vehicle_delivery_checklist.sections"
+                                  :key="section.name"
                                 >
-                                  <tr :key="section.name" class="thead-dark">
+                                  <tr class="thead-dark">
                                     <th scope="col" colspan="4">
                                       {{ section.name }}
                                     </th>
@@ -415,7 +416,7 @@ export default {
     await this.getDeliveryChecklistConfigurations();
     await this.getDeliveryChecklist();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("delivery_checklist_count", null);
   },
 };

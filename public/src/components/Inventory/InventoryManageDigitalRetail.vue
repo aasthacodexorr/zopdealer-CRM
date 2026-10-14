@@ -410,7 +410,7 @@ export default {
       );
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_complete", null);
   },
 };

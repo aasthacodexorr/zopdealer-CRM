@@ -209,7 +209,7 @@ export default {
       vm.resetBulkColumns();
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("reset_selected_columns", null);
   }
 };

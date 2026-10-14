@@ -1012,7 +1012,7 @@ export default {
 
     this.getAllUsers();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_inventory", null);
     Event.vue.$off("save_inventory_purchase", null);
     Event.vue.$off("save_inventory_disclosures", null);

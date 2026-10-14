@@ -60,7 +60,7 @@
                             <td class="p-1">
                               <h6 class="col-12">{{ cost.name }}</h6>
                               <p class="col-12" style="font-size: 0.8em">
-                                {{ cost.description | truncate(50, "...") }}
+                                {{ $helpers.truncate(cost.description, 50, "...") }}
                               </p>
                             </td>
                             <td class="text-center p-0">

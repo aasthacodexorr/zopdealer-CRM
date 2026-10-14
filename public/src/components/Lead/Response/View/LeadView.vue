@@ -405,7 +405,7 @@ export default {
     this.getPlaceholder();
     this.getLeadResponse(this.id);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_complete", null);
     Event.vue.$off("save_lead", null);
     Event.vue.$off("get_lead_email", null);

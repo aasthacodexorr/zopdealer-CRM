@@ -1445,9 +1445,8 @@
                         <div class="card-content">
                           <div id="v-standard" class="card-body">
                             <ul class="list-unstyled mb-0 feactures-check">
-                              <template v-for="(value, key) in this.standard">
+                              <template v-for="(value, key) in this.standard" :key="key">
                                 <li
-                                  :key="key"
                                   class="card-header border-line-bottom-title mr-2 mb-1"
                                   style="
                                     width: 100%;
@@ -1522,9 +1521,9 @@
                               <template
                                 v-for="(value, header) in this
                                   .generic_equipment"
+                                :key="header"
                               >
                                 <li
-                                  :key="header"
                                   class="card-header border-line-bottom-title mr-2 mb-1"
                                   style="
                                     width: 100%;
@@ -1623,9 +1622,9 @@
                               <template
                                 v-for="(value, header) in this
                                   .technical_specification"
+                                :key="header"
                               >
                                 <li
-                                  :key="header"
                                   class="card-header border-line-bottom-title mr-2 mb-1"
                                   style="
                                     width: 100%;
@@ -1733,9 +1732,9 @@
                               <template
                                 v-for="(value, key) in this
                                   .technical_specification"
+                                :key="key"
                               >
                                 <li
-                                  :key="key"
                                   class="card-header border-line-bottom-title mr-2 mb-1"
                                   style="
                                     width: 100%;
@@ -1811,9 +1810,8 @@
                         <div class="card-content">
                           <div id="v-standard" class="card-body">
                             <ul class="list-unstyled mb-0 feactures-check">
-                              <template v-for="(value, key) in this.optional">
+                              <template v-for="(value, key) in this.optional" :key="key">
                                 <li
-                                  :key="key"
                                   class="card-header border-line-bottom-title mr-2 mb-1"
                                   style="
                                     width: 100%;
@@ -3004,7 +3002,7 @@ export default {
       vm.getVehicleInformation(data);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_complete", null);
     Event.vue.$off("change_inventory_selling_price", null);
     Event.vue.$off("change_inventory", null);

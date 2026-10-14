@@ -89,7 +89,7 @@ var components = {
         },
       },
       template:
-        "<span :title='pascalCase' >{{pascalCase | truncate(15, '...') }}</span>",
+        "<span :title='pascalCase' >{{$helpers.truncate(pascalCase, 15, '...') }}</span>",
     },
   },
   phone: {

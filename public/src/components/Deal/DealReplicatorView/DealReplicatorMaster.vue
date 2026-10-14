@@ -146,7 +146,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_deal_template", null);
     Event.vue.$off("save_deal_template_complete", null);
     Event.vue.$off("change_retail_or_wholesale", null);

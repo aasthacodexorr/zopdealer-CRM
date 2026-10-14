@@ -1,4 +1,4 @@
-import VueRouter from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 let routes = [
   {
@@ -650,7 +650,6 @@ let routes = [
     name: "tenant-account-website-settings",
     component: require("./components/Settings/WebsiteSetting").default,
   },
-  ,
   {
     path: "/tenant-account/ai-studio-settings",
     name: "tenant-account-ai-studio-settings",
@@ -725,7 +724,10 @@ let routes = [
   }
 ];
 
-export default new VueRouter({
+const router = createRouter({
+  history: createWebHashHistory(),
   routes,
   linkActiveClass: "active",
 });
+
+export default router;

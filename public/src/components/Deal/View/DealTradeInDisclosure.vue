@@ -611,7 +611,7 @@ export default {
       vm.addPrefilledTemplate(template);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_deal_trade_in_disclosures_complete", null);
   },
 };

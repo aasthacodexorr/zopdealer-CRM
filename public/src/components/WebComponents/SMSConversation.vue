@@ -365,7 +365,7 @@ export default {
       div.scrollTop = div.scrollHeight + 10;
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.socket.hasListeners("notification")) {
       this.socket.removeListener("notification", this.socketListener);
     }

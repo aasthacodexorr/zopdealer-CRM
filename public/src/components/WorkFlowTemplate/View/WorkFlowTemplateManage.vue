@@ -168,7 +168,7 @@ export default {
       );
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_workflow_template", null);
     Event.vue.$off("save_workflow_template_complete", null);
   },

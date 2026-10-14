@@ -1012,7 +1012,7 @@ export default {
       });
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("reset_listing_page", null);
     Event.vue.$off("reset_selected_rows", null);
     Event.vue.$off("reset_current_pagination", null);

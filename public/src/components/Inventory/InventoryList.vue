@@ -55,8 +55,11 @@
                                       changeInventoryView(inventory_view.id)
                                     "
                                     >{{
-                                      inventory_view.header
-                                        | truncate(25, "...")
+                                      $helpers.truncate(
+                                        inventory_view.header,
+                                        25,
+                                        "..."
+                                      )
                                     }}</span
                                   ><router-link
                                     tag="td"
@@ -97,8 +100,11 @@
                                         changeInventoryView(inventory_view.id)
                                       "
                                       >{{
-                                        inventory_view.header
-                                          | truncate(25, "...")
+                                        $helpers.truncate(
+                                          inventory_view.header,
+                                          25,
+                                          "..."
+                                        )
                                       }}</span
                                     ><router-link
                                       tag="td"
@@ -2268,7 +2274,7 @@ export default {
       },
     );
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("update_bulk_syndication", null);
   },
 };

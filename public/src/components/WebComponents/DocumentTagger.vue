@@ -498,7 +498,7 @@ export default {
         }
     );
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("document_tagging_initialize", null);
     Event.vue.$off("document_tagging_cleanup", null);
   },

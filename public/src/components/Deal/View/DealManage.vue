@@ -1711,7 +1711,7 @@ export default {
       vm.$helpers.gTagClickEvent(vm, "zd_action", "deal", "deal_general", "");
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_deal", null);
     Event.vue.$off("save_deal_complete", null);
 

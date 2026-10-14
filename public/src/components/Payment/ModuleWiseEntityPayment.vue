@@ -297,7 +297,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("reload_payments", null);
   },
 };

@@ -37,10 +37,10 @@
       <!-- Inspection Title (Primary) -->
       <div class="mb-1">
         <h4 class="text-uppercase mb-0 text-primary" style="font-weight: 700">
-          {{ form.title | truncate(50, "...") }}
+          {{ $helpers.truncate(form.title, 50, "...") }}
         </h4>
         <small class="text-muted">{{
-          form.description | truncate(70, "...")
+          $helpers.truncate(form.description, 70, "...")
         }}</small>
       </div>
       <div class="mt-25 mb-25">
@@ -124,7 +124,7 @@
         <div class="col-12 p-0 pb-25">
           <label for="">Trim</label>
           <span class="float-right" style="font-weight: 600">{{
-            form.inventory.trim | truncate(20, "...")
+            $helpers.truncate(form.inventory.trim, 20, "...")
           }}</span>
         </div>
         <div class="col-12 p-0 pb-25">
@@ -153,8 +153,8 @@
         <hr />
       </template>
       <!-- Issues -->
-      <template v-for="item in getFailedItems">
-        <div class="col-12 p-0 pb-50" :key="`failed_item_${item.id}`">
+      <template v-for="item in getFailedItems" :key="`failed_item_${item.id}`">
+        <div class="col-12 p-0 pb-50">
           <label class="d-block mb-25" style="font-weight: 600">
             {{ item.title }}
           </label>
@@ -172,7 +172,7 @@
           </small>
         </div>
 
-        <hr :key="`hr_failed_item_${item.id}`" />
+        <hr />
       </template>
       <div
         v-if="entity_id && form.inventory.vin !== ''"
@@ -340,7 +340,7 @@ export default {
       vm.$data.isOpen = true;
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("change_selected_dvi_id_for_snapshot", null);
   },
 };

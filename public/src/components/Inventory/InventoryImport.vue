@@ -3374,7 +3374,7 @@ export default {
       vm.getVehicleInformation(data);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("load_available_data_for_a_vin_default", null);
   },
 };

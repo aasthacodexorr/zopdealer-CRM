@@ -3563,8 +3563,7 @@
                                             >
                                               <td class="text-center">
                                                 {{
-                                                  deal_fee.name
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_fee.name, 25, "...")
                                                 }}
                                               </td>
                                               <td class="text-center">
@@ -3732,8 +3731,7 @@
                                             >
                                               <td class="text-center">
                                                 {{
-                                                  deal_accessory.name
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_accessory.name, 25, "...")
                                                 }}
                                               </td>
                                               <td class="text-center">
@@ -3911,14 +3909,12 @@
                                             >
                                               <td class="text-center">
                                                 {{
-                                                  deal_warranty.company_name
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_warranty.company_name, 25, "...")
                                                 }}
                                                 <hr />
                                                 <small>
                                                   {{
-                                                    deal_warranty.description
-                                                      | truncate(25, "...")
+                                                    $helpers.truncate(deal_warranty.description, 25, "...")
                                                   }}
                                                 </small>
                                               </td>
@@ -4091,14 +4087,12 @@
                                             >
                                               <td class="text-center">
                                                 {{
-                                                  deal_guarantee.company_name
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_guarantee.company_name, 25, "...")
                                                 }}
                                                 <hr />
                                                 <small>
                                                   {{
-                                                    deal_guarantee.description
-                                                      | truncate(25, "...")
+                                                    $helpers.truncate(deal_guarantee.description, 25, "...")
                                                   }}
                                                 </small>
                                               </td>
@@ -4270,14 +4264,12 @@
                                             >
                                               <td class="text-center">
                                                 {{
-                                                  deal_insurance.type
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_insurance.type, 25, "...")
                                                 }}
                                                 <hr />
                                                 <small>
                                                   {{
-                                                    deal_insurance.description
-                                                      | truncate(25, "...")
+                                                    $helpers.truncate(deal_insurance.description, 25, "...")
                                                   }}
                                                 </small>
                                               </td>
@@ -4438,14 +4430,12 @@
                                             >
                                               <td class="text-center">
                                                 {{
-                                                  deal_payment.type
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_payment.type, 25, "...")
                                                 }}
                                               </td>
                                               <td class="text-center">
                                                 {{
-                                                  deal_payment.description
-                                                    | truncate(25, "...")
+                                                  $helpers.truncate(deal_payment.description, 25, "...")
                                                 }}
                                               </td>
                                               <td class="text-center">
@@ -6016,7 +6006,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("add_deal_import_worksheet_entity", null);
     Event.vue.$off("deal_import_worksheet_entity_save", null);
     Event.vue.$off("autopopulate_location_default", null);

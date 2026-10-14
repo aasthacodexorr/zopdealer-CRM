@@ -57,8 +57,11 @@
                                       )
                                     "
                                     >{{
-                                      lead_response_view.header
-                                        | truncate(25, "...")
+                                      $helpers.truncate(
+                                        lead_response_view.header,
+                                        25,
+                                        "..."
+                                      )
                                     }}</span
                                   ><router-link
                                     tag="td"
@@ -100,8 +103,11 @@
                                         )
                                       "
                                       >{{
-                                        lead_response_view.header
-                                          | truncate(25, "...")
+                                        $helpers.truncate(
+                                          lead_response_view.header,
+                                          25,
+                                          "..."
+                                        )
                                       }}</span
                                     ><router-link
                                       tag="td"

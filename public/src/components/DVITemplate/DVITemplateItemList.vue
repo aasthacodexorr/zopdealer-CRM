@@ -70,7 +70,7 @@
                     <td>
                       <div class="h6">{{ template.title }}</div>
                       <div class="small">
-                        {{ template.description | truncate(75) }}
+                        {{ $helpers.truncate(template.description, 75) }}
                       </div>
                     </td>
                     <td>

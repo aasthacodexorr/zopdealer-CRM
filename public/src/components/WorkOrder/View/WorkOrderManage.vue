@@ -246,7 +246,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_work_order", null);
     Event.vue.$off("save_work_order_complete", null);
   },

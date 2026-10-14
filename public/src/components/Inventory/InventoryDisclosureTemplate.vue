@@ -332,7 +332,7 @@ export default {
       }
     );
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off(`add_prefilled_template_${this.elementId}`, null);
   },
 };

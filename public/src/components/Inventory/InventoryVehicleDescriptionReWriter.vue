@@ -546,7 +546,7 @@ export default {
       toast.close();
     },
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("update_vehicle_description", null);
   },
 };

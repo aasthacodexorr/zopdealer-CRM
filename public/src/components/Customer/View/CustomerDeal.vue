@@ -168,7 +168,7 @@ export default {
       vm.getAllCustomerDeals(this.$route.params.id);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("deal_count", null);
   }
 };

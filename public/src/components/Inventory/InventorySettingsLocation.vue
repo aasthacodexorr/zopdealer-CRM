@@ -874,7 +874,7 @@ export default {
       vm.resetForm();
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     console.log("Destroy called");
   },
 };

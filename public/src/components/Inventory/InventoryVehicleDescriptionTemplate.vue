@@ -401,7 +401,7 @@ export default {
       }
     );
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("update_vehicle_description", null);
   }
 };

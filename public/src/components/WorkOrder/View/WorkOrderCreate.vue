@@ -330,7 +330,7 @@
                         </h4>
                         <li class="list-group-item">
                           TRIM :
-                          {{ inventory.trim | truncate(20, "...") }}
+                          {{ $helpers.truncate(inventory.trim, 20, "...") }}
                         </li>
                         <li class="list-group-item">
                           VIN :
@@ -953,7 +953,7 @@ export default {
       vm.save();
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_work_order", null);
   },
 };

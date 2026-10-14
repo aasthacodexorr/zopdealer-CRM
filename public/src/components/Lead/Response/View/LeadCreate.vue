@@ -963,7 +963,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_complete", null);
     Event.vue.$off("save_lead", null);
     Event.vue.$off("autopopulate_location_lead_address", null);

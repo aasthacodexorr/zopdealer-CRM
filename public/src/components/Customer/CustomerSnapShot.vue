@@ -83,7 +83,7 @@
           title="Click to Copy"
           @click="doCopy(`${form.company_name}`)"
           style="font-weight: 600"
-          >{{ form.company_name | truncate(20, "...") }}</span
+          >{{ $helpers.truncate(form.company_name, 20, "...") }}</span
         >
       </div>
       <hr />
@@ -113,7 +113,7 @@
           <label
             class="d-block"
             style="font-weight: 600; letter-spacing: 1px"
-            >{{ each_note.title | truncate(50, "...") }}</label
+            >{{ $helpers.truncate(each_note.title, 50, "...") }}</label
           >
         </div>
 
@@ -449,7 +449,7 @@ export default {
       vm.$data.isOpen = true;
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("change_selected_customer_id_for_snapshot", null);
   },
 };

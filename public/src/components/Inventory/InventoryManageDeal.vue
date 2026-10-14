@@ -183,7 +183,7 @@ export default {
       vm.getAllInventoryDeals(this.$route.params.id);
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("deal_count", null);
   },
 };

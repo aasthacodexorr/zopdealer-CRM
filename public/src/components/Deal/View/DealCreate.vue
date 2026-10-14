@@ -1873,7 +1873,7 @@ export default {
       vm.addPrefilledTemplate(template);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_deal", null);
     Event.vue.$off("update_worksheet_data", null);
   },

@@ -615,7 +615,7 @@ export default {
       vm.addPrefilledTemplate(template);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_complete", null);
   },
 };

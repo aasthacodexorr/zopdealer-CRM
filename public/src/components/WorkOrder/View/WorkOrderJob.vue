@@ -270,8 +270,11 @@
                                     </h6>
                                     <p class="card-text">
                                       {{
-                                        work_order.description
-                                          | truncate(250, "...")
+                                        $helpers.truncate(
+                                          work_order.description,
+                                          250,
+                                          "..."
+                                        )
                                       }}
                                     </p>
                                     <hr class="w-100" />
@@ -375,8 +378,11 @@
                                                   style="font-size:0.8em;"
                                                 >
                                                   {{
-                                                    product.description
-                                                      | truncate(50, "...")
+                                                    $helpers.truncate(
+                                                      product.description,
+                                                      50,
+                                                      "..."
+                                                    )
                                                   }}
                                                 </p>
                                               </td>

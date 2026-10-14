@@ -204,7 +204,7 @@ export default {
       }
     );
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("event_payment_refund", null);
   },
 };

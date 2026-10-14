@@ -650,7 +650,6 @@
             <span class="menu-title" data-i18n="Content">Super Settings</span>
           </a>
           <transition name="fade">
-            >
             <ul v-if="tenantApp && selected == 'SuperSettings'">
               <router-link
                 tag="li"
@@ -720,7 +719,6 @@
             <span class="menu-title" data-i18n="Content">Import Settings</span>
           </a>
           <transition name="fade">
-            >
             <ul v-if="tenantApp && selected == 'ImportSettings'">
               <router-link
                 tag="li"

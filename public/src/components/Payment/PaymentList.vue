@@ -49,7 +49,7 @@
                                   ><span
                                   class="d-inline-block flex-fill"
                                   @click="changePaymentView(payment_view.id)"
-                                    >{{ payment_view.header | truncate(25, "...") }}</span
+                                    >{{ $helpers.truncate(payment_view.header, 25, "...") }}</span
                                   ><router-link
                                     tag="td"
                                     class="d-inline-block"
@@ -82,7 +82,7 @@
                                   ><span
                                   class="d-inline-block flex-fill"
                                   @click="changePaymentView(payment_view.id)"
-                                    >{{ payment_view.header | truncate(25, "...") }}</span
+                                    >{{ $helpers.truncate(payment_view.header, 25, "...") }}</span
                                   ><router-link
                                     tag="td"
                                     class="d-inline-block"

@@ -3953,7 +3953,7 @@ export default {
       }
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_credit_application_complete", null);
     Event.vue.$off("autopopulate_location_previous_address", null);
     Event.vue.$off("autopopulate_location_previous_employer_address", null);

@@ -63,12 +63,15 @@
                         :key="`deal_replicator_fee` + deal_replicator_fee.id"
                       >
                         <td class="text-center">
-                          {{ deal_replicator_fee.name | truncate(25, "...") }}
+                          {{ $helpers.truncate(deal_replicator_fee.name, 25, "...") }}
                         </td>
                         <td class="text-center">
                           {{
-                            deal_replicator_fee.description
-                              | truncate(50, "...")
+                            $helpers.truncate(
+                              deal_replicator_fee.description,
+                              50,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
@@ -207,13 +210,20 @@
                       >
                         <td class="text-center">
                           {{
-                            deal_replicator_accessory.name | truncate(25, "...")
+                            $helpers.truncate(
+                              deal_replicator_accessory.name,
+                              25,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
                           {{
-                            deal_replicator_accessory.description
-                              | truncate(50, "...")
+                            $helpers.truncate(
+                              deal_replicator_accessory.description,
+                              50,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
@@ -356,14 +366,20 @@
                       >
                         <td class="text-center">
                           {{
-                            deal_replicator_warranty.company_name
-                              | truncate(25, "...")
+                            $helpers.truncate(
+                              deal_replicator_warranty.company_name,
+                              25,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
                           {{
-                            deal_replicator_warranty.description
-                              | truncate(50, "...")
+                            $helpers.truncate(
+                              deal_replicator_warranty.description,
+                              50,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
@@ -503,14 +519,20 @@
                       >
                         <td class="text-center">
                           {{
-                            deal_replicator_guarantee.company_name
-                              | truncate(25, "...")
+                            $helpers.truncate(
+                              deal_replicator_guarantee.company_name,
+                              25,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
                           {{
-                            deal_replicator_guarantee.description
-                              | truncate(50, "...")
+                            $helpers.truncate(
+                              deal_replicator_guarantee.description,
+                              50,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
@@ -653,13 +675,20 @@
                       >
                         <td class="text-center">
                           {{
-                            deal_replicator_insurance.type | truncate(25, "...")
+                            $helpers.truncate(
+                              deal_replicator_insurance.type,
+                              25,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
                           {{
-                            deal_replicator_insurance.description
-                              | truncate(50, "...")
+                            $helpers.truncate(
+                              deal_replicator_insurance.description,
+                              50,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
@@ -795,13 +824,20 @@
                       >
                         <td class="text-center">
                           {{
-                            deal_replicator_payment.type | truncate(25, "...")
+                            $helpers.truncate(
+                              deal_replicator_payment.type,
+                              25,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">
                           {{
-                            deal_replicator_payment.description
-                              | truncate(50, "...")
+                            $helpers.truncate(
+                              deal_replicator_payment.description,
+                              50,
+                              "..."
+                            )
                           }}
                         </td>
                         <td class="text-center">

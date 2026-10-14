@@ -1208,7 +1208,7 @@ export default {
       vm.getVehicleInformation(data);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("save_deal_trade_in_complete", null);
     Event.vue.$off("saved_trade_in", null);
     Event.vue.$off("update_worksheet_data", null);

@@ -63,7 +63,7 @@
                           </span>
                         </h6>
                         <div :title="activity.description" class="col-12 mb-50">
-                          {{ activity.description | truncate(250) }}
+                          {{ $helpers.truncate(activity.description, 250) }}
                         </div>
                         <small class="col-12 d-block text-muted">
                           <span
@@ -1190,7 +1190,7 @@ export default {
       vm.resetForm();
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("activity_count", null);
   },
 };

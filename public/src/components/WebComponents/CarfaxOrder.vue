@@ -625,7 +625,7 @@ export default {
     this.getCarfaxAvailability();
     this.getAllUsers();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     Event.vue.$off("vehicle_history_report_update", null);
   },
 };
