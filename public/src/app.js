@@ -442,6 +442,11 @@ const RootComponent = {
 const app = createApp(RootComponent);
 
 app.use(router);
+app.use(store);
+
+if (Vue && Vue.prototype) {
+  Vue.prototype.$store = store;
+}
 
 // Ensure global properties are bound to Vue 3 app instance
 app.config.globalProperties.$helpers = Helpers;

@@ -826,12 +826,6 @@
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
 
-/**
- * vuex v3.1.3
- * (c) 2020 Evan You
- * @license MIT
- */
-
 /**!
  * Sortable 1.10.2
  * @author	RubaXa   <trash@rubaxa.org>

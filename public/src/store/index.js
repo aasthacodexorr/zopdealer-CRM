@@ -1,5 +1,4 @@
-import Vuex from "vuex";
-import Vue from "vue";
+import { createStore } from "vuex";
 import inventoryView from "./modules/inventoryView";
 import inventory from "./modules/inventory";
 import leadResponse from "./modules/leadResponse";
@@ -47,11 +46,9 @@ import testDrive from "./modules/testDrive";
 import testDriveView from "./modules/testDriveView";
 import dVIView from "./modules/dVIView";
 import dVI from "./modules/dVI";
-// Load Vuex
-Vue.use(Vuex);
 
 // Create store
-export default new Vuex.Store({
+export default createStore({
   modules: {
     inventoryView,
     inventory,
