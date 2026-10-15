@@ -700,7 +700,7 @@ export default {
           } else {
             this.form.rin_or_dl_flag = "1";
             this.form.rin = "";
-            Vue.nextTick(() => {
+            this.$nextTick(() => {
               document.getElementById(
                 "driver_licence_expiry_date"
               ).firstElementChild.placeholder = "DL Expiry Date";
@@ -714,7 +714,7 @@ export default {
     },
     "form.rin_or_dl_flag": function (newVal, oldVal) {
       if (parseInt(newVal) == 1) {
-        Vue.nextTick(() => {
+        this.$nextTick(() => {
           document.getElementById(
             "driver_licence_expiry_date"
           ).firstElementChild.placeholder = "DL Expiry Date";

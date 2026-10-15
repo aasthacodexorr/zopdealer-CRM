@@ -71,11 +71,11 @@
     <div v-if="application">
       <!-- BEGIN: Header-->
       <div class="header-navbar-shadow"></div>
-      <main-header :application=application :app_metadata=app_metadata :user_metadata=user_metadata></main-header>
+      <main-header :application="application" :app_metadata="app_metadata" :user_metadata="user_metadata"></main-header>
       <!-- END: Header-->
-      <side-bar :application=application :app_metadata=app_metadata :user_metadata=user_metadata></side-bar>
+      <side-bar :application="application" :app_metadata="app_metadata" :user_metadata="user_metadata"></side-bar>
 
-      <router-view :application=application :app_metadata=app_metadata :user_metadata=user_metadata :key="$route.fullPath"></router-view>
+      <router-view :application="application" :app_metadata="app_metadata" :user_metadata="user_metadata" :key="$route.fullPath"></router-view>
 
       <div class="sidenav-overlay"></div>
       <div class="drag-target"></div>

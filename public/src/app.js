@@ -9,30 +9,59 @@ configureCompat({
 });
 
 import ClipboardPlugin from "./library/ClipboardPlugin.js";
-Vue.use(ClipboardPlugin);
-
 import Helpers from "./library/Helpers.js";
-const plugin = {
+import VueCookies from "vue-cookies";
+import SweetalertPlugin from "./library/SweetalertPlugin.js";
+import "sweetalert2/dist/sweetalert2.min.css";
+import vueDebounce from "vue-debounce";
+import AnalyticsPlugin from "./library/AnalyticsPlugin.js";
+import router from "./router";
+import store from "./store";
+import MainFooter from "./components/Layout/Footer.vue";
+import MainHeader from "./components/Layout/Header.vue";
+import SideBar from "./components/Layout/Menu.vue";
+import VSelectAdapter from "./components/Common/VSelectAdapter.vue";
+import DatePickerAdapter from "./components/Common/DatePickerAdapter.vue";
+import StarRatingAdapter from "./components/Common/StarRatingAdapter.vue";
+import SliderAdapter from "./components/Common/SliderAdapter.vue";
+import RouterLinkAdapter from "./components/Common/RouterLinkAdapter.vue";
+import RouterViewAdapter from "./components/Common/RouterViewAdapter.vue";
+import QuillEditor from "./components/Common/QuillEditor.vue";
+import draggable from "vuedraggable";
+
+// Helpers plugin adapter
+const HelpersPlugin = {
   install(app) {
-    Vue.helpers = Helpers;
-    Vue.prototype.$helpers = Helpers;
     if (app && app.config && app.config.globalProperties) {
       app.config.globalProperties.$helpers = Helpers;
     }
+    // Retain compatibility bridge for Vue 2 / @vue/compat
+    if (Vue) {
+      Vue.helpers = Helpers;
+      if (Vue.prototype) {
+        Vue.prototype.$helpers = Helpers;
+      }
+    }
   },
 };
-Vue.use(plugin);
 
+// VueCookies plugin adapter
+const VueCookiesPlugin = {
+  install(app) {
+    if (app && app.config && app.config.globalProperties) {
+      app.config.globalProperties.$cookies = VueCookies;
+    }
+    window.$cookies = VueCookies;
+    // Retain compatibility bridge for Vue 2 / @vue/compat
+    if (Vue) {
+      Vue.$cookies = VueCookies;
+      if (Vue.prototype) {
+        Vue.prototype.$cookies = VueCookies;
+      }
+    }
+  },
+};
 
-import VueCookies from "vue-cookies";
-Vue.use(VueCookies);
-window.$cookies = VueCookies;
-
-import SweetalertPlugin from "./library/SweetalertPlugin.js";
-import "sweetalert2/dist/sweetalert2.min.css";
-Vue.use(SweetalertPlugin);
-
-import vueDebounce from "vue-debounce";
 const rawDebounce = typeof vueDebounce === "function" ? vueDebounce() : (vueDebounce.default ? vueDebounce.default() : vueDebounce);
 const debounceDirective = {
   ...rawDebounce,
@@ -57,17 +86,10 @@ const debounceDirective = {
     }
   },
 };
-Vue.directive("debounce", debounceDirective);
-
-import AnalyticsPlugin from "./library/AnalyticsPlugin.js";
-Vue.use(AnalyticsPlugin, {
-  config: { id: "G-3RLC81KJ0D" },
-});
 
 const truncate = function(text, length, clamp) {
   return Helpers.truncate(text, length, clamp);
 };
-Vue.filter("truncate", truncate);
 
 function triggerInputEvent(element) {
   const event = document.createEvent("Event");
@@ -100,7 +122,6 @@ const uppercaseDirective = {
     this.unmounted(el);
   },
 };
-Vue.directive("uppercase", uppercaseDirective);
 
 const integerDirective = {
   beforeMount(el) {
@@ -156,7 +177,6 @@ const integerDirective = {
     this.unmounted(el);
   },
 };
-Vue.directive("integer", integerDirective);
 
 const decimalDirective = {
   beforeMount(el) {
@@ -224,45 +244,6 @@ const decimalDirective = {
     this.unmounted(el);
   },
 };
-Vue.directive("decimal", decimalDirective);
-
-import router from "./router";
-import MainFooter from "./components/Layout/Footer.vue";
-import MainHeader from "./components/Layout/Header.vue";
-import SideBar from "./components/Layout/Menu.vue";
-import store from "./store";
-import VSelectAdapter from "./components/Common/VSelectAdapter.vue";
-Vue.component("v-select", VSelectAdapter);
-Vue.component("VSelect", VSelectAdapter);
-import DatePickerAdapter from "./components/Common/DatePickerAdapter.vue";
-Vue.component("date-picker", DatePickerAdapter);
-Vue.component("DatePicker", DatePickerAdapter);
-import StarRatingAdapter from "./components/Common/StarRatingAdapter.vue";
-Vue.component("star-rating", StarRatingAdapter);
-Vue.component("StarRating", StarRatingAdapter);
-import SliderAdapter from "./components/Common/SliderAdapter.vue";
-Vue.component("vue-slider", SliderAdapter);
-Vue.component("VueSlider", SliderAdapter);
-import RouterLinkAdapter from "./components/Common/RouterLinkAdapter.vue";
-Vue.component("router-link", RouterLinkAdapter);
-Vue.component("RouterLink", RouterLinkAdapter);
-import RouterViewAdapter from "./components/Common/RouterViewAdapter.vue";
-Vue.component("router-view", RouterViewAdapter);
-Vue.component("RouterView", RouterViewAdapter);
-import QuillEditor from "./components/Common/QuillEditor.vue";
-Vue.component("quill-editor", QuillEditor);
-Vue.component("QuillEditor", QuillEditor);
-import draggable from "vuedraggable";
-Vue.component("draggable", draggable);
-Vue.component("Draggable", draggable);
-
-Vue.prototype.$router = router;
-Object.defineProperty(Vue.prototype, "$route", {
-  get() {
-    return router.currentRoute.value;
-  },
-  configurable: true,
-});
 
 /***Declaring variables here **/
 const base_url = window.location.origin;
@@ -445,47 +426,96 @@ const RootComponent = {
 
 const app = createApp(RootComponent);
 
-app.use(router);
+// 1. Install plugins once in a safe, deterministic order
 app.use(store);
+app.use(router);
+app.use(HelpersPlugin);
+app.use(VueCookiesPlugin);
 app.use(SweetalertPlugin);
 app.use(ClipboardPlugin);
 app.use(AnalyticsPlugin, {
   config: { id: "G-3RLC81KJ0D" },
 });
 
-if (Vue && Vue.prototype) {
-  Vue.prototype.$store = store;
-}
-
-// Ensure global properties are bound to Vue 3 app instance
+// 2. Shared instance properties on app.config.globalProperties
 app.config.globalProperties.$helpers = Helpers;
-if (window.$cookies) {
-  app.config.globalProperties.$cookies = window.$cookies;
+app.config.globalProperties.$cookies = VueCookies;
+app.config.globalProperties.$store = store;
+app.config.globalProperties.$router = router;
+app.config.globalProperties.$event = window.Event;
+app.config.globalProperties.$filters = {
+  truncate,
+};
+if (!Object.prototype.hasOwnProperty.call(app.config.globalProperties, "$route")) {
+  Object.defineProperty(app.config.globalProperties, "$route", {
+    get() {
+      return router.currentRoute.value;
+    },
+    configurable: true,
+  });
 }
 
-app.component("SideBar", SideBar);
-app.component("MainHeader", MainHeader);
-app.component("MainFooter", MainFooter);
-app.component("v-select", VSelectAdapter);
-app.component("VSelect", VSelectAdapter);
-app.component("date-picker", DatePickerAdapter);
-app.component("DatePicker", DatePickerAdapter);
-app.component("star-rating", StarRatingAdapter);
-app.component("StarRating", StarRatingAdapter);
-app.component("vue-slider", SliderAdapter);
-app.component("VueSlider", SliderAdapter);
-app.component("RouterLink", RouterLinkAdapter);
-app.component("router-link", RouterLinkAdapter);
-app.component("RouterView", RouterViewAdapter);
-app.component("router-view", RouterViewAdapter);
-app.component("quill-editor", QuillEditor);
-app.component("QuillEditor", QuillEditor);
-app.component("draggable", draggable);
-app.component("Draggable", draggable);
+// 3. Intentionally retained compatibility bridges for Vue 2 / @vue/compat
+if (Vue && Vue.prototype) {
+  Vue.prototype.$router = router;
+  Vue.prototype.$store = store;
+  if (!Object.prototype.hasOwnProperty.call(Vue.prototype, "$route")) {
+    Object.defineProperty(Vue.prototype, "$route", {
+      get() {
+        return router.currentRoute.value;
+      },
+      configurable: true,
+    });
+  }
+}
+if (Vue && typeof Vue.filter === "function") {
+  Vue.filter("truncate", truncate);
+}
 
-app.directive("uppercase", uppercaseDirective);
-app.directive("integer", integerDirective);
-app.directive("decimal", decimalDirective);
-app.directive("debounce", debounceDirective);
+// 4. Register global components on app.component (with compatibility bridge on Vue.component)
+const globalComponents = {
+  SideBar,
+  MainHeader,
+  MainFooter,
+  "v-select": VSelectAdapter,
+  VSelect: VSelectAdapter,
+  "date-picker": DatePickerAdapter,
+  DatePicker: DatePickerAdapter,
+  "star-rating": StarRatingAdapter,
+  StarRating: StarRatingAdapter,
+  "vue-slider": SliderAdapter,
+  VueSlider: SliderAdapter,
+  "router-link": RouterLinkAdapter,
+  RouterLink: RouterLinkAdapter,
+  "router-view": RouterViewAdapter,
+  RouterView: RouterViewAdapter,
+  "quill-editor": QuillEditor,
+  QuillEditor: QuillEditor,
+  draggable: draggable,
+  Draggable: draggable,
+};
 
+for (const [name, component] of Object.entries(globalComponents)) {
+  app.component(name, component);
+  if (Vue && typeof Vue.component === "function") {
+    Vue.component(name, component);
+  }
+}
+
+// 5. Register global directives on app.directive (with compatibility bridge on Vue.directive)
+const globalDirectives = {
+  uppercase: uppercaseDirective,
+  integer: integerDirective,
+  decimal: decimalDirective,
+  debounce: debounceDirective,
+};
+
+for (const [name, directive] of Object.entries(globalDirectives)) {
+  app.directive(name, directive);
+  if (Vue && typeof Vue.directive === "function") {
+    Vue.directive(name, directive);
+  }
+}
+
+// 6. Mount application
 app.mount("#app");
