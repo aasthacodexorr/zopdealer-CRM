@@ -1,4 +1,4 @@
-import Vue, { createApp, configureCompat } from "vue";
+import Vue, { createApp, configureCompat, reactive } from "vue";
 window.Vue = Vue;
 window._ = require("lodash");
 window.axios = require("axios");
@@ -26,6 +26,7 @@ Vue.use(plugin);
 
 import VueCookies from "vue-cookies";
 Vue.use(VueCookies);
+window.$cookies = VueCookies;
 
 import SweetalertPlugin from "./library/SweetalertPlugin.js";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -261,16 +262,16 @@ Object.defineProperty(Vue.prototype, "$route", {
 
 /***Declaring variables here **/
 const base_url = window.location.origin;
-let global = {
+let global = reactive({
   guest: true,
   user: "",
   token: "",
-  app_metadata: "",
-  user_metadata: "",
+  app_metadata: {},
+  user_metadata: {},
   base_url: base_url,
   hostname: window.location.hostname,
   cdn: "",
-};
+});
 window.global = global;
 
 /**
@@ -380,6 +381,7 @@ router.beforeEach((to, from, next) => {
           next();
         } else {
           window.location = base_url + "/api/admin/login";
+          next(false);
         }
       });
   } else {
@@ -387,6 +389,7 @@ router.beforeEach((to, from, next) => {
       next();
     } else {
       window.location = base_url + "/api/admin/login";
+      next(false);
     }
   }
 });
@@ -407,36 +410,30 @@ const RootComponent = {
   computed: {
     application() {
       let application_name = "";
-      if (this.global && this.global.hasOwnProperty("hostname")) {
-        let hostname = this.global.hostname;
-        hostname = hostname.split(".");
+      let g = window.global || this.global;
+      if (g && g.hostname) {
+        let hostname = g.hostname.split(".");
+        let org = (g.app_metadata && g.app_metadata.organization) ? g.app_metadata.organization : "";
         if (hostname.length > 2 && hostname[0] != "www") {
           application_name =
-            hostname[0] == this.global.app_metadata.organization ||
-            this.global.app_metadata.organization == "zopdealer"
+            (hostname[0] == org || org == "zopdealer")
               ? "tenant"
               : "";
         } else {
           application_name =
-            this.global.app_metadata.organization == "zopdealer" ? "main" : "";
+            (org == "zopdealer") ? "main" : "";
         }
         return application_name;
       }
       return "";
     },
     app_metadata() {
-      let app_metadata = {};
-      if (this.global && this.global.hasOwnProperty("app_metadata")) {
-        app_metadata = this.global.app_metadata;
-      }
-      return app_metadata;
+      let g = window.global || this.global;
+      return (g && g.app_metadata) ? g.app_metadata : {};
     },
     user_metadata() {
-      let user_metadata = {};
-      if (this.global && this.global.hasOwnProperty("user_metadata")) {
-        user_metadata = this.global.user_metadata;
-      }
-      return user_metadata;
+      let g = window.global || this.global;
+      return (g && g.user_metadata) ? g.user_metadata : {};
     },
   },
   created() {},

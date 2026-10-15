@@ -110,7 +110,15 @@
   <script src="dist/app-assets/vendors/js/forms/validation/jquery.validate.min.js"></script>
   <script src="dist/app-assets/vendors/js/forms/repeater/jquery.repeater.min.js"></script>
   <script src="dist/app-assets/vendors/js/forms/select/select2.full.min.js"></script>
+  <script>
+    var _bsTooltip = (typeof $.fn !== 'undefined' && $.fn.tooltip && $.fn.tooltip.noConflict) ? $.fn.tooltip.noConflict() : ($.fn ? $.fn.tooltip : null);
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.js"></script>
+  <script>
+    if (_bsTooltip) {
+      $.fn.tooltip = _bsTooltip;
+    }
+  </script>
   <!-- END: Page Vendor JS-->
 
   <!-- BEGIN: Theme JS-->
@@ -127,8 +135,8 @@
   <script src="/dist/js/pdf.js"></script>
   <script src="dist/psl.min.js"></script>
   <script src="dist/manifest.js"></script>
-  <script src="dist/vendor.js?version=<?php echo ZD_VERSION; ?>"></script>
-  <script src="dist/app.js?version=<?php echo ZD_VERSION; ?>"></script>
+  <script src="dist/vendor.js?version=<?php echo ZD_VERSION; ?>.<?= @filemtime(FCPATH . 'dist/vendor.js') ?>"></script>
+  <script src="dist/app.js?version=<?php echo ZD_VERSION; ?>.<?= @filemtime(FCPATH . 'dist/app.js') ?>"></script>
 
   <!-- END: Page JS-->
 

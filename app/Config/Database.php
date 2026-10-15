@@ -145,10 +145,41 @@ class Database extends \CodeIgniter\Database\Config
 			$urlParts = explode('.', $_SERVER['HTTP_HOST']);
 			$count = count($urlParts);
 			if($count > 2 && $urlParts[0] !== "www"){
-				$db = $cache->get($urlParts[0]);
-				$this->defaultGroup = $db["group"];
-				$this->default['database'] = $db["database"];
-				$this->default['charset'] = 'utf8mb4';
+				$subdomain = $urlParts[0];
+				$db = $cache->get($subdomain);
+				if (!empty($db) && isset($db["group"], $db["database"])) {
+					$this->defaultGroup = $db["group"];
+					$this->default['database'] = $db["database"];
+					$this->default['charset'] = 'utf8mb4';
+				} else {
+					// Fallback: Query clients table directly to populate cache and switch db
+					try {
+						$mysqli = @new \mysqli(
+							$this->default['hostname'],
+							$this->default['username'],
+							$this->default['password'],
+							$this->default['database'],
+							$this->default['port'] ?? 3306
+						);
+						if (!$mysqli->connect_errno) {
+							$escapedSubdomain = $mysqli->real_escape_string($subdomain);
+							$res = $mysqli->query("SELECT subdomain, client_hash, connection_group FROM clients WHERE subdomain = '$escapedSubdomain' AND deleted_at IS NULL LIMIT 1");
+							if ($res && $row = $res->fetch_assoc()) {
+								$dbData = [
+									"database" => $row['subdomain'] . '_' . $row['client_hash'],
+									"group"    => $row['connection_group']
+								];
+								$cache->save($subdomain, $dbData);
+								$this->defaultGroup = $dbData["group"];
+								$this->default['database'] = $dbData["database"];
+								$this->default['charset'] = 'utf8mb4';
+							}
+							$mysqli->close();
+						}
+					} catch (\Throwable $e) {
+						// Fallback silently to default database configuration
+					}
+				}
 			}
 		}
 	}

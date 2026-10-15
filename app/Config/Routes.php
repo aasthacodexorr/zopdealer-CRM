@@ -34,6 +34,15 @@ $routes->setAutoRoute(true);
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 
+$routes->get('app-assets/data/locales/(:any)', function ($file) {
+	$path = FCPATH . 'dist/app-assets/data/locales/' . $file;
+	if (file_exists($path)) {
+		header('Content-Type: application/json');
+		readfile($path);
+		exit;
+	}
+});
+
 $routes->group('api', function ($routes) {
 	$routes->group('admin', function ($routes) {
 		$routes->add('login', 'AuthenticationController::login');

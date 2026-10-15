@@ -44,11 +44,13 @@ $(function () {
   });
 
   // dragable list
-  dragula([document.getElementById("todo-task-list-drag")], {
-    moves: function(el, container, handle) {
-      return handle.classList.contains("handle");
-    }
-  });
+  if (typeof dragula !== "undefined" && document.getElementById("todo-task-list-drag")) {
+    dragula([document.getElementById("todo-task-list-drag")], {
+      moves: function(el, container, handle) {
+        return handle.classList.contains("handle");
+      }
+    });
+  }
 
 
   // select assigner
@@ -89,22 +91,28 @@ $(function () {
   }
 
   // New compose message compose field
-  var composeEditor = new Quill('.snow-container .compose-editor', {
-    modules: {
-      toolbar: '.compose-quill-toolbar'
-    },
-    placeholder: 'Add Description..... ',
-    theme: 'snow'
-  });
+  var composeEditor = null;
+  if (typeof Quill !== 'undefined' && document.querySelector('.snow-container .compose-editor')) {
+    composeEditor = new Quill('.snow-container .compose-editor', {
+      modules: {
+        toolbar: '.compose-quill-toolbar'
+      },
+      placeholder: 'Add Description..... ',
+      theme: 'snow'
+    });
+  }
 
   //Assigner Comment Quill editor
-  var commentEditor = new Quill('.snow-container .comment-editor', {
-    modules: {
-      toolbar: '.comment-quill-toolbar'
-    },
-    placeholder: 'Write a Comment...',
-    theme: 'snow'
-  });
+  var commentEditor = null;
+  if (typeof Quill !== 'undefined' && document.querySelector('.snow-container .comment-editor')) {
+    commentEditor = new Quill('.snow-container .comment-editor', {
+      modules: {
+        toolbar: '.comment-quill-toolbar'
+      },
+      placeholder: 'Write a Comment...',
+      theme: 'snow'
+    });
+  }
 
   // **************Sidebar Left**************//
   // -----------------------------------------
@@ -515,61 +523,70 @@ $(document).ready(function () {
   *********************/  
     
 var sliderWithInput = document.getElementById('slider-with-input');
-
-noUiSlider.create(sliderWithInput, {
-    start: [40],
-     step: 1,
-    connect:'lower',
-    range: {
-        'min': [0],
-        'max': [100]
+if (typeof noUiSlider !== "undefined" && sliderWithInput) {
+    noUiSlider.create(sliderWithInput, {
+        start: [40],
+        step: 1,
+        connect:'lower',
+        range: {
+            'min': [0],
+            'max': [100]
+        }
+    });
+        
+    var sliderWithInputElement = document.getElementById('slider-With-Input');
+    if (sliderWithInputElement && sliderWithInput.noUiSlider) {
+        sliderWithInput.noUiSlider.on('update', function (values, handle) {
+            sliderWithInputElement.innerHTML = values[handle];
+        });
     }
-});
-    
-var sliderWithInputElement = document.getElementById('slider-With-Input');
-sliderWithInput.noUiSlider.on('update', function (values, handle) {
-    sliderWithInputElement.innerHTML = values[handle];
-});
+}
  
 /*****************
     Interest Rate
   *********************/  
     
 var interestWithInput = document.getElementById('interest-with-input');
-
-noUiSlider.create(interestWithInput, {
-    start: [20],
-     step: 1,
-    connect:'lower',
-    range: {
-        'min': [0],
-        'max': [50]
+if (typeof noUiSlider !== "undefined" && interestWithInput) {
+    noUiSlider.create(interestWithInput, {
+        start: [20],
+        step: 1,
+        connect:'lower',
+        range: {
+            'min': [0],
+            'max': [50]
+        }
+    });
+    var interestWithInputElement = document.getElementById('interest-With-Input');
+    if (interestWithInputElement && interestWithInput.noUiSlider) {
+        interestWithInput.noUiSlider.on('update', function (values, handle) {
+            interestWithInputElement.innerHTML = values[handle];
+        });
     }
-});
-var interestWithInputElement = document.getElementById('interest-With-Input');
-interestWithInput.noUiSlider.on('update', function (values, handle) {
-    interestWithInputElement.innerHTML = values[handle];
-})
+}
     /*****************
     Term Rate
   *********************/  
     
 var termWithInput = document.getElementById('term-with-input');
-
-noUiSlider.create(termWithInput, {
-    start: [60],
-     step: 1,
-    connect:'lower',
-    range: {
-        'min': [0],
-        'max': [96]
+if (typeof noUiSlider !== "undefined" && termWithInput) {
+    noUiSlider.create(termWithInput, {
+        start: [60],
+        step: 1,
+        connect:'lower',
+        range: {
+            'min': [0],
+            'max': [96]
+        }
+    });
+        
+    var termWithInputElement = document.getElementById('term-With-Input');
+    if (termWithInputElement && termWithInput.noUiSlider) {
+        termWithInput.noUiSlider.on('update', function (values, handle) {
+            termWithInputElement.innerHTML = values[handle];
+        });    
     }
-});
-    
-var termWithInputElement = document.getElementById('term-With-Input');
-termWithInput.noUiSlider.on('update', function (values, handle) {
-    termWithInputElement.innerHTML = values[handle];
-});    
+}    
 
     });
 
@@ -810,12 +827,13 @@ $('.wizard-vertical [role="menuitem"]').removeClass("btn-primary").addClass("btn
 
 $(document).ready(function () {
   // With Handles
-
-  dragula([document.getElementById("handle-list-1"), document.getElementById("handle-list-2")], {
-    moves: function (el, container, handle) {
-      return handle.classList.contains('handle');
-    }
-  }); 
+  if (typeof dragula !== "undefined" && document.getElementById("handle-list-1") && document.getElementById("handle-list-2")) {
+    dragula([document.getElementById("handle-list-1"), document.getElementById("handle-list-2")], {
+      moves: function (el, container, handle) {
+        return handle.classList.contains('handle');
+      }
+    }); 
+  }
     
     // dropdown open 
     
@@ -845,31 +863,30 @@ $(document).ready(function () {
 
 
 $(document).ready( function(){
-    
-    $.fn.editable.defaults.mode = 'Popup';
-    $.fn.editableform.buttons = 
-      '<button type="submit" class="btn btn-primary editable-submit">'+
-        '<i class="ficon bx bx-check " aria-hidden="true"></i>'+
-      '</button>'+
-      '<button type="button" class="btn btn-secondary btn-sm editable-cancel">'+
-        '<i class="ficon bx bx-x" aria-hidden="true"></i>'+
-      '</button>';  
-    $('#price1, #price2, #price3, #price4, #price5, #price6, #price7, #price8, #price9, #price10, #price12, #price13, #price14, #price14, #price15').editable({
-           url: '/post',
-           type: 'number',
-           pk: 1,
-           name: 'Price',
-           title: 'price'
-        
-    });
-    $('#sp-price1, #sp-price2, #sp-price3, #sp-price4, #sp-price5, #sp-price6, #sp-price7, #sp-price8, #sp-price9, #sp-price10, #sp-price12, #sp-price13, #sp-price14, #sp-price14, #sp-price15').editable({
-           url: '/post',
-           type: 'number',
-           pk: 1,
-           name: 'Special Price',
-           title: 'Special price'
-        
-    });
+    if ($.fn && $.fn.editable && $.fn.editable.defaults) {
+      $.fn.editable.defaults.mode = 'Popup';
+      $.fn.editableform.buttons = 
+        '<button type="submit" class="btn btn-primary editable-submit">'+
+          '<i class="ficon bx bx-check " aria-hidden="true"></i>'+
+        '</button>'+
+        '<button type="button" class="btn btn-secondary btn-sm editable-cancel">'+
+          '<i class="ficon bx bx-x" aria-hidden="true"></i>'+
+        '</button>';  
+      $('#price1, #price2, #price3, #price4, #price5, #price6, #price7, #price8, #price9, #price10, #price12, #price13, #price14, #price14, #price15').editable({
+             url: '/post',
+             type: 'number',
+             pk: 1,
+             name: 'Price',
+             title: 'price'
+      });
+      $('#sp-price1, #sp-price2, #sp-price3, #sp-price4, #sp-price5, #sp-price6, #sp-price7, #sp-price8, #sp-price9, #sp-price10, #sp-price12, #sp-price13, #sp-price14, #sp-price14, #sp-price15').editable({
+             url: '/post',
+             type: 'number',
+             pk: 1,
+             name: 'Special Price',
+             title: 'Special price'
+      });
+    }
       
 
 
@@ -2071,9 +2088,11 @@ $(document).ready(function()
             }
         };
 
-        $('#domenu').domenu({
-            data: '[{"id":11,"title":"Home","http":""},{"id":10,"title":"Blog","http":""},{"id":9,"title":"Gallery","http":""},{"id":6,"title":"About Us","http":"","children":[{"id":5,"title":"Service","http":""},{"id":4,"title":"Contact us","http":"","children":[{"id":3,"title":"Item 3","http":""},{"id":2,"title":"Item 2","http":"","children":[{"id":7,"title":"Example","http":"http://google.com"},{"id":8,"title":"Item 8","http":""}]}]}]},{"id":1,"title":"Item 1","http":""}]'
-        }).parseJson();
+        if ($.fn && $.fn.domenu && $('#domenu').length) {
+            $('#domenu').domenu({
+                data: '[{"id":11,"title":"Home","http":""},{"id":10,"title":"Blog","http":""},{"id":9,"title":"Gallery","http":""},{"id":6,"title":"About Us","http":"","children":[{"id":5,"title":"Service","http":""},{"id":4,"title":"Contact us","http":"","children":[{"id":3,"title":"Item 3","http":""},{"id":2,"title":"Item 2","http":"","children":[{"id":7,"title":"Example","http":"http://google.com"},{"id":8,"title":"Item 8","http":""}]}]}]},{"id":1,"title":"Item 1","http":""}]'
+            }).parseJson();
+        }
     });
 
 /*=========================================================================================
@@ -2779,80 +2798,90 @@ $(".js-example-tokenizer").select2({
 (function (window, document, $) {
   'use strict';
 
-  var Font = Quill.import('formats/font');
-  Font.whitelist = ['sofia', 'slabo', 'roboto', 'inconsolata', 'ubuntu'];
-  Quill.register(Font, true);
+  if (typeof Quill === 'undefined') return;
+
+  try {
+    var Font = Quill.import('formats/font');
+    Font.whitelist = ['sofia', 'slabo', 'roboto', 'inconsolata', 'ubuntu'];
+    Quill.register(Font, true);
+  } catch (e) {}
 
   // Bubble Editor
-
-  var bubbleEditor = new Quill('#bubble-container .editor', {
-    bounds: '#bubble-container .editor',
-    modules: {
-      'formula': true,
-      'syntax': true
-    },
-    theme: 'bubble'
-  });
+  var bubbleEditor = null;
+  if (document.querySelector('#bubble-container .editor')) {
+    bubbleEditor = new Quill('#bubble-container .editor', {
+      bounds: '#bubble-container .editor',
+      modules: {
+        'formula': true,
+        'syntax': true
+      },
+      theme: 'bubble'
+    });
+  }
 
   // Snow Editor
-
-  var snowEditor = new Quill('#snow-container .editor', {
-    bounds: '#snow-container .editor',
-    modules: {
-      'formula': true,
-      'syntax': true,
-      'toolbar': '#snow-container .quill-toolbar'
-    },
-    theme: 'snow'
-  });
+  var snowEditor = null;
+  if (document.querySelector('#snow-container .editor')) {
+    snowEditor = new Quill('#snow-container .editor', {
+      bounds: '#snow-container .editor',
+      modules: {
+        'formula': true,
+        'syntax': true,
+        'toolbar': '#snow-container .quill-toolbar'
+      },
+      theme: 'snow'
+    });
+  }
 
   // Full Editor
-
-  var fullEditor = new Quill('#full-container .editor', {
-    bounds: '#full-container .editor',
-    modules: {
-      'formula': true,
-      'syntax': true,
-      'toolbar': [
-        [{
-          'font': []
-        }, {
-          'size': []
-        }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{
-          'color': []
-        }, {
-          'background': []
-        }],
-        [{
-          'script': 'super'
-        }, {
-          'script': 'sub'
-        }],
-        [{
-          'header': '1'
-        }, {
-          'header': '2'
-        }, 'blockquote', 'code-block'],
-        [{
-          'list': 'ordered'
-        }, {
-          'list': 'bullet'
-        }, {
-          'indent': '-1'
-        }, {
-          'indent': '+1'
-        }],
-        ['direction', {
-          'align': []
-        }],
-        ['link', 'image', 'video', 'formula'],
-        ['clean']
-      ],
-    },
-    theme: 'snow'
-  });
+  var fullEditor = null;
+  if (document.querySelector('#full-container .editor')) {
+    fullEditor = new Quill('#full-container .editor', {
+      bounds: '#full-container .editor',
+      modules: {
+        'formula': true,
+        'syntax': true,
+        'toolbar': [
+          [{
+            'font': []
+          }, {
+            'size': []
+          }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{
+            'color': []
+          }, {
+            'background': []
+          }],
+          [{
+            'script': 'super'
+          }, {
+            'script': 'sub'
+          }],
+          [{
+            'header': '1'
+          }, {
+            'header': '2'
+          }, 'blockquote', 'code-block'],
+          [{
+            'list': 'ordered'
+          }, {
+            'list': 'bullet'
+          }, {
+            'indent': '-1'
+          }, {
+            'indent': '+1'
+          }],
+          ['direction', {
+            'align': []
+          }],
+          ['link', 'image', 'video', 'formula'],
+          ['clean']
+        ],
+      },
+      theme: 'snow'
+    });
+  }
 
   var editors = [bubbleEditor, snowEditor, fullEditor];
 

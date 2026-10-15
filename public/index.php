@@ -8,6 +8,11 @@ if (phpversion() < $minPHPVersion)
 }
 unset($minPHPVersion);
 
+// Detect SSL when behind local SSL proxy or development server
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+	$_SERVER['HTTPS'] = 'on';
+}
+
 // Path to the front controller (this file)
 define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
 

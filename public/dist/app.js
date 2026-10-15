@@ -183892,6 +183892,7 @@ var plugin = {
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].use(plugin);
 
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].use((vue_cookies__WEBPACK_IMPORTED_MODULE_3___default()));
+window.$cookies = (vue_cookies__WEBPACK_IMPORTED_MODULE_3___default());
 
 
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].use(_library_SweetalertPlugin_js__WEBPACK_IMPORTED_MODULE_4__["default"]);
@@ -184100,16 +184101,16 @@ Object.defineProperty(vue__WEBPACK_IMPORTED_MODULE_0__["default"].prototype, "$r
 
 /***Declaring variables here **/
 var base_url = window.location.origin;
-var global = {
+var global = (0,vue__WEBPACK_IMPORTED_MODULE_0__.reactive)({
   guest: true,
   user: "",
   token: "",
-  app_metadata: "",
-  user_metadata: "",
+  app_metadata: {},
+  user_metadata: {},
   base_url: base_url,
   hostname: window.location.hostname,
   cdn: ""
-};
+});
 window.global = global;
 
 /**
@@ -184237,6 +184238,7 @@ _router__WEBPACK_IMPORTED_MODULE_8__["default"].beforeEach(function (to, from, n
         next();
       } else {
         window.location = base_url + "/api/admin/login";
+        next(false);
       }
     });
   } else {
@@ -184244,6 +184246,7 @@ _router__WEBPACK_IMPORTED_MODULE_8__["default"].beforeEach(function (to, from, n
       next();
     } else {
       window.location = base_url + "/api/admin/login";
+      next(false);
     }
   }
 });
@@ -184263,31 +184266,26 @@ var RootComponent = {
   computed: {
     application: function application() {
       var application_name = "";
-      if (this.global && this.global.hasOwnProperty("hostname")) {
-        var hostname = this.global.hostname;
-        hostname = hostname.split(".");
+      var g = window.global || this.global;
+      if (g && g.hostname) {
+        var hostname = g.hostname.split(".");
+        var org = g.app_metadata && g.app_metadata.organization ? g.app_metadata.organization : "";
         if (hostname.length > 2 && hostname[0] != "www") {
-          application_name = hostname[0] == this.global.app_metadata.organization || this.global.app_metadata.organization == "zopdealer" ? "tenant" : "";
+          application_name = hostname[0] == org || org == "zopdealer" ? "tenant" : "";
         } else {
-          application_name = this.global.app_metadata.organization == "zopdealer" ? "main" : "";
+          application_name = org == "zopdealer" ? "main" : "";
         }
         return application_name;
       }
       return "";
     },
     app_metadata: function app_metadata() {
-      var app_metadata = {};
-      if (this.global && this.global.hasOwnProperty("app_metadata")) {
-        app_metadata = this.global.app_metadata;
-      }
-      return app_metadata;
+      var g = window.global || this.global;
+      return g && g.app_metadata ? g.app_metadata : {};
     },
     user_metadata: function user_metadata() {
-      var user_metadata = {};
-      if (this.global && this.global.hasOwnProperty("user_metadata")) {
-        user_metadata = this.global.user_metadata;
-      }
-      return user_metadata;
+      var g = window.global || this.global;
+      return g && g.user_metadata ? g.user_metadata : {};
     }
   },
   created: function created() {}
