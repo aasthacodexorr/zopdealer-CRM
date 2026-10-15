@@ -225,8 +225,8 @@
 </template>
 <script>
 import StarRating from "vue-star-rating";
-import DatePicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
+import DatePicker from "../Common/DatePickerAdapter.vue";
+import "vue-datepicker-next/index.css";
 import { mapGetters, mapActions } from "vuex";
 
 import Toast from "../../library/Toast";

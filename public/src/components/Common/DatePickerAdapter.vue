@@ -14,6 +14,7 @@
 
 <script>
 import DatePickerNext from "vue-datepicker-next";
+import "vue-datepicker-next/index.css";
 
 const DatePickerAdapter = {
   name: "DatePickerAdapter",

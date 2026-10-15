@@ -23,8 +23,6 @@ mix.webpackConfig({
             'vue-select-original$': path.resolve(__dirname, 'node_modules/vue-select/dist/vue-select.es.js'),
             'vue-select$': path.resolve(__dirname, 'public/src/components/Common/VSelectAdapter.vue'),
             'vue-select/src/scss/vue-select.scss': path.resolve(__dirname, 'public/src/assets/scss/vue-select.scss'),
-            'vue2-datepicker$': path.resolve(__dirname, 'public/src/components/Common/DatePickerAdapter.vue'),
-            'vue2-datepicker/index.css': path.resolve(__dirname, 'node_modules/vue-datepicker-next/index.css'),
             'vue-star-rating$': path.resolve(__dirname, 'public/src/components/Common/StarRatingAdapter.vue'),
             'vue-slider-component$': path.resolve(__dirname, 'public/src/components/Common/SliderAdapter.vue'),
             'vuedraggable-original$': path.resolve(__dirname, 'node_modules/vuedraggable/dist/vuedraggable.umd.js'),

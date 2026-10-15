@@ -846,8 +846,8 @@ import ActivityMixin from "../mixins/activity";
 import moment from "moment-timezone";
 import CalendarEntityOption from "./CalendarEntityOption.vue";
 
-import DatePicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
+import DatePicker from "./Common/DatePickerAdapter.vue";
+import "vue-datepicker-next/index.css";
 
 export default {
   props: {

@@ -547,8 +547,8 @@ import draggable from "vuedraggable";
 import TestDriveItem from "./TestDriveItem";
 import {mapGetters, mapActions} from "vuex";
 import vSelect from "vue-select";
-import DatePicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
+import DatePicker from "../Common/DatePickerAdapter.vue";
+import "vue-datepicker-next/index.css";
 
 export default {
   props: ["application", "app_metadata"],

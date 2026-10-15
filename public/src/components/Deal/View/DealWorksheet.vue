@@ -4751,8 +4751,8 @@
 </template>
 <script>
 import Toast from "../../../library/Toast";
-import DatePicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
+import DatePicker from "../../Common/DatePickerAdapter.vue";
+import "vue-datepicker-next/index.css";
 import { mapGetters, mapActions } from "vuex";
 import vSelect from "vue-select";
 

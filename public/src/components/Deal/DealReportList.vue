@@ -684,8 +684,8 @@ import draggable from "vuedraggable";
 import DealReportItem from "./DealReportItem";
 import { mapGetters, mapActions } from "vuex";
 import vSelect from "vue-select";
-import DatePicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
+import DatePicker from "../Common/DatePickerAdapter.vue";
+import "vue-datepicker-next/index.css";
 
 import Toast from "../../library/Toast";
 

@@ -463,9 +463,9 @@
   </div>
 </template>
 <script>
-import DatePicker from "vue2-datepicker";
+import DatePicker from "../Common/DatePickerAdapter.vue";
 import draggable from "vuedraggable";
-import "vue2-datepicker/index.css";
+import "vue-datepicker-next/index.css";
 import vSelect from "vue-select";
 
 import Toast from "../../library/Toast";
