@@ -54,33 +54,18 @@
 
 <body id="body" class="vertical-layout vertical-menu-modern 2-columns navbar-sticky footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
   <div id="app">
-    <div class="page-loader" v-if="!application">
+    <div class="page-loader">
       <div class="lds-grid">
         <div></div>
         <div></div>
         <div></div>
         <div></div>
-        <div>
-        </div>
+        <div></div>
         <div></div>
         <div></div>
         <div></div>
         <div></div>
       </div>
-    </div>
-    <div v-if="application">
-      <!-- BEGIN: Header-->
-      <div class="header-navbar-shadow"></div>
-      <main-header :application="application" :app_metadata="app_metadata" :user_metadata="user_metadata"></main-header>
-      <!-- END: Header-->
-      <side-bar :application="application" :app_metadata="app_metadata" :user_metadata="user_metadata"></side-bar>
-
-      <router-view :application="application" :app_metadata="app_metadata" :user_metadata="user_metadata" :key="$route.fullPath"></router-view>
-
-      <div class="sidenav-overlay"></div>
-      <div class="drag-target"></div>
-
-      <main-footer></main-footer>
     </div>
   </div>
 

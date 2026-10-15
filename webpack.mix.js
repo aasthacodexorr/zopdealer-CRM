@@ -18,8 +18,8 @@ mix.setPublicPath('public');
 mix.webpackConfig({
     resolve: {
         alias: {
-            vue$: '@vue/compat',
-            vue: '@vue/compat',
+            vue$: 'vue/dist/vue.esm-bundler.js',
+            vue: 'vue/dist/vue.esm-bundler.js',
             'vue-select-original$': path.resolve(__dirname, 'node_modules/vue-select/dist/vue-select.es.js'),
             'vue-select$': path.resolve(__dirname, 'public/src/components/Common/VSelectAdapter.vue'),
             'vue-select/src/scss/vue-select.scss': path.resolve(__dirname, 'public/src/assets/scss/vue-select.scss'),
@@ -34,15 +34,7 @@ mix.webpackConfig({
 });
 
 mix.js('public/src/app.js', 'dist')
-    .vue({
-        options: {
-            compilerOptions: {
-                compatConfig: {
-                    MODE: 2
-                }
-            }
-        }
-    })
+    .vue()
     .sass('public/src/app.scss', 'dist')
     .extract(['vue', '@vue'])
     .version();

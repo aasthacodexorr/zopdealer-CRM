@@ -19,7 +19,6 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/compat-data": "7.9.0",
-    "@vue/compat": "3.4.38",
     "@vue/compiler-sfc": "3.4.38",
     "entities": "^4.5.0",
     "laravel-mix": "^6.0.49",

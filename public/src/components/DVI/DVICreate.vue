@@ -168,10 +168,9 @@
 
             <!-- Item List : START -->
             <div class="dvi-section mb-5 pb-5">
-              <template v-for="(item, item_index) in items">
+              <template v-for="(item, item_index) in items" :key="`item_${item.id || item_index}`">
                 <div
                   v-if="item.type === 'HEADER'"
-                  :key="`item_${item.id}`"
                   class="dvi-section-header d-flex justify-content-between align-items-center"
                 >
                   <span>{{ item.title }}</span>
@@ -180,7 +179,6 @@
                 <div
                   class="dvi-row row mx-0"
                   v-else-if="item.type === 'COMMENT'"
-                  :key="`item_${item.id}`"
                 >
                   <div class="col-auto dvi-row-number">
                     {{ getCurrentItemCount(item_index) }}
@@ -284,7 +282,6 @@
                   v-else-if="
                     item.type === 'PASSFAIL' || item.type === 'PASSFAILWITHNA'
                   "
-                  :key="`item_${item.id}`"
                   :class="{
                     'is-invalid':
                       items_errors.hasOwnProperty(item_index) &&
@@ -717,17 +714,21 @@ export default {
             this.getEntity(vm.$route.params.id);
           }
         })
-        .catch(({ response }) => {
+        .catch((error) => {
           let error_message = "There were errors in saving DVI.";
-          let { items: items_errors, ...errors } = response.data;
+          let responseData =
+            error && error.response && error.response.data
+              ? error.response.data
+              : {};
+          let { items: items_errors, ...errors } = responseData;
 
-          vm.$data.errors = errors;
+          vm.errors = errors;
 
           if (items_errors) {
-            vm.$data.items_errors = items_errors;
+            vm.items_errors = items_errors;
           }
 
-          if (errors.hasOwnProperty("status")) {
+          if (errors && errors.hasOwnProperty("status")) {
             error_message = errors.status;
           }
 
@@ -789,12 +790,15 @@ export default {
         },
       })
         .then(({ data }) => {
-          vm.$set(vm.items_errors, item_index, {});
+          vm.items_errors[item_index] = {};
           vm.triggerFetchUpdatedEntity(vm.$route.params.id);
         })
         .catch(function(error) {
-          let current_error = error.response.data;
-          vm.$set(vm.items_errors, item_index, current_error);
+          let current_error =
+            error && error.response && error.response.data
+              ? error.response.data
+              : {};
+          vm.items_errors[item_index] = current_error;
           vm.triggerFetchUpdatedEntity(vm.$route.params.id);
         });
     },

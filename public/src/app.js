@@ -1,12 +1,8 @@
-import Vue, { createApp, configureCompat, reactive } from "vue";
+import { createApp, reactive } from "vue";
+import * as Vue from "vue";
 window.Vue = Vue;
 window._ = require("lodash");
 window.axios = require("axios");
-
-// Configure Vue compat mode (MODE: 2 defaults to Vue 2 behavior for unmigrated components)
-configureCompat({
-  MODE: 2,
-});
 
 import ClipboardPlugin from "./library/ClipboardPlugin.js";
 import Helpers from "./library/Helpers.js";
@@ -17,6 +13,7 @@ import vueDebounce from "vue-debounce";
 import AnalyticsPlugin from "./library/AnalyticsPlugin.js";
 import router from "./router";
 import store from "./store";
+import AppRoot from "./components/Layout/AppRoot.vue";
 import MainFooter from "./components/Layout/Footer.vue";
 import MainHeader from "./components/Layout/Header.vue";
 import SideBar from "./components/Layout/Menu.vue";
@@ -35,13 +32,6 @@ const HelpersPlugin = {
     if (app && app.config && app.config.globalProperties) {
       app.config.globalProperties.$helpers = Helpers;
     }
-    // Retain compatibility bridge for Vue 2 / @vue/compat
-    if (Vue) {
-      Vue.helpers = Helpers;
-      if (Vue.prototype) {
-        Vue.prototype.$helpers = Helpers;
-      }
-    }
   },
 };
 
@@ -52,13 +42,6 @@ const VueCookiesPlugin = {
       app.config.globalProperties.$cookies = VueCookies;
     }
     window.$cookies = VueCookies;
-    // Retain compatibility bridge for Vue 2 / @vue/compat
-    if (Vue) {
-      Vue.$cookies = VueCookies;
-      if (Vue.prototype) {
-        Vue.prototype.$cookies = VueCookies;
-      }
-    }
   },
 };
 
@@ -379,52 +362,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-const RootComponent = {
-  components: {
-    SideBar,
-    MainHeader,
-    MainFooter,
-  },
-  data() {
-    return {
-      global: window.global,
-    };
-  },
-  router,
-  store,
-  computed: {
-    application() {
-      let application_name = "";
-      let g = window.global || this.global;
-      if (g && g.hostname) {
-        let hostname = g.hostname.split(".");
-        let org = (g.app_metadata && g.app_metadata.organization) ? g.app_metadata.organization : "";
-        if (hostname.length > 2 && hostname[0] != "www") {
-          application_name =
-            (hostname[0] == org || org == "zopdealer")
-              ? "tenant"
-              : "";
-        } else {
-          application_name =
-            (org == "zopdealer") ? "main" : "";
-        }
-        return application_name;
-      }
-      return "";
-    },
-    app_metadata() {
-      let g = window.global || this.global;
-      return (g && g.app_metadata) ? g.app_metadata : {};
-    },
-    user_metadata() {
-      let g = window.global || this.global;
-      return (g && g.user_metadata) ? g.user_metadata : {};
-    },
-  },
-  created() {},
-};
-
-const app = createApp(RootComponent);
+const app = createApp(AppRoot);
 
 // 1. Install plugins once in a safe, deterministic order
 app.use(store);
@@ -455,24 +393,7 @@ if (!Object.prototype.hasOwnProperty.call(app.config.globalProperties, "$route")
   });
 }
 
-// 3. Intentionally retained compatibility bridges for Vue 2 / @vue/compat
-if (Vue && Vue.prototype) {
-  Vue.prototype.$router = router;
-  Vue.prototype.$store = store;
-  if (!Object.prototype.hasOwnProperty.call(Vue.prototype, "$route")) {
-    Object.defineProperty(Vue.prototype, "$route", {
-      get() {
-        return router.currentRoute.value;
-      },
-      configurable: true,
-    });
-  }
-}
-if (Vue && typeof Vue.filter === "function") {
-  Vue.filter("truncate", truncate);
-}
-
-// 4. Register global components on app.component (with compatibility bridge on Vue.component)
+// 3. Register global components on app.component
 const globalComponents = {
   SideBar,
   MainHeader,
@@ -497,12 +418,9 @@ const globalComponents = {
 
 for (const [name, component] of Object.entries(globalComponents)) {
   app.component(name, component);
-  if (Vue && typeof Vue.component === "function") {
-    Vue.component(name, component);
-  }
 }
 
-// 5. Register global directives on app.directive (with compatibility bridge on Vue.directive)
+// 4. Register global directives on app.directive
 const globalDirectives = {
   uppercase: uppercaseDirective,
   integer: integerDirective,
@@ -512,10 +430,7 @@ const globalDirectives = {
 
 for (const [name, directive] of Object.entries(globalDirectives)) {
   app.directive(name, directive);
-  if (Vue && typeof Vue.directive === "function") {
-    Vue.directive(name, directive);
-  }
 }
 
-// 6. Mount application
+// 5. Mount application
 app.mount("#app");
