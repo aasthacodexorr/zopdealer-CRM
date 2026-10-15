@@ -386,10 +386,6 @@
   </div>
 </template>
 <script>
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { quillEditor } from "vue-quill-editor";
 import vSelect from "vue-select";
 import TextEditor from "../WebComponents/TextEditor.vue";
 import Toast from "../../library/Toast";
@@ -416,7 +412,6 @@ export default {
     };
   },
   components: {
-    quillEditor,
     vSelect,
     TextEditor,
   },

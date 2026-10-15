@@ -114,7 +114,7 @@
               <div class="col-md-8 form-group">
                 <fieldset class="form-group">
                   <quill-editor
-                    id="default-disclosure"
+                    id="default-disclosure-content"
                     v-model="form.account_email_template_content"
                     :options="editorOption"
                   ></quill-editor>
@@ -144,8 +144,7 @@
 <script>
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { quillEditor } from "vue-quill-editor";
+import QuillEditor from "../Common/QuillEditor.vue";
 
 import ConfigurationMixin from "../../mixins/configuration";
 
@@ -181,7 +180,8 @@ export default {
     };
   },
   components: {
-    quillEditor,
+    quillEditor: QuillEditor,
+    QuillEditor,
   },
   mixins: [ConfigurationMixin],
   async mounted() {

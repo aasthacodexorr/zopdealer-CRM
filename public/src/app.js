@@ -8,8 +8,8 @@ configureCompat({
   MODE: 2,
 });
 
-import VueClipboard from "vue-clipboard2";
-Vue.use(VueClipboard);
+import ClipboardPlugin from "./library/ClipboardPlugin.js";
+Vue.use(ClipboardPlugin);
 
 import Helpers from "./library/Helpers.js";
 const plugin = {
@@ -27,9 +27,9 @@ Vue.use(plugin);
 import VueCookies from "vue-cookies";
 Vue.use(VueCookies);
 
-import VueSweetalert2 from "vue-sweetalert2";
+import SweetalertPlugin from "./library/SweetalertPlugin.js";
 import "sweetalert2/dist/sweetalert2.min.css";
-Vue.use(VueSweetalert2);
+Vue.use(SweetalertPlugin);
 
 import vueDebounce from "vue-debounce";
 const rawDebounce = typeof vueDebounce === "function" ? vueDebounce() : (vueDebounce.default ? vueDebounce.default() : vueDebounce);
@@ -58,8 +58,8 @@ const debounceDirective = {
 };
 Vue.directive("debounce", debounceDirective);
 
-import VueGtag from "vue-gtag";
-Vue.use(VueGtag, {
+import AnalyticsPlugin from "./library/AnalyticsPlugin.js";
+Vue.use(AnalyticsPlugin, {
   config: { id: "G-3RLC81KJ0D" },
 });
 
@@ -247,6 +247,9 @@ Vue.component("RouterLink", RouterLinkAdapter);
 import RouterViewAdapter from "./components/Common/RouterViewAdapter.vue";
 Vue.component("router-view", RouterViewAdapter);
 Vue.component("RouterView", RouterViewAdapter);
+import QuillEditor from "./components/Common/QuillEditor.vue";
+Vue.component("quill-editor", QuillEditor);
+Vue.component("QuillEditor", QuillEditor);
 
 Vue.prototype.$router = router;
 Object.defineProperty(Vue.prototype, "$route", {
@@ -443,6 +446,11 @@ const app = createApp(RootComponent);
 
 app.use(router);
 app.use(store);
+app.use(SweetalertPlugin);
+app.use(ClipboardPlugin);
+app.use(AnalyticsPlugin, {
+  config: { id: "G-3RLC81KJ0D" },
+});
 
 if (Vue && Vue.prototype) {
   Vue.prototype.$store = store;
@@ -468,6 +476,8 @@ app.component("RouterLink", RouterLinkAdapter);
 app.component("router-link", RouterLinkAdapter);
 app.component("RouterView", RouterViewAdapter);
 app.component("router-view", RouterViewAdapter);
+app.component("quill-editor", QuillEditor);
+app.component("QuillEditor", QuillEditor);
 
 app.directive("uppercase", uppercaseDirective);
 app.directive("integer", integerDirective);

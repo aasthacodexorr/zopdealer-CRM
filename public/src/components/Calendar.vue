@@ -599,7 +599,7 @@
                           (query, loading) => searchIndexes(query, loading)
                         "
                       >
-                        <template slot="option" slot-scope="option">
+                        <template #option="option">
                           <calendar-entity-option
                             :current_module="form.module"
                             :option="option"
@@ -607,7 +607,7 @@
                         </template>
 
                         <!-- Selected Option Slot : START -->
-                        <template slot="selected-option" slot-scope="option">
+                        <template #selected-option="option">
                           <calendar-entity-option
                             :current_module="form.module"
                             :option="option"

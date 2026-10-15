@@ -175,7 +175,7 @@
                           "
                           :options="customers"
                         >
-                          <template slot="selected-option" slot-scope="option">
+                          <template #selected-option="option">
                             {{ option.first_name }} {{ option.last_name }}
                             <span
                               v-show="
@@ -186,7 +186,7 @@
                               - {{ option.company_name }}
                             </span>
                           </template>
-                          <template slot="option" slot-scope="option">
+                          <template #option="option">
                             <span v-show="option.first_name !== null">
                               {{ option.first_name }}
                             </span>
@@ -229,7 +229,7 @@
                           "
                           :options="customers"
                         >
-                          <template slot="selected-option" slot-scope="option">
+                          <template #selected-option="option">
                             {{ option.first_name }} {{ option.last_name }}
                             <span
                               v-show="
@@ -240,7 +240,7 @@
                               - {{ option.company_name }}
                             </span>
                           </template>
-                          <template slot="option" slot-scope="option">
+                          <template #option="option">
                             <span v-show="option.first_name !== null">
                               {{ option.first_name }}
                             </span>
@@ -497,7 +497,7 @@
                           clearable
                           :options="inventories"
                         >
-                          <template slot="selected-option" slot-scope="option">
+                          <template #selected-option="option">
                             <label>
                               <div>
                                 {{ option.year }} {{ option.make }}
@@ -507,7 +507,7 @@
                               </div>
                             </label>
                           </template>
-                          <template slot="option" slot-scope="option">
+                          <template #option="option">
                             <div>
                               {{ option.year }} {{ option.make }}
                               {{ option.model }} &lt; {{ option.stock_no }} &gt;

@@ -15,10 +15,10 @@
       </template>
       <em v-else style="opacity: 0.5">Start typing to search for a location</em>
     </template>
-    <template slot="selected-option" slot-scope="option">
+    <template #selected-option="option">
       <span>{{ option.text }}</span>
     </template>
-    <template slot="option" slot-scope="option">
+    <template #option="option">
       <span>{{ option.text }}</span>
     </template>
   </v-select>

@@ -323,14 +323,14 @@ import Toast from "../../library/Toast";
 import { mapGetters, mapActions } from "vuex";
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { quillEditor } from "vue-quill-editor";
+import QuillEditor from "../Common/QuillEditor.vue";
 
 export default {
   name: "Email",
   props: ["id", "shortpath", "email_address", "subject", "body"],
   components: {
-    quillEditor,
+    quillEditor: QuillEditor,
+    QuillEditor,
   },
   data() {
     return {

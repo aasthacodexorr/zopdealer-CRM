@@ -1,4 +1,5 @@
 import moment from "moment";
+import { copyText as writeClipboardText } from "./ClipboardPlugin.js";
 
 export default {
   parseAbsoluteOrRelativeUrl(base_url, url) {
@@ -71,9 +72,13 @@ export default {
     return Number(Math.round(value + "e" + decimals) + "e-" + decimals);
   },
 
-  copyText(data) {
-    navigator.clipboard.writeText(data);
-    alert("Text Copied.");
+  async copyText(data) {
+    try {
+      await writeClipboardText(data);
+      alert("Text Copied.");
+    } catch (e) {
+      console.error("Clipboard copy failed", e);
+    }
   },
 
   formatPhoneNumber(phone_no) {
@@ -166,30 +171,41 @@ export default {
     return new Promise((resolve) => setTimeout(resolve, ms));
   },
   doCopy(current_object, string) {
-    current_object.$copyText(string).then(
-      function(e) {
-        current_object.$swal({
-          showConfirmButton: false,
-          icon: "success",
-          toast: true,
-          timer: 2000,
-          position: "bottom",
-          title: "Text has been copied.",
-        });
-        console.log(e);
-      },
-      function(e) {
-        current_object.$swal({
-          showConfirmButton: false,
-          icon: "error",
-          toast: true,
-          timer: 2000,
-          position: "bottom",
-          title: "Can not copy.",
-        });
-        console.log(e);
-      }
-    );
+    const copyFn =
+      current_object && typeof current_object.$copyText === "function"
+        ? (str) => current_object.$copyText(str)
+        : (str) => writeClipboardText(str);
+
+    Promise.resolve()
+      .then(() => copyFn(string))
+      .then(
+        function(e) {
+          if (current_object && typeof current_object.$swal === "function") {
+            current_object.$swal({
+              showConfirmButton: false,
+              icon: "success",
+              toast: true,
+              timer: 2000,
+              position: "bottom",
+              title: "Text has been copied.",
+            });
+          }
+          console.log(e);
+        },
+        function(e) {
+          if (current_object && typeof current_object.$swal === "function") {
+            current_object.$swal({
+              showConfirmButton: false,
+              icon: "error",
+              toast: true,
+              timer: 2000,
+              position: "bottom",
+              title: "Can not copy.",
+            });
+          }
+          console.log(e);
+        }
+      );
   },
   truncate(text, length, clamp = "...") {
     if (!text && text !== 0) return "";

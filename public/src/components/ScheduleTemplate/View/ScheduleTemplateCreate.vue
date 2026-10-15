@@ -245,7 +245,7 @@
                                           clearable
                                           :options="[]"
                                         >
-                                          <template slot="no-options">
+                                          <template #no-options>
                                             Type the valid email and press enter
                                           </template>
                                         </v-select>

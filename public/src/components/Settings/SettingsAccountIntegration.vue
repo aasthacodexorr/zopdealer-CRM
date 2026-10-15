@@ -280,10 +280,6 @@
 </template>
 <script>
 import Toast from "../../library/Toast";
-import "quill/dist/quill.core.css";
-import "quill/dist/quill.snow.css";
-import "quill/dist/quill.bubble.css";
-import { quillEditor } from "vue-quill-editor";
 
 export default {
   name: "SettingsAccountIntegration",
@@ -303,24 +299,6 @@ export default {
         glo3d_username: "",
         glo3d_password: "",
         carfax_account_token: "",
-      },
-      editorOption: {
-        modules: {
-          toolbar: [
-            ["bold", "italic", "underline", "strike"],
-            ["blockquote", "code-block"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            [{ script: "sub" }, { script: "super" }],
-            [{ indent: "-1" }, { indent: "+1" }],
-            [{ direction: "rtl" }],
-            ["link", "image"],
-            [{ size: ["small", false, "large", "huge"] }],
-            [{ header: [1, 2, 3, 4, 5, 6, false] }],
-            [{ color: [] }, { background: [] }],
-            [{ align: [] }],
-            ["clean"],
-          ],
-        },
       },
     };
   },
@@ -352,9 +330,6 @@ export default {
 
       this.form.default_deposit_amount = default_deposit_amount;
     },
-  },
-  components: {
-    quillEditor,
   },
   methods: {
     async getGlobalConfiguration() {
