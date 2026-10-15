@@ -190,26 +190,24 @@
                       <div class="col-md-12">
                         <!-- Draggable List : OPEN -->
                         <draggable
-                          tag="div"
+                          tag="transition-group"
+                          :component-data="{
+                            tag: 'ul',
+                            class: 'list-group dvi-template-create-items',
+                            style: 'height: 70vh; overflow-y: auto',
+                            type: 'transition',
+                            name: 'flip-list'
+                          }"
                           :list="form.items"
                           v-bind="dragOptions"
                           @start="isDragging = true"
                           @end="isDragging = false"
                           handle=".handle"
+                          item-key="id"
                         >
-                          <transition-group
-                            tag="ul"
-                            class="list-group dvi-template-create-items"
-                            style="height: 70vh; overflow-y: auto"
-                            type="transition"
-                            name="flip-list"
-                          >
+                          <template #item="{ element: item, index: item_index }">
                             <li
-                              v-for="(item, item_index) in form.items"
                               class="list-group-item d-flex justify-content-between align-items-center"
-                              :key="
-                                `dvi_template_item_${item.id}_${item_index}`
-                              "
                             >
                               <span
                                 style="cursor: pointer"
@@ -246,7 +244,7 @@
                                 ></i>
                               </div>
                             </li>
-                          </transition-group>
+                          </template>
                         </draggable>
                         <!-- Draggable List : CLOSE -->
                       </div>

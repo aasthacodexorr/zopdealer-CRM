@@ -73,64 +73,60 @@
                           @end="isDragging = false"
                           @change="sortIndex"
                           draggable="tr"
+                          item-key="id"
                         >
-                          <tr
-                            v-for="(workflow_template_step,
-                            wft_index) in workflow_template_step_list"
-                            :key="
-                              `workflow_template_step_${workflow_template_step.id}`
-                            "
-                            v-show="is_loaded"
-                          >
-                            <td class="p-1">
-                              <span
-                                style="cursor: pointer"
-                                class="bx bx-grid-vertical pr-1 handle"
-                              ></span>
-                              #{{ wft_index + 1 }}
-                            </td>
-                            <td class="p-1">
-                              <span v-show="wft_index === 0">After</span>
-                              {{ workflow_template_step.wait_time }}
-                              {{ workflow_template_step.wait_time_unit }}
-                              <span v-show="wft_index > 0"
-                                >After Step #{{ wft_index }}</span
-                              >
-                            </td>
-                            <td class="p-1">
-                              {{ workflow_template_step.action }}
-                            </td>
-                            <td class="p-1">
-                              <button
-                                class="btn btn-info"
-                                @click.prevent="
-                                  editWorkFlowTemplateStep(
-                                    workflow_template_step.id,
-                                  )
-                                "
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                "
-                              >
-                                <i class="bx bx-edit"></i>
-                              </button>
-                              <button
-                                class="btn btn-danger"
-                                @click.prevent="
-                                  deleteWorkFlowTemplateStep(
-                                    workflow_template_step.id,
-                                  )
-                                "
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                "
-                              >
-                                <i class="bx bx-trash-alt"></i>
-                              </button>
-                            </td>
-                          </tr>
+                          <template #item="{ element: workflow_template_step, index: wft_index }">
+                            <tr v-show="is_loaded">
+                              <td class="p-1">
+                                <span
+                                  style="cursor: pointer"
+                                  class="bx bx-grid-vertical pr-1 handle"
+                                ></span>
+                                #{{ wft_index + 1 }}
+                              </td>
+                              <td class="p-1">
+                                <span v-show="wft_index === 0">After</span>
+                                {{ workflow_template_step.wait_time }}
+                                {{ workflow_template_step.wait_time_unit }}
+                                <span v-show="wft_index > 0"
+                                  >After Step #{{ wft_index }}</span
+                                >
+                              </td>
+                              <td class="p-1">
+                                {{ workflow_template_step.action }}
+                              </td>
+                              <td class="p-1">
+                                <button
+                                  class="btn btn-info"
+                                  @click.prevent="
+                                    editWorkFlowTemplateStep(
+                                      workflow_template_step.id,
+                                    )
+                                  "
+                                  style="
+                                    padding-right: 0.8em;
+                                    padding-left: 0.8em;
+                                  "
+                                >
+                                  <i class="bx bx-edit"></i>
+                                </button>
+                                <button
+                                  class="btn btn-danger"
+                                  @click.prevent="
+                                    deleteWorkFlowTemplateStep(
+                                      workflow_template_step.id,
+                                    )
+                                  "
+                                  style="
+                                    padding-right: 0.8em;
+                                    padding-left: 0.8em;
+                                  "
+                                >
+                                  <i class="bx bx-trash-alt"></i>
+                                </button>
+                              </td>
+                            </tr>
+                          </template>
                         </draggable>
                       </table>
                     </div>

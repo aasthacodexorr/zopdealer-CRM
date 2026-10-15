@@ -60,7 +60,7 @@
     "vue-slider-component": "^4.1.0-beta.7",
     "vue-star-rating": "^2.1.0",
     "vue-sweetalert2": "^3.0.3",
-    "vuedraggable": "^2.23.2",
+    "vuedraggable": "^4.1.0",
     "vuex": "^4.1.0"
   }
 }

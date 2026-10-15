@@ -126,7 +126,13 @@
                 <!-- Draggable List : OPEN -->
                 <draggable
                   v-show="galleryLoad"
-                  tag="div"
+                  tag="transition-group"
+                  :component-data="{
+                    tag: 'div',
+                    type: 'transition',
+                    name: 'flip-list',
+                    class: 'row'
+                  }"
                   :list="gallery_list"
                   v-bind="dragOptions"
                   @start="isDragging = true"
@@ -134,16 +140,10 @@
                   class="row"
                   @change="saveSortRank"
                   handle=".handle"
+                  item-key="id"
                 >
-                  <transition-group
-                    tag="div"
-                    class="row"
-                    type="transition"
-                    name="flip-list"
-                  >
+                  <template #item="{ element: image }">
                     <div
-                      v-for="image in gallery_list"
-                      :key="image.id"
                       class="col-lg-2 col-md-3 col-xs-6 p-0 m-1"
                       style="min-width: 200px"
                     >
@@ -166,7 +166,7 @@
                         ></i>
                       </label>
                     </div>
-                  </transition-group>
+                  </template>
                 </draggable>
                 <!-- Draggable List : CLOSE -->
                 <div class="row">

@@ -135,42 +135,44 @@
                 <div class="modal-body p-0">
                   <!-- Draggable List : OPEN -->
                   <draggable
-                      tag="ul"
-                      :list="list"
-                      v-bind="dragOptions"
-                      @start="isDragging = true"
-                      @end="isDragging = false"
-                      class="list-group"
-                      @change="unsavedView"
-                      handle=".handle"
+                    tag="transition-group"
+                    :component-data="{
+                      tag: 'ul',
+                      type: 'transition',
+                      name: 'flip-list'
+                    }"
+                    :list="list"
+                    v-bind="dragOptions"
+                    @start="isDragging = true"
+                    @end="isDragging = false"
+                    class="list-group"
+                    @change="unsavedView"
+                    handle=".handle"
+                    item-key="header"
                   >
-                    <transition-group type="transition" name="flip-list">
-                      <li
-                          class="list-group-item"
-                          v-for="(element, idx) in list"
-                          :key="element.header"
-                      >
+                    <template #item="{ element, index }">
+                      <li class="list-group-item">
                         <span
-                            style="cursor: pointer"
-                            class="bx bx-grid-vertical pr-1 handle"
+                          style="cursor: pointer"
+                          class="bx bx-grid-vertical pr-1 handle"
                         ></span>
                         <div class="checkbox">
                           <input
-                              type="checkbox"
-                              @change="unsavedView"
-                              v-model="element.visibility"
-                              class="checkbox-input"
-                              value="photodrag"
-                              :id="'dragging_' + idx"
-                              :true-value="'1'"
-                              :false-value="'0'"
+                            type="checkbox"
+                            @change="unsavedView"
+                            v-model="element.visibility"
+                            class="checkbox-input"
+                            value="photodrag"
+                            :id="'dragging_' + index"
+                            :true-value="'1'"
+                            :false-value="'0'"
                           />
-                          <label :for="'dragging_' + idx">{{
-                              element.header
-                            }}</label>
+                          <label :for="'dragging_' + index">{{
+                            element.header
+                          }}</label>
                         </div>
                       </li>
-                    </transition-group>
+                    </template>
                   </draggable>
                 </div>
               </div>

@@ -281,7 +281,12 @@
                       <div class="row">
                         <!-- Draggable List : OPEN -->
                         <draggable
-                          tag="ul"
+                          tag="transition-group"
+                          :component-data="{
+                            tag: 'ul',
+                            type: 'transition',
+                            name: 'flip-list'
+                          }"
                           v-model="form.view"
                           style="width: 100%"
                           v-bind="dragOptions"
@@ -289,13 +294,10 @@
                           @end="isDragging = false"
                           class="list-group"
                           handle=".handle"
+                          item-key="header"
                         >
-                          <transition-group type="transition" name="flip-list">
-                            <li
-                              class="list-group-item"
-                              v-for="(element, idx) in form.view"
-                              :key="element.header"
-                            >
+                          <template #item="{ element, index }">
+                            <li class="list-group-item">
                               <span
                                 style="cursor: pointer"
                                 class="bx bx-grid-vertical pr-1 handle"
@@ -306,16 +308,16 @@
                                   v-model="element.visibility"
                                   class="checkbox-input"
                                   value="photodrag"
-                                  :id="'dragging_' + idx"
+                                  :id="'dragging_' + index"
                                   :true-value="'1'"
                                   :false-value="'0'"
                                 />
-                                <label :for="'dragging_' + idx">{{
+                                <label :for="'dragging_' + index">{{
                                   element.header
                                 }}</label>
                               </div>
                             </li>
-                          </transition-group>
+                          </template>
                         </draggable>
                         <!-- Draggable List : CLOSE -->
                       </div>
