@@ -45,23 +45,7 @@
           </button>
         </div>
         <div class="col-12">
-          <calendar
-            :view="'month'"
-            ref="tuiCalendar"
-            :scheduleView="scheduleView"
-            :schedules="activitiesMapper"
-            :calendars="calendarList"
-            :useCreationPopup="false"
-            :useDetailPopup="false"
-            @beforeCreateSchedule="onBeforeCreateSchedule"
-            @beforeDeleteSchedule="onBeforeDeleteSchedule"
-            @beforeUpdateSchedule="onBeforeUpdateSchedule"
-            @clickSchedule="onClickSchedule"
-            :month="month"
-            :template="template"
-            :taskView="['task']"
-            :timezones="timeZones"
-          />
+          <div ref="tuiCalendar" id="tuiCalendar"></div>
         </div>
       </div>
     </div>
@@ -851,7 +835,7 @@
 </template>
 
 <script>
-import { Calendar } from "@toast-ui/vue-calendar";
+import Calendar from "tui-calendar";
 import "tui-calendar/dist/tui-calendar.css";
 
 import vSelect from "vue-select";
@@ -958,7 +942,6 @@ export default {
   },
   mixins: [ActivityMixin],
   components: {
-    calendar: Calendar,
     "v-select": vSelect,
     CalendarEntityOption,
     DatePicker,
@@ -986,7 +969,42 @@ export default {
     },
     dateTimeChecker() {},
     search_index() {},
-    activitiesMapper() {},
+    activitiesMapper: {
+      handler(newVal) {
+        this.renderSchedules(newVal);
+      },
+      deep: true,
+    },
+    calendarList: {
+      handler(newVal) {
+        if (this.calendarInstance) {
+          this.calendarInstance.setCalendars(newVal);
+        }
+      },
+      deep: true,
+    },
+    timeZones: {
+      handler(newVal) {
+        if (this.calendarInstance) {
+          this.calendarInstance.setOptions({ timezones: newVal });
+        }
+      },
+      deep: true,
+    },
+    scheduleView(newVal) {
+      if (this.calendarInstance) {
+        this.calendarInstance.setOptions({ scheduleView: newVal });
+      }
+    },
+    tenantApp(val) {
+      if (val && !this.calendarInstance) {
+        this.$nextTick(() => {
+          if (this.$refs.tuiCalendar) {
+            this.setupCalendar();
+          }
+        });
+      }
+    },
     selected_entity: function (newVal) {
       this.selected_entity = newVal;
     },
@@ -1568,7 +1586,7 @@ export default {
       this.search_index = [];
       this.current_saved_entity = null;
       this.current_saved_module = "";
-      this.$refs.tuiCalendar.invoke("render");
+      this.invokeCalendar("render");
     },
     onBeforeCreateSchedule(e) {
       console.log(e);
@@ -1623,31 +1641,34 @@ export default {
       this.getActivity(e.schedule.id, true);
     },
     previousPeriod() {
-      this.$refs.tuiCalendar.invoke("prev");
+      this.invokeCalendar("prev");
       this.changeCalendarTitle();
     },
     nextPeriod() {
-      this.$refs.tuiCalendar.invoke("next");
+      this.invokeCalendar("next");
       this.changeCalendarTitle();
     },
     changeView() {
-      this.$refs.tuiCalendar.invoke("changeView", this.calendar_view);
+      this.invokeCalendar("changeView", this.calendar_view);
       this.changeCalendarTitle();
     },
     resetToToday() {
-      this.$refs.tuiCalendar.invoke("today");
+      this.invokeCalendar("today");
       this.changeCalendarTitle();
     },
     changeCalendarTitle(update_results = true) {
-      let calender_start_date =
-        this.$refs.tuiCalendar.invoke("getDateRangeStart");
-      let calender_end_date = this.$refs.tuiCalendar.invoke("getDateRangeEnd");
+      let calender_start_date = this.invokeCalendar("getDateRangeStart");
+      let calender_end_date = this.invokeCalendar("getDateRangeEnd");
+
+      if (!calender_start_date || !calender_end_date) {
+        return;
+      }
 
       switch (this.calendar_view) {
         case "day":
-          this.calendar_title = moment(
-            this.$refs.tuiCalendar.invoke("getDateRangeStart")
-          ).format("MM/DD/YYYY");
+          this.calendar_title = moment(calender_start_date.toDate()).format(
+            "MM/DD/YYYY"
+          );
           break;
         default:
           let start = moment(calender_start_date.toDate()).format(
@@ -1669,6 +1690,90 @@ export default {
       if (update_results) {
         this.fetchWithURL();
       }
+    },
+    initCalendar() {
+      if (this.calendarInstance) {
+        this.destroyCalendar();
+      }
+      if (!this.$refs.tuiCalendar) {
+        return;
+      }
+      this.calendarInstance = new Calendar(this.$refs.tuiCalendar, {
+        defaultView: this.calendar_view || "month",
+        taskView: ["task"],
+        scheduleView: this.scheduleView,
+        theme: {},
+        template: this.template,
+        month: this.month,
+        calendars: this.calendarList,
+        useCreationPopup: false,
+        useDetailPopup: false,
+        timezones: this.timeZones,
+        usageStatistics: false,
+      });
+
+      this.calendarInstance.on(
+        "beforeCreateSchedule",
+        this.onBeforeCreateSchedule
+      );
+      this.calendarInstance.on(
+        "beforeDeleteSchedule",
+        this.onBeforeDeleteSchedule
+      );
+      this.calendarInstance.on(
+        "beforeUpdateSchedule",
+        this.onBeforeUpdateSchedule
+      );
+      this.calendarInstance.on("clickSchedule", this.onClickSchedule);
+
+      if (this.$refs.tuiCalendar) {
+        this.$refs.tuiCalendar.invoke = (methodName, ...args) => {
+          return this.invokeCalendar(methodName, ...args);
+        };
+      }
+    },
+    destroyCalendar() {
+      if (this.calendarInstance) {
+        this.calendarInstance.off();
+        this.calendarInstance.destroy();
+        this.calendarInstance = null;
+      }
+    },
+    renderSchedules(schedules) {
+      if (!this.calendarInstance) return;
+      this.calendarInstance.clear();
+      const items = schedules || this.activitiesMapper;
+      if (Array.isArray(items) && items.length > 0) {
+        this.calendarInstance.createSchedules(items);
+      }
+    },
+    invokeCalendar(methodName, ...args) {
+      if (
+        this.calendarInstance &&
+        typeof this.calendarInstance[methodName] === "function"
+      ) {
+        return this.calendarInstance[methodName](...args);
+      }
+    },
+    setupCalendar() {
+      this.initCalendar();
+      this.renderSchedules();
+
+      let calender_start_date = this.invokeCalendar("getDateRangeStart");
+      let calender_end_date = this.invokeCalendar("getDateRangeEnd");
+
+      if (calender_start_date && calender_end_date) {
+        this.calendar_start_date = moment(calender_start_date.toDate()).format(
+          "MM/DD/YYYY"
+        );
+        this.calendar_end_date = moment(calender_end_date.toDate()).format(
+          "MM/DD/YYYY"
+        );
+      }
+
+      this.fetchAllActivities();
+      this.getAllUsers();
+      this.changeCalendarTitle(false);
     },
     async deleteActivity() {
       if (this.activity_id !== null) {
@@ -1970,6 +2075,7 @@ export default {
     },
   },
   async created() {
+    this.calendarInstance = null;
     const vm = this;
     this.form.assignee = this.app_metadata.id;
 
@@ -1988,26 +2094,28 @@ export default {
     this.search_index = [];
   },
   mounted() {
-    let calender_start_date =
-      this.$refs.tuiCalendar.invoke("getDateRangeStart");
-    let calender_end_date = this.$refs.tuiCalendar.invoke("getDateRangeEnd");
+    if (this.$refs.tuiCalendar) {
+      this.setupCalendar();
+    } else {
+      this.$nextTick(() => {
+        if (this.$refs.tuiCalendar) {
+          this.setupCalendar();
+        }
+      });
+    }
 
-    this.calendar_start_date = moment(calender_start_date.toDate()).format(
-      "MM/DD/YYYY"
-    );
-    this.calendar_end_date = moment(calender_end_date.toDate()).format(
-      "MM/DD/YYYY"
-    );
-
-    this.fetchAllActivities();
-
-    this.getAllUsers();
-
-    this.changeCalendarTitle(false);
     const vm = this;
     jQuery("#activityModel").on("hidden.bs.modal", function () {
       vm.resetForm();
     });
+  },
+  beforeUnmount() {
+    this.destroyCalendar();
+    jQuery("#activityModel").off("hidden.bs.modal");
+  },
+  beforeDestroy() {
+    this.destroyCalendar();
+    jQuery("#activityModel").off("hidden.bs.modal");
   },
 };
 </script>
