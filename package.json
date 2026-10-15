@@ -19,14 +19,14 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/compat-data": "7.9.0",
-    "@vue/compiler-sfc": "3.4.38",
+    "@vue/compiler-sfc": "^3.5.44",
     "entities": "^4.5.0",
     "laravel-mix": "^6.0.49",
     "lodash": "^4.17.4",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.26.3",
     "sass-loader": "^12.6.0",
-    "vue": "3.4.38",
+    "vue": "^3.5.44",
     "vue-loader": "^17.4.2",
     "webpack": "5.88.2"
   },
