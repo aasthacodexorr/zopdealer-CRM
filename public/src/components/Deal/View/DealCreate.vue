@@ -342,7 +342,7 @@
                           style="cursor: pointer"
                           :to="{
                             name: 'customer-update',
-                            params: { id: primary_customer.id },
+                            params: { id: primary_customer.id || 0 },
                           }"
                           class="list-group-item active"
                           exact
@@ -462,7 +462,7 @@
                           style="cursor: pointer"
                           :to="{
                             name: 'customer-update',
-                            params: { id: secondary_customer.id },
+                            params: { id: secondary_customer.id || 0 },
                           }"
                           class="list-group-item active"
                           exact
@@ -535,13 +535,13 @@
                     </div>
                     <router-link
                       tag="button"
-                      v-show="
-                        inventory != null && Object.keys(inventory).length != 0
+                      v-if="
+                        inventory != null && Object.keys(inventory).length != 0 && (inventory.inventory_id || inventory.id)
                       "
                       style="cursor: pointer"
                       :to="{
                         name: 'inventory-update',
-                        params: { id: inventory.inventory_id },
+                        params: { id: inventory.inventory_id || inventory.id },
                       }"
                       class="p-0 col-xs-2 btn btn-link"
                       exact

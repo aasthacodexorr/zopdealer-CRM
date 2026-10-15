@@ -2127,8 +2127,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -2160,7 +2159,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "AddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -4964,7 +4963,30 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   setup: function setup(props, _ref) {
     var attrs = _ref.attrs;
     var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_1__.useRouter)();
-    var _useLink = (0,vue_router__WEBPACK_IMPORTED_MODULE_1__.useLink)(props),
+    function resolveSafeTo(to) {
+      if (!to) return "#";
+      try {
+        if (router) {
+          router.resolve(to);
+        }
+        return to;
+      } catch (e) {
+        return "#";
+      }
+    }
+    var safeTo = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return resolveSafeTo(props.to);
+    });
+    var isFallback = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      return safeTo.value === "#";
+    });
+    var safeProps = (0,vue__WEBPACK_IMPORTED_MODULE_0__.reactive)({
+      to: safeTo,
+      replace: (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+        return props.replace;
+      })
+    });
+    var _useLink = (0,vue_router__WEBPACK_IMPORTED_MODULE_1__.useLink)(safeProps),
       route = _useLink.route,
       href = _useLink.href,
       isActive = _useLink.isActive,
@@ -4974,6 +4996,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
       return props.tag || "a";
     });
     var isLinkActive = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
+      if (isFallback.value) return false;
       return props.exact ? isExactActive.value : isActive.value;
     });
     var computedClasses = (0,vue__WEBPACK_IMPORTED_MODULE_0__.computed)(function () {
@@ -4986,7 +5009,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
       if (isLinkActive.value && activeCls) {
         list.push(activeCls);
       }
-      if (isExactActive.value && exactActiveCls) {
+      if (!isFallback.value && isExactActive.value && exactActiveCls) {
         list.push(exactActiveCls);
       }
       return list.filter(Boolean).join(" ");
@@ -5006,6 +5029,12 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
           attrs.onClick(e);
         }
       }
+      if (isFallback.value) {
+        if (e && e.preventDefault) {
+          e.preventDefault();
+        }
+        return;
+      }
       if (e && !e.defaultPrevented) {
         navigate(e);
       }
@@ -5019,7 +5048,8 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
       navigate: navigate,
       computedClasses: computedClasses,
       filteredAttrs: filteredAttrs,
-      handleClick: handleClick
+      handleClick: handleClick,
+      isFallback: isFallback
     };
   }
 });
@@ -5776,8 +5806,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var _CraigslistItem_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CraigslistItem.vue */ "./public/src/components/Craigslist/CraigslistItem.vue");
@@ -5803,7 +5832,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
     CraigslistItem: _CraigslistItem_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
     return {
@@ -6142,8 +6171,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -6169,7 +6197,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "CustomerReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -6614,8 +6642,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _CustomerReportItem_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CustomerReportItem.vue */ "./public/src/components/CustomerReport/CustomerReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -6644,7 +6671,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "CustomerReportList",
   components: {
     CustomerReportItem: _CustomerReportItem_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -7563,8 +7590,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _CustomerItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CustomerItem */ "./public/src/components/Customer/CustomerItem.vue");
 /* harmony import */ var _CustomerSnapShot__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CustomerSnapShot */ "./public/src/components/Customer/CustomerSnapShot.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
@@ -7591,7 +7617,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     CustomerItem: _CustomerItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     CustomerSnapShot: _CustomerSnapShot__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -9418,8 +9444,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../library/Toast */ "./public/src/library/Toast.js");
@@ -9460,7 +9485,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_1___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   watch: {
     selected_template_item_name: function selected_template_item_name(newVal, oldVal) {
@@ -10177,8 +10202,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -10210,7 +10234,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "DVIAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -11181,8 +11205,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _DVIItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DVIItem */ "./public/src/components/DVI/DVIItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -11208,7 +11231,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "DVIList",
   components: {
     DVIItem: _DVIItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"],
     DVISnapShot: _DVISnapShot_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
@@ -11531,8 +11554,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -11564,7 +11586,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "DealAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -15393,8 +15415,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _DealItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DealItem */ "./public/src/components/Deal/DealItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -15420,7 +15441,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "DealList",
   components: {
     DealItem: _DealItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -18953,8 +18974,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -18980,7 +19000,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "DealReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -20033,8 +20053,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _DealReportItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DealReportItem */ "./public/src/components/Deal/DealReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -20063,7 +20082,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "DealReportList",
   components: {
     DealReportItem: _DealReportItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -29673,8 +29692,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var _FacebookMarketPlaceItem_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FacebookMarketPlaceItem.vue */ "./public/src/components/FacebookMarketPlace/FacebookMarketPlaceItem.vue");
@@ -29700,7 +29718,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
     FacebookMarketPlaceItem: _FacebookMarketPlaceItem_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
     return {
@@ -30394,8 +30412,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -30421,7 +30438,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "InventoryExpenseReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -30917,8 +30934,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _InventoryExpenseReportItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InventoryExpenseReportItem */ "./public/src/components/InventoryExpenseReport/InventoryExpenseReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -30947,7 +30963,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "InventoryExpenseReportList",
   components: {
     InventoryExpenseReportItem: _InventoryExpenseReportItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -31806,8 +31822,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -31833,7 +31848,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "InventoryPurchaseReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -32468,8 +32483,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _InventoryPurchaseReportItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InventoryPurchaseReportItem */ "./public/src/components/InventoryPurchaseReport/InventoryPurchaseReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -32498,7 +32512,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "InventoryPurchaseReportList",
   components: {
     InventoryPurchaseReportItem: _InventoryPurchaseReportItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -35700,8 +35714,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _InventoryItem_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InventoryItem.vue */ "./public/src/components/Inventory/InventoryItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../library/Toast */ "./public/src/library/Toast.js");
@@ -35739,7 +35752,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     InventoryItem: _InventoryItem_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     InventorySnapShot: _InventorySnapShot_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
   watch: {
@@ -38935,8 +38948,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../library/Toast */ "./public/src/library/Toast.js");
 /* harmony import */ var vue_easy_lightbox__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-easy-lightbox */ "./node_modules/vue-easy-lightbox/dist/vue-easy-lightbox.esm.min.js");
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
@@ -38956,7 +38968,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "InventoryManageGallery",
   components: {
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     VueEasyLightbox: vue_easy_lightbox__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   watch: {
@@ -41462,8 +41474,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -41495,7 +41506,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "InventoryReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -42438,8 +42449,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _InventoryReportItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InventoryReportItem */ "./public/src/components/Inventory/InventoryReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -42468,7 +42478,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "InventoryReportList",
   components: {
     InventoryReportItem: _InventoryReportItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -45360,13 +45370,14 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
       var _arguments = arguments,
         _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var module, request_url;
+        var module, request_url, _t;
         return _regenerator().w(function (_context2) {
-          while (1) switch (_context2.n) {
+          while (1) switch (_context2.p = _context2.n) {
             case 0:
               module = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : "global";
               request_url = window.location.origin + "/api/business/configurations/".concat(module);
-              _context2.n = 1;
+              _context2.p = 1;
+              _context2.n = 2;
               return axios({
                 method: "get",
                 url: request_url,
@@ -45382,10 +45393,17 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
                   }
                 }
               });
-            case 1:
+            case 2:
+              _context2.n = 4;
+              break;
+            case 3:
+              _context2.p = 3;
+              _t = _context2.v;
+              console.warn("Failed to fetch configurations for ".concat(module, ":"), _t);
+            case 4:
               return _context2.a(2);
           }
-        }, _callee2);
+        }, _callee2, null, [[1, 3]]);
       }))();
     },
     userSMSStats: function userSMSStats() {
@@ -45751,7 +45769,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
     checkClientActiveStatus: function checkClientActiveStatus() {
       var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee0() {
-        var _t;
+        var _t2;
         return _regenerator().w(function (_context0) {
           while (1) switch (_context0.p = _context0.n) {
             case 0:
@@ -45772,7 +45790,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
               break;
             case 2:
               _context0.p = 2;
-              _t = _context0.v;
+              _t2 = _context0.v;
             case 3:
               return _context0.a(2);
           }
@@ -46525,8 +46543,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -46552,7 +46569,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "LeadReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -47063,8 +47080,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _LeadReportItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LeadReportItem */ "./public/src/components/Lead/LeadReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -47093,7 +47109,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "LeadReportList",
   components: {
     LeadReportItem: _LeadReportItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -47862,8 +47878,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -47895,7 +47910,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "LeadAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -48538,8 +48553,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _LeadResponseItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./LeadResponseItem */ "./public/src/components/Lead/Response/LeadResponseItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -48568,7 +48582,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "LeadResponseList",
   components: {
     LeadResponseItem: _LeadResponseItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     LeadResponseSnapShot: _LeadResponseSnapShot_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
@@ -50866,8 +50880,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -50893,7 +50906,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "PaymentReportAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -51502,8 +51515,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _PaymentReportItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PaymentReportItem */ "./public/src/components/PaymentReport/PaymentReportItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -51532,7 +51544,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "PaymentReportList",
   components: {
     PaymentReportItem: _PaymentReportItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -52689,8 +52701,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -52716,7 +52727,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "PaymentAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -53410,8 +53421,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _PaymentItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PaymentItem */ "./public/src/components/Payment/PaymentItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -53435,7 +53445,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     PaymentItem: _PaymentItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     AcceptPayment: _WebComponents_AcceptPayment__WEBPACK_IMPORTED_MODULE_3__["default"],
     RefundPayment: _WebComponents_RefundPayment__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
@@ -54173,8 +54183,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -54196,7 +54205,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "ProductAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -54847,8 +54856,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _ProductItem_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ProductItem.vue */ "./public/src/components/Product/ProductItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../library/Toast */ "./public/src/library/Toast.js");
@@ -54892,7 +54900,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     ProductItem: _ProductItem_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     ProductListFilter: _ProductListFilter__WEBPACK_IMPORTED_MODULE_4__["default"],
     ProductSearch: _ProductSearch__WEBPACK_IMPORTED_MODULE_5__["default"],
     ProductBulkUpdate: _ProductBulkUpdate__WEBPACK_IMPORTED_MODULE_6__["default"],
@@ -55542,8 +55550,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -55565,7 +55572,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "ReviewFeedbackAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -56103,8 +56110,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _ReviewFeedbackItem_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReviewFeedbackItem.vue */ "./public/src/components/ReviewFeedback/ReviewFeedbackItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -56146,7 +56152,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     ReviewFeedbackItem: _ReviewFeedbackItem_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     ReviewFeedbackListFilter: _ReviewFeedbackListFilter__WEBPACK_IMPORTED_MODULE_3__["default"],
     ReviewFeedbackSearch: _ReviewFeedbackSearch__WEBPACK_IMPORTED_MODULE_4__["default"],
     ReviewFeedbackBulkUpdate: _ReviewFeedbackBulkUpdate__WEBPACK_IMPORTED_MODULE_5__["default"],
@@ -57020,8 +57026,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -57043,7 +57048,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "ReviewAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -57749,8 +57754,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _ReviewItem_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReviewItem.vue */ "./public/src/components/Review/ReviewItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../library/Toast */ "./public/src/library/Toast.js");
@@ -57794,7 +57798,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     ReviewItem: _ReviewItem_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     ReviewListFilter: _ReviewListFilter__WEBPACK_IMPORTED_MODULE_4__["default"],
     ReviewSearch: _ReviewSearch__WEBPACK_IMPORTED_MODULE_5__["default"],
     ReviewBulkUpdate: _ReviewBulkUpdate__WEBPACK_IMPORTED_MODULE_6__["default"],
@@ -64196,8 +64200,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -64267,7 +64270,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   },
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)("review", ["getSources"])),
@@ -65786,8 +65789,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -65874,7 +65876,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   },
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   watch: {
@@ -67643,8 +67645,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var _SocialConnectItem_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./SocialConnectItem.vue */ "./public/src/components/SocialConnect/SocialConnectItem.vue");
@@ -67664,7 +67665,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
     SocialConnectItem: _SocialConnectItem_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
     return {
@@ -68712,8 +68713,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _TestDriveCustomerItem__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TestDriveCustomerItem */ "./public/src/components/TestDriveCustomer/TestDriveCustomerItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -68731,7 +68731,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "TestDriveCustomerList",
   components: {
     TestDriveCustomerItem: _TestDriveCustomerItem__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_1___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   data: function data() {
     return {
@@ -69530,8 +69530,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _TestDriveItem__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TestDriveItem */ "./public/src/components/TestDrive/TestDriveItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -69560,7 +69559,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     TestDriveItem: _TestDriveItem__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_1___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_1__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
   data: function data() {
@@ -70462,8 +70461,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _VendorItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./VendorItem */ "./public/src/components/Vendor/VendorItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -70483,7 +70481,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     VendorItem: _VendorItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   data: function data() {
     return {
@@ -71287,8 +71285,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
@@ -71314,7 +71311,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "VoucherAddCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -72047,8 +72044,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _VoucherItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./VoucherItem */ "./public/src/components/Voucher/VoucherItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
@@ -72072,7 +72068,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "VoucherList",
   components: {
     VoucherItem: _VoucherItem__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
     VoucherCreate: _VoucherCreate_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -76123,8 +76119,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../library/Toast */ "./public/src/library/Toast.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
 /* harmony import */ var vue2_datepicker_index_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue2-datepicker/index.css */ "./node_modules/vue-datepicker-next/index.css");
@@ -76214,7 +76209,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
   },
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_1___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_1__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)("users", ["allUsers"])), (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)("workFlow", ["getAvailableWorkFlowModules"])), (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)("baseView", ["getDefaultComparatorMapping"])), (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)("inventoryView", {
@@ -76628,8 +76623,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../library/Toast */ "./public/src/library/Toast.js");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var _WebComponents_GenericTextEditor_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../WebComponents/GenericTextEditor.vue */ "./public/src/components/WebComponents/GenericTextEditor.vue");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
@@ -76704,7 +76698,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     GenericTextEditor: _WebComponents_GenericTextEditor_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_2__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_1___default())
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("users", ["allUsers"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("workFlow", ["getAvailableCommonPlaceholders", "getAvailableInventoryPlaceholders", "getAvailableLeadPlaceholders", "getAvailableCustomerPlaceholders", "getAvailableDealPlaceholders", "getAvailableCommonEmailPlaceholders", "getAvailableInventoryEmailPlaceholders", "getAvailableLeadEmailPlaceholders", "getAvailableCustomerEmailPlaceholders", "getAvailableDealEmailPlaceholders", "getAvailableCommonMobilePlaceholders", "getAvailableInventoryMobilePlaceholders", "getAvailableLeadMobilePlaceholders", "getAvailableCustomerMobilePlaceholders", "getAvailableDealMobilePlaceholders"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("calendarView", ["getActivityTypes", "getStatuses", "getPriorities"])), {}, {
     dragOptions: function dragOptions() {
@@ -79099,8 +79093,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var vue_select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select */ "./public/src/components/Common/VSelectAdapter.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-datepicker */ "./public/src/components/Common/DatePickerAdapter.vue");
@@ -79122,7 +79115,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   name: "WorkOrderCustomView",
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
@@ -79647,8 +79640,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
-/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 /* harmony import */ var _WorkOrderItem_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./WorkOrderItem.vue */ "./public/src/components/WorkOrder/WorkOrderItem.vue");
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _library_Toast__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../library/Toast */ "./public/src/library/Toast.js");
@@ -79692,7 +79684,7 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   components: {
     "v-select": vue_select__WEBPACK_IMPORTED_MODULE_3__["default"],
     WorkOrderItem: _WorkOrderItem_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    draggable: (vuedraggable__WEBPACK_IMPORTED_MODULE_0___default()),
+    draggable: vuedraggable__WEBPACK_IMPORTED_MODULE_0__["default"],
     WorkOrderListFilter: _WorkOrderListFilter__WEBPACK_IMPORTED_MODULE_4__["default"],
     WorkOrderSearch: _WorkOrderSearch__WEBPACK_IMPORTED_MODULE_5__["default"],
     WorkOrderBulkUpdate: _WorkOrderBulkUpdate__WEBPACK_IMPORTED_MODULE_6__["default"],
@@ -84279,14 +84271,14 @@ __webpack_require__.r(__webpack_exports__);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDynamicComponent)($setup.actualTag), (0,vue__WEBPACK_IMPORTED_MODULE_0__.mergeProps)($setup.filteredAttrs, {
     "class": $setup.computedClasses,
-    href: $setup.actualTag === 'a' ? $setup.href : undefined,
+    href: $setup.actualTag === 'a' ? $setup.isFallback ? undefined : $setup.href : undefined,
     type: $setup.actualTag === 'button' ? $props.type || 'button' : undefined
   }, {
     onClick: $setup.handleClick
   }), {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "default", {
-        href: $setup.href,
+        href: $setup.isFallback ? undefined : $setup.href,
         route: $setup.route,
         navigate: $setup.navigate,
         isActive: $setup.isActive,
@@ -109675,7 +109667,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     to: {
       name: 'customer-update',
       params: {
-        id: $data.primary_customer.id
+        id: $data.primary_customer.id || 0
       }
     },
     "class": "list-group-item active",
@@ -109721,7 +109713,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     to: {
       name: 'customer-update',
       params: {
-        id: $data.secondary_customer.id
+        id: $data.secondary_customer.id || 0
       }
     },
     "class": "list-group-item active",
@@ -109749,7 +109741,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.year) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.make) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.model) + " < " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.stock_no) + " > < " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.vin) + " > ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_hoisted_92, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.trim) + " ", 1 /* TEXT */), _hoisted_93, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.exterior_color) + " ", 1 /* TEXT */), _hoisted_94, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.odometer), 1 /* TEXT */)])];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" inventory : END ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  }, 8 /* PROPS */, ["modelValue", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" inventory : END ")]), $data.inventory != null && Object.keys($data.inventory).length != 0 && ($data.inventory.inventory_id || $data.inventory.id) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_router_link, {
+    key: 0,
     tag: "button",
     style: {
       "cursor": "pointer"
@@ -109757,7 +109750,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     to: {
       name: 'inventory-update',
       params: {
-        id: $data.inventory.inventory_id
+        id: $data.inventory.inventory_id || $data.inventory.id
       }
     },
     "class": "p-0 col-xs-2 btn btn-link",
@@ -109767,7 +109760,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [_hoisted_95];
     }, undefined, true),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["to"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.inventory != null && Object.keys($data.inventory).length != 0]]), _hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" inventory section : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" year: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [_hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_101, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.year), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" year: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" make: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_102, [_hoisted_103, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_104, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.make), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" make: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [_hoisted_106, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_107, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.model), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" trim: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [_hoisted_109, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_110, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.trim), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" trim: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" status: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [_hoisted_112, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_113, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.status), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" status: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" vin: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_116, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.vin), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" vin: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" stock_no: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [_hoisted_118, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.stock_no), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" stock_no: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" exterior_color: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [_hoisted_121, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_122, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.exterior_color), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" exterior_color: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" odometer: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [_hoisted_124, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_125, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.odometer) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.km_miles), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" odometer: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" odometer: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, 8 /* PROPS */, ["to"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" inventory section : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" year: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [_hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_101, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.year), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" year: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" make: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_102, [_hoisted_103, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_104, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.make), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" make: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [_hoisted_106, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_107, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.model), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" trim: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [_hoisted_109, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_110, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.trim), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" trim: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" status: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [_hoisted_112, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_113, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.status), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" status: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" vin: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [_hoisted_115, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_116, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.vin), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" vin: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" stock_no: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [_hoisted_118, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_119, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.stock_no), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" stock_no: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" exterior_color: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [_hoisted_121, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_122, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.exterior_color), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" exterior_color: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" odometer: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [_hoisted_124, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_125, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.odometer) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.km_miles), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" odometer: END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" odometer: START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [_hoisted_127, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     name: "odometer",
     "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
@@ -183853,6 +183846,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Common_RouterLinkAdapter_vue__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./components/Common/RouterLinkAdapter.vue */ "./public/src/components/Common/RouterLinkAdapter.vue");
 /* harmony import */ var _components_Common_RouterViewAdapter_vue__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./components/Common/RouterViewAdapter.vue */ "./public/src/components/Common/RouterViewAdapter.vue");
 /* harmony import */ var _components_Common_QuillEditor_vue__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./components/Common/QuillEditor.vue */ "./public/src/components/Common/QuillEditor.vue");
+/* harmony import */ var vuedraggable__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! vuedraggable */ "./public/src/components/Common/DraggableAdapter.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -184073,6 +184067,7 @@ vue__WEBPACK_IMPORTED_MODULE_0__["default"].directive("decimal", decimalDirectiv
 
 
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("v-select", _components_Common_VSelectAdapter_vue__WEBPACK_IMPORTED_MODULE_13__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("VSelect", _components_Common_VSelectAdapter_vue__WEBPACK_IMPORTED_MODULE_13__["default"]);
 
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("date-picker", _components_Common_DatePickerAdapter_vue__WEBPACK_IMPORTED_MODULE_14__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("DatePicker", _components_Common_DatePickerAdapter_vue__WEBPACK_IMPORTED_MODULE_14__["default"]);
@@ -184091,6 +184086,9 @@ vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("RouterView", _components_
 
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("quill-editor", _components_Common_QuillEditor_vue__WEBPACK_IMPORTED_MODULE_19__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("QuillEditor", _components_Common_QuillEditor_vue__WEBPACK_IMPORTED_MODULE_19__["default"]);
+
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("draggable", vuedraggable__WEBPACK_IMPORTED_MODULE_20__["default"]);
+vue__WEBPACK_IMPORTED_MODULE_0__["default"].component("Draggable", vuedraggable__WEBPACK_IMPORTED_MODULE_20__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.$router = _router__WEBPACK_IMPORTED_MODULE_8__["default"];
 Object.defineProperty(vue__WEBPACK_IMPORTED_MODULE_0__["default"].prototype, "$route", {
   get: function get() {
@@ -184313,6 +184311,7 @@ app.component("SideBar", _components_Layout_Menu_vue__WEBPACK_IMPORTED_MODULE_11
 app.component("MainHeader", _components_Layout_Header_vue__WEBPACK_IMPORTED_MODULE_10__["default"]);
 app.component("MainFooter", _components_Layout_Footer_vue__WEBPACK_IMPORTED_MODULE_9__["default"]);
 app.component("v-select", _components_Common_VSelectAdapter_vue__WEBPACK_IMPORTED_MODULE_13__["default"]);
+app.component("VSelect", _components_Common_VSelectAdapter_vue__WEBPACK_IMPORTED_MODULE_13__["default"]);
 app.component("date-picker", _components_Common_DatePickerAdapter_vue__WEBPACK_IMPORTED_MODULE_14__["default"]);
 app.component("DatePicker", _components_Common_DatePickerAdapter_vue__WEBPACK_IMPORTED_MODULE_14__["default"]);
 app.component("star-rating", _components_Common_StarRatingAdapter_vue__WEBPACK_IMPORTED_MODULE_15__["default"]);
@@ -184325,11 +184324,227 @@ app.component("RouterView", _components_Common_RouterViewAdapter_vue__WEBPACK_IM
 app.component("router-view", _components_Common_RouterViewAdapter_vue__WEBPACK_IMPORTED_MODULE_18__["default"]);
 app.component("quill-editor", _components_Common_QuillEditor_vue__WEBPACK_IMPORTED_MODULE_19__["default"]);
 app.component("QuillEditor", _components_Common_QuillEditor_vue__WEBPACK_IMPORTED_MODULE_19__["default"]);
+app.component("draggable", vuedraggable__WEBPACK_IMPORTED_MODULE_20__["default"]);
+app.component("Draggable", vuedraggable__WEBPACK_IMPORTED_MODULE_20__["default"]);
 app.directive("uppercase", uppercaseDirective);
 app.directive("integer", integerDirective);
 app.directive("decimal", decimalDirective);
 app.directive("debounce", debounceDirective);
 app.mount("#app");
+
+/***/ }),
+
+/***/ "./public/src/components/Common/DraggableAdapter.js":
+/*!**********************************************************!*\
+  !*** ./public/src/components/Common/DraggableAdapter.js ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vuedraggable_original__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuedraggable-original */ "./node_modules/vuedraggable/dist/vuedraggable.umd.js");
+/* harmony import */ var vuedraggable_original__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuedraggable_original__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r; if ("undefined" != typeof Symbol && void 0 !== (r = t[Symbol.toPrimitive])) { var i = r.call(t, e || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === e ? String : Number)(t); }
+
+var rawDraggable = (vuedraggable_original__WEBPACK_IMPORTED_MODULE_0___default()) && (vuedraggable_original__WEBPACK_IMPORTED_MODULE_0___default()["default"]) ? (vuedraggable_original__WEBPACK_IMPORTED_MODULE_0___default()["default"]) : (vuedraggable_original__WEBPACK_IMPORTED_MODULE_0___default());
+function patchComponentStructure(structure) {
+  if (!structure) return;
+  var Proto = structure.constructor ? structure.constructor.prototype : null;
+  if (Proto && !Proto.__safe_updated_patched__) {
+    Proto.__safe_updated_patched__ = true;
+    Proto.updated = function () {
+      var defaultNodes = this.defaultNodes,
+        realList = this.realList;
+      if (!defaultNodes || !realList) return;
+      defaultNodes.forEach(function (node, index) {
+        var domElement = null;
+        if (node) {
+          if (node.el && node.el.nodeType === 1) {
+            domElement = node.el;
+          } else if (node.component && node.component.subTree && node.component.subTree.el && node.component.subTree.el.nodeType === 1) {
+            domElement = node.component.subTree.el;
+          }
+        }
+        if (domElement) {
+          domElement.__draggable_context = {
+            element: realList[index],
+            index: index
+          };
+        }
+      });
+    };
+  }
+  structure.updated = function () {
+    var defaultNodes = this.defaultNodes,
+      realList = this.realList;
+    if (!defaultNodes || !realList) return;
+    defaultNodes.forEach(function (node, index) {
+      var domElement = null;
+      if (node) {
+        if (node.el && node.el.nodeType === 1) {
+          domElement = node.el;
+        } else if (node.component && node.component.subTree && node.component.subTree.el && node.component.subTree.el.nodeType === 1) {
+          domElement = node.component.subTree.el;
+        }
+      }
+      if (domElement) {
+        domElement.__draggable_context = {
+          element: realList[index],
+          index: index
+        };
+      }
+    });
+  };
+}
+var DraggableAdapter = _objectSpread(_objectSpread({}, rawDraggable), {}, {
+  name: "draggable",
+  compatConfig: {
+    MODE: 3
+  },
+  props: _objectSpread(_objectSpread({}, rawDraggable.props), {}, {
+    value: {
+      type: Array,
+      required: false,
+      "default": null
+    }
+  }),
+  emits: [].concat(_toConsumableArray(rawDraggable.emits || []), ["input"]),
+  computed: _objectSpread(_objectSpread({}, rawDraggable.computed), {}, {
+    realList: function realList() {
+      if (this.list) {
+        return this.list;
+      }
+      if (this.modelValue !== null && this.modelValue !== undefined) {
+        return this.modelValue;
+      }
+      if (this.value !== null && this.value !== undefined) {
+        return this.value;
+      }
+      return null;
+    }
+  }),
+  render: function render() {
+    var vnodes;
+    try {
+      this.error = false;
+      vnodes = rawDraggable.render.call(this);
+    } catch (err) {
+      this.error = true;
+      console.warn("Draggable render error:", err);
+      return null;
+    }
+    patchComponentStructure(this.componentStructure);
+    return vnodes;
+  },
+  mounted: function mounted() {
+    var _this = this;
+    if (this.error || !this.componentStructure) {
+      return;
+    }
+    patchComponentStructure(this.componentStructure);
+    try {
+      if (typeof rawDraggable.mounted === "function") {
+        rawDraggable.mounted.call(this);
+      }
+    } catch (e) {
+      console.warn("Draggable mounted warning:", e);
+    }
+    this.updateDomContext();
+    if (this.$nextTick) {
+      this.$nextTick(function () {
+        _this.updateDomContext();
+      });
+    }
+  },
+  updated: function updated() {
+    var _this2 = this;
+    if (this.error || !this.componentStructure) {
+      return;
+    }
+    patchComponentStructure(this.componentStructure);
+    try {
+      if (typeof rawDraggable.updated === "function") {
+        rawDraggable.updated.call(this);
+      }
+    } catch (e) {
+      console.warn("Draggable updated warning:", e);
+    }
+    this.updateDomContext();
+    if (this.$nextTick) {
+      this.$nextTick(function () {
+        _this2.updateDomContext();
+      });
+    }
+  },
+  methods: _objectSpread(_objectSpread({}, rawDraggable.methods || {}), {}, {
+    updateDomContext: function updateDomContext() {
+      var targetDomElement = this.targetDomElement || (this.$el && this.$el.nodeType === 1 ? this.$el : this.$el && this.$el.parentElement ? this.$el.parentElement : null);
+      var realList = this.realList;
+      if (targetDomElement && targetDomElement.children && realList) {
+        var children = _toConsumableArray(targetDomElement.children).filter(function (el) {
+          return el.nodeType === 1 && !el.classList.contains("header") && !el.classList.contains("footer");
+        });
+        children.forEach(function (child, index) {
+          if (realList[index] !== undefined) {
+            child.__draggable_context = {
+              element: realList[index],
+              index: index
+            };
+          }
+        });
+      }
+    },
+    getUnderlyingVm: function getUnderlyingVm(domElement) {
+      if (!domElement) return null;
+      if (domElement.__draggable_context) {
+        return domElement.__draggable_context;
+      }
+      if (this.componentStructure) {
+        return this.componentStructure.getUnderlyingVm(domElement) || null;
+      }
+      return null;
+    },
+    getVmIndexFromDomIndex: function getVmIndexFromDomIndex(domIndex) {
+      var targetDomElement = this.targetDomElement || (this.$el && this.$el.nodeType === 1 ? this.$el : this.$el && this.$el.parentElement);
+      if (targetDomElement && targetDomElement.children) {
+        var domElement = targetDomElement.children.item(domIndex);
+        if (domElement && domElement.__draggable_context) {
+          return domElement.__draggable_context.index;
+        }
+      }
+      if (this.componentStructure && targetDomElement) {
+        return this.componentStructure.getVmIndexFromDomIndex(domIndex, targetDomElement);
+      }
+      return 0;
+    },
+    alterList: function alterList(onList) {
+      if (this.list) {
+        onList(this.list);
+        return;
+      }
+      var currentList = this.modelValue || this.value || [];
+      var newList = _toConsumableArray(currentList);
+      onList(newList);
+      this.$emit("update:modelValue", newList);
+      this.$emit("input", newList);
+    }
+  })
+});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DraggableAdapter);
 
 /***/ }),
 

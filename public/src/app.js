@@ -233,6 +233,7 @@ import SideBar from "./components/Layout/Menu.vue";
 import store from "./store";
 import VSelectAdapter from "./components/Common/VSelectAdapter.vue";
 Vue.component("v-select", VSelectAdapter);
+Vue.component("VSelect", VSelectAdapter);
 import DatePickerAdapter from "./components/Common/DatePickerAdapter.vue";
 Vue.component("date-picker", DatePickerAdapter);
 Vue.component("DatePicker", DatePickerAdapter);
@@ -251,6 +252,9 @@ Vue.component("RouterView", RouterViewAdapter);
 import QuillEditor from "./components/Common/QuillEditor.vue";
 Vue.component("quill-editor", QuillEditor);
 Vue.component("QuillEditor", QuillEditor);
+import draggable from "vuedraggable";
+Vue.component("draggable", draggable);
+Vue.component("Draggable", draggable);
 
 Vue.prototype.$router = router;
 Object.defineProperty(Vue.prototype, "$route", {
@@ -463,6 +467,7 @@ app.component("SideBar", SideBar);
 app.component("MainHeader", MainHeader);
 app.component("MainFooter", MainFooter);
 app.component("v-select", VSelectAdapter);
+app.component("VSelect", VSelectAdapter);
 app.component("date-picker", DatePickerAdapter);
 app.component("DatePicker", DatePickerAdapter);
 app.component("star-rating", StarRatingAdapter);
@@ -475,6 +480,8 @@ app.component("RouterView", RouterViewAdapter);
 app.component("router-view", RouterViewAdapter);
 app.component("quill-editor", QuillEditor);
 app.component("QuillEditor", QuillEditor);
+app.component("draggable", draggable);
+app.component("Draggable", draggable);
 
 app.directive("uppercase", uppercaseDirective);
 app.directive("integer", integerDirective);

@@ -26,7 +26,9 @@ mix.webpackConfig({
             'vue2-datepicker$': path.resolve(__dirname, 'public/src/components/Common/DatePickerAdapter.vue'),
             'vue2-datepicker/index.css': path.resolve(__dirname, 'node_modules/vue-datepicker-next/index.css'),
             'vue-star-rating$': path.resolve(__dirname, 'public/src/components/Common/StarRatingAdapter.vue'),
-            'vue-slider-component$': path.resolve(__dirname, 'public/src/components/Common/SliderAdapter.vue')
+            'vue-slider-component$': path.resolve(__dirname, 'public/src/components/Common/SliderAdapter.vue'),
+            'vuedraggable-original$': path.resolve(__dirname, 'node_modules/vuedraggable/dist/vuedraggable.umd.js'),
+            'vuedraggable$': path.resolve(__dirname, 'public/src/components/Common/DraggableAdapter.js')
         }
     }
 });

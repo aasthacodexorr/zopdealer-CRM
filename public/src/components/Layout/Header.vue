@@ -1777,22 +1777,26 @@ export default {
       let request_url =
         window.location.origin + `/api/business/configurations/${module}`;
 
-      await axios({
-        method: "get",
-        url: request_url,
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-      }).then(({ data }) => {
-        for (const key in data) {
-          if (data.hasOwnProperty(key)) {
-            const element = data[key];
-            this.form.hasOwnProperty(element.key)
-              ? (this.form[element.key] = element.value)
-              : null;
+      try {
+        await axios({
+          method: "get",
+          url: request_url,
+          headers: {
+            Authorization: "Bearer " + window.$cookies.get("_token"),
+          },
+        }).then(({ data }) => {
+          for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+              const element = data[key];
+              this.form.hasOwnProperty(element.key)
+                ? (this.form[element.key] = element.value)
+                : null;
+            }
           }
-        }
-      });
+        });
+      } catch (err) {
+        console.warn(`Failed to fetch configurations for ${module}:`, err);
+      }
     },
     async userSMSStats() {
       let request_url =

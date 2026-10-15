@@ -41,7 +41,7 @@
         if (this.obj) {
           // Scroll to currently active menu on page load if data-scroll-to-active is true
           if ($('.main-menu').data('scroll-to-active') === true) {
-            var activeEl, menu;
+            var activeEl, menu, change;
             activeEl = document.querySelector('.main-menu-content li.active');
             if ($body.hasClass('menu-collapsed')) {
               if ($('.main-menu-content li.sidebar-group-active').length) {
@@ -49,15 +49,19 @@
               }
             }else{              
               menu = document.querySelector('.main-menu-content');
-              activeEl = activeEl.getBoundingClientRect().top + menu.scrollTop;
-              // If active element's top position is less than 2/3 (66%) of menu height than do not scroll
-              if (activeEl > parseInt((menu.clientHeight * 2) / 3)) {
-                var start = menu.scrollTop,
+              if (activeEl && menu) {
+                activeEl = activeEl.getBoundingClientRect().top + menu.scrollTop;
+                // If active element's top position is less than 2/3 (66%) of menu height than do not scroll
+                if (activeEl > parseInt((menu.clientHeight * 2) / 3)) {
+                  var start = menu.scrollTop;
                   change = activeEl - start - parseInt(menu.clientHeight / 2);
+                }
               }
             }
             setTimeout(function () {
-              $.app.menu.container.stop().animate({ scrollTop: change }, 300);
+              if ($.app && $.app.menu && $.app.menu.container && typeof change !== 'undefined') {
+                $.app.menu.container.stop().animate({ scrollTop: change }, 300);
+              }
               $('.main-menu').data('scroll-to-active', 'false');
             }, 300);
           }

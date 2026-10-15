@@ -2,13 +2,13 @@
   <component
     :is="actualTag"
     :class="computedClasses"
-    :href="actualTag === 'a' ? href : undefined"
+    :href="actualTag === 'a' ? (isFallback ? undefined : href) : undefined"
     :type="actualTag === 'button' ? (type || 'button') : undefined"
     v-bind="filteredAttrs"
     @click="handleClick"
   >
     <slot
-      :href="href"
+      :href="isFallback ? undefined : href"
       :route="route"
       :navigate="navigate"
       :isActive="isActive"
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { computed } from "vue";
+import { computed, reactive } from "vue";
 import { useLink, useRouter } from "vue-router";
 
 export default {
@@ -67,11 +67,33 @@ export default {
   },
   setup(props, { attrs }) {
     const router = useRouter();
-    const { route, href, isActive, isExactActive, navigate } = useLink(props);
+
+    function resolveSafeTo(to) {
+      if (!to) return "#";
+      try {
+        if (router) {
+          router.resolve(to);
+        }
+        return to;
+      } catch (e) {
+        return "#";
+      }
+    }
+
+    const safeTo = computed(() => resolveSafeTo(props.to));
+    const isFallback = computed(() => safeTo.value === "#");
+
+    const safeProps = reactive({
+      to: safeTo,
+      replace: computed(() => props.replace),
+    });
+
+    const { route, href, isActive, isExactActive, navigate } = useLink(safeProps);
 
     const actualTag = computed(() => props.tag || "a");
 
     const isLinkActive = computed(() => {
+      if (isFallback.value) return false;
       return props.exact ? isExactActive.value : isActive.value;
     });
 
@@ -92,7 +114,7 @@ export default {
       if (isLinkActive.value && activeCls) {
         list.push(activeCls);
       }
-      if (isExactActive.value && exactActiveCls) {
+      if (!isFallback.value && isExactActive.value && exactActiveCls) {
         list.push(exactActiveCls);
       }
       return list.filter(Boolean).join(" ");
@@ -112,6 +134,12 @@ export default {
           attrs.onClick(e);
         }
       }
+      if (isFallback.value) {
+        if (e && e.preventDefault) {
+          e.preventDefault();
+        }
+        return;
+      }
       if (e && !e.defaultPrevented) {
         navigate(e);
       }
@@ -127,6 +155,7 @@ export default {
       computedClasses,
       filteredAttrs,
       handleClick,
+      isFallback,
     };
   },
 };
