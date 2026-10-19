@@ -1,100 +1,100 @@
 <template>
-  <span>
-    <span v-show="current_module === 'Inventory'">
-      <span v-show="option.year !== null && option.year != ''">
+  <span v-if="option">
+    <span v-if="current_module === 'Inventory'">
+      <span v-if="option.year != null && option.year !== ''">
         {{ option.year }}
       </span>
-      <span v-show="option.make !== null && option.make != ''">
+      <span v-if="option.make != null && option.make !== ''">
         {{ option.make }}
       </span>
-      <span v-show="option.model !== null && option.model != ''">
+      <span v-if="option.model != null && option.model !== ''">
         {{ option.model }}
       </span>
-      <span v-show="option.stock_no !== null && option.stock_no != ''">
+      <span v-if="option.stock_no != null && option.stock_no !== ''">
         {{ `< ${option.stock_no} >` }}
       </span>
-      <span v-show="option.vin !== null && option.vin != ''">
+      <span v-if="option.vin != null && option.vin !== ''">
         {{ `< ${option.vin} >` }}
       </span>
     </span>
 
-    <span v-show="current_module === 'Deal'">
-      <span v-show="option.id !== null && option.id != ''">
+    <span v-if="current_module === 'Deal'">
+      <span v-if="option.id != null && option.id !== ''">
         {{ `< D - ${option.id} >` }}
       </span>
-      <span v-show="option.first_name !== null && option.first_name != ''">
+      <span v-if="option.first_name != null && option.first_name !== ''">
         {{ option.first_name }}
       </span>
-      <span v-show="option.last_name !== null && option.last_name != ''">
+      <span v-if="option.last_name != null && option.last_name !== ''">
         {{ option.last_name }}
       </span>
-      <span v-show="option.phone !== null && option.phone != ''">
+      <span v-if="option.phone != null && option.phone !== ''">
         {{ `< ${option.phone} >` }}
       </span>
-      <span v-show="option.mobile !== null && option.mobile != ''">
+      <span v-if="option.mobile != null && option.mobile !== ''">
         {{ `< ${option.mobile} >` }}
       </span>
-      <span v-show="option.email !== null && option.email != ''">
+      <span v-if="option.email != null && option.email !== ''">
         {{ `< ${option.email} >` }}
       </span>
     </span>
 
-    <span v-show="current_module === 'Vendor'">
-      <span v-show="option.id !== null && option.id != ''">
+    <span v-if="current_module === 'Vendor'">
+      <span v-if="option.id != null && option.id !== ''">
         {{ `< V - ${option.id} >` }}
       </span>
-      <span v-show="option.first_name !== null">
+      <span v-if="option.first_name != null">
         {{ option.first_name }}
       </span>
-      <span v-show="option.last_name !== null">
+      <span v-if="option.last_name != null">
         {{ option.last_name }}
       </span>
-      <span v-show="option.company_name !== null && option.company_name !== ''">
+      <span v-if="option.company_name != null && option.company_name !== ''">
         {{ `< ${option.company_name} >` }}
       </span>
-      <span v-show="option.phone !== null && option.phone != ''">
+      <span v-if="option.phone != null && option.phone !== ''">
         {{ `< ${option.phone} >` }}
       </span>
-      <span v-show="option.email !== null && option.email != ''">
+      <span v-if="option.email != null && option.email !== ''">
         {{ `< ${option.email} >` }}
       </span>
     </span>
 
-    <span v-show="current_module === 'Lead'">
-      <span v-show="option.id !== null && option.id != ''">
+    <span v-if="current_module === 'Lead'">
+      <span v-if="option.id != null && option.id !== ''">
         {{ `< L - ${option.id} >` }}
       </span>
-      <span v-show="option.first_name !== null">
+      <span v-if="option.first_name != null">
         {{ option.first_name }}
       </span>
-      <span v-show="option.last_name !== null">
+      <span v-if="option.last_name != null">
         {{ option.last_name }}
       </span>
-      <span v-show="option.phone !== null && option.phone != ''">
+      <span v-if="option.phone != null && option.phone !== ''">
         {{ `< ${option.phone} >` }}
       </span>
-      <span v-show="option.email !== null && option.email != ''">
+      <span v-if="option.email != null && option.email !== ''">
         {{ `< ${option.email} >` }}
       </span>
     </span>
 
-    <span v-show="current_module === 'Customer'">
-      <span v-show="option.id !== null && option.id != ''">
+    <span v-if="current_module === 'Customer'">
+      <span v-if="option.id != null && option.id !== ''">
         {{ `< C - ${option.id} >` }}
       </span>
-      <span v-show="option.first_name !== null">
+      <span v-if="option.first_name != null">
         {{ option.first_name }}
       </span>
-      <span v-show="option.last_name !== null">
+      <span v-if="option.last_name != null">
         {{ option.last_name }}
       </span>
-      <span v-show="option.company_name !== null && option.company_name !== ''">
+      <span v-if="option.company_name != null && option.company_name !== ''">
         {{ `< ${option.company_name} >` }}
       </span>
-      <span v-show="option.phone !== null && option.phone != ''">
+      <span v-if="option.phone != null && option.phone !== ''">
         {{ `< ${option.phone} >` }}
       </span>
-      <span v-show="option.email !== null && option.email != ''">
+      <span v-if="option.email != null && option.email !== ''">
         {{ `< ${option.email} >` }}
       </span>
     </span>
@@ -104,11 +104,11 @@
 export default {
   props: {
     current_module: {
-      required: true,
+      type: String,
+      default: "",
     },
     option: {
-      required: true,
-      default: {}
+      default: () => ({}),
     },
   },
   name: "CalendarEntityOption",

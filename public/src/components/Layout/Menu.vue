@@ -198,6 +198,7 @@
           :to="{ name: 'lead-responses' }"
           class="nav-item"
           exact
+          style="cursor: pointer;"
         >
           <a @click="selected = null">
             <i

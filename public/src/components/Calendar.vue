@@ -573,6 +573,7 @@
                           }"
                         >
                           <calendar-entity-option
+                            v-if="current_saved_entity"
                             :current_module="current_saved_module"
                             :option="current_saved_entity"
                           ></calendar-entity-option>
