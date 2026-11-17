@@ -4,17 +4,31 @@
     @mouseover="show_edit_button = true"
     @mouseleave="show_edit_button = false"
   >
-    <span v-if="!edit_mode" style="cursor: pointer" @click="enableEditMode"
-      >{{ renderedValue }} &nbsp;&nbsp;&nbsp;&nbsp;<slot></slot>
-      <i
-        v-show="show_edit_button"
-        style="font-size: 1.4em; vertical-align: bottom"
-        class="bx text-secondary bx bx-edit-alt"
-      ></i
-    ></span>
-    <div v-else>
+    <span
+      v-if="!edit_mode"
+      class="lr-inline-edit"
+      :title="'Click to change ' + column"
+      @click="enableEditMode"
+    >
+      <span v-if="display === 'pill'" class="lr-pill" :class="pillClass">{{
+        renderedValue || "—"
+      }}</span>
+      <span v-else-if="display === 'user'" class="lr-user">
+        <template v-if="renderedValue">
+          <span class="lr-avatar lr-avatar-sm" :style="userAvatarStyle">{{
+            userInitials
+          }}</span>
+          {{ renderedValue }}
+        </template>
+        <span v-else class="lr-unassigned">Unassigned</span>
+      </span>
+      <span v-else>{{ renderedValue }}</span>
+      <slot></slot>
+      <i class="bx bx-edit-alt lr-edit-hint"></i>
+    </span>
+    <div v-else class="lr-inline-form" @click.stop>
       <select
-        class="custom-select form-control mr-1"
+        class="custom-select form-control"
         :class="{
           'is-invalid': errors.hasOwnProperty(column),
         }"
@@ -31,18 +45,16 @@
           {{ option.label }}
         </option>
       </select>
-      <span>
-        <i
-          style="font-size: 1.4em; cursor: pointer"
-          class="bx text-success bx bx-save mt-50 mr-1"
-          @click="partialUpdate"
-        ></i>
-        <i
-          @click="resetEditMode"
-          style="font-size: 1.4em; cursor: pointer"
-          class="bx text-danger bx bx-x-circle mt-50"
-        ></i>
-      </span>
+      <i
+        class="bx bx-check-circle text-success"
+        title="Save"
+        @click="partialUpdate"
+      ></i>
+      <i
+        @click="resetEditMode"
+        title="Cancel"
+        class="bx bx-x-circle text-danger"
+      ></i>
     </div>
   </span>
 </template>
@@ -71,6 +83,12 @@ export default {
       required: true,
       type: Array,
     },
+    /** "text" (default), "pill" for status badges, "user" for assignee avatars */
+    display: {
+      required: false,
+      type: String,
+      default: "text",
+    },
   },
   data() {
     return {
@@ -87,6 +105,37 @@ export default {
     },
   },
   computed: {
+    pillClass() {
+      const value = String(this.rendered_value || "").toLowerCase();
+      if (value === "won") return "lr-pill--green";
+      if (value === "new") return "lr-pill--blue";
+      if (value.includes("appointment")) return "lr-pill--purple";
+      if (value.includes("junk") || value.includes("lost")) return "lr-pill--red";
+      if (value.includes("interested") || value.includes("follow up")) return "lr-pill--amber";
+      if (value === "contacted" || value.includes("future")) return "lr-pill--teal";
+      return "lr-pill--gray";
+    },
+    userInitials() {
+      const parts = String(this.renderedValue || "").trim().split(/\s+/);
+      return ((parts[0] || "")[0] || "").concat((parts[1] || "")[0] || "").toUpperCase() || "?";
+    },
+    userAvatarStyle() {
+      const palette = [
+        ["#e6efff", "#2f62d6"],
+        ["#e3f6e8", "#1e8a43"],
+        ["#fff3d1", "#a26a00"],
+        ["#efe8ff", "#6b46c1"],
+        ["#def6f3", "#11806f"],
+        ["#fde6ef", "#b83268"],
+      ];
+      const value = String(this.renderedValue || "");
+      let hash = 0;
+      for (let i = 0; i < value.length; i++) {
+        hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+      }
+      const [background, color] = palette[hash % palette.length];
+      return { background, color };
+    },
     renderedValue() {
       let label_from_options = this.options.filter(
         (option) => option.value == this.rendered_value,

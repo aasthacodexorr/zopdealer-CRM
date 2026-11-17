@@ -1,7 +1,7 @@
 <template>
   <!-- BEGIN: Main Menu-->
   <div
-    class="main-menu menu-fixed menu-light menu-accordion menu-shadow"
+    class="main-menu menu-fixed menu-light menu-accordion menu-shadow zd-sidebar"
     data-scroll-to-active="true"
     id="main-menu"
     style="overflow: auto;"
@@ -756,6 +756,38 @@
           </a>
         </router-link>
         <!-- User Management : END -->
+
+        <!-- Support (moved from the top bar; opens the modals defined in Header.vue) : START -->
+        <li class="navigation-header">
+          <span>Support</span>
+        </li>
+        <li class="nav-item zd-menu-action">
+          <a
+            href="#"
+            data-toggle="modal"
+            data-target="#helpCenter"
+            @click.prevent
+          >
+            <i class="bx bx-support" data-icon="support"></i>
+            <span class="menu-title" data-i18n="Customer Support"
+              >Customer Support</span
+            >
+          </a>
+        </li>
+        <li class="nav-item zd-menu-action">
+          <a
+            href="#"
+            data-toggle="modal"
+            data-target="#referAndSave"
+            @click.prevent
+          >
+            <i class="bx bxs-gift" data-icon="refer"></i>
+            <span class="menu-title" data-i18n="Refer & Save"
+              >Refer &amp; Save</span
+            >
+          </a>
+        </li>
+        <!-- Support : END -->
       </ul>
     </div>
   </div>
@@ -941,5 +973,283 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+</style>
+
+<style lang="scss">
+/* ==========================================================================
+   Sidebar — modern dark navigation. Scoped to #main-menu.zd-sidebar.
+   ========================================================================== */
+#main-menu.zd-sidebar {
+  --sb-bg: #161b26;
+  --sb-bg-2: #1c2230;
+  --sb-text: #c3cad6;
+  --sb-text-strong: #ffffff;
+  --sb-muted: #6b7486;
+  --sb-hover: rgba(255, 255, 255, 0.06);
+  --sb-active-bg: rgba(90, 141, 238, 0.16);
+  --sb-active: #8fb2ff;
+  --sb-accent: #5a8dee;
+
+  background: var(--sb-bg) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+  }
+
+  /* Brand row */
+  /* Vertically centre the logo + pin toggle inside the brand row
+     (the theme's margins pushed the logo past the bottom border). */
+  .navbar-header {
+    display: flex;
+    align-items: center;
+    height: 68px !important;
+    padding: 0 1rem 0 1.25rem !important;
+    background: var(--sb-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    > ul.nav {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      margin: 0;
+      > li.nav-item {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin: 0 !important;
+      }
+      > li.nav-toggle {
+        margin-left: auto !important;
+      }
+    }
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      margin: 0 !important;
+      padding: 0 !important;
+      img {
+        position: static !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 112px !important;
+        height: auto;
+        display: block;
+      }
+    }
+    .modern-nav-toggle {
+      display: flex;
+      align-items: center;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  }
+  .shadow-bottom {
+    display: none !important;
+  }
+  .modern-nav-toggle i {
+    color: var(--sb-muted) !important;
+    transition: color 0.15s;
+  }
+  .modern-nav-toggle:hover i,
+  .modern-nav-toggle.active i {
+    color: var(--sb-text-strong) !important;
+  }
+
+  .main-menu-content {
+    padding-bottom: 1.5rem;
+  }
+  .navigation {
+    background: transparent !important;
+    padding-top: 0.25rem;
+  }
+
+  /* Section headings */
+  .navigation > .navigation-header {
+    margin: 1.4rem 0 0.4rem 1.6rem !important;
+    padding: 0 !important;
+    background: transparent !important;
+    span {
+      color: var(--sb-muted) !important;
+      font-size: 0.68rem !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.09em !important;
+      text-transform: uppercase;
+    }
+  }
+
+  /* Items */
+  .navigation > li.nav-item {
+    margin: 1px 0.75rem !important;
+    border-radius: 10px;
+    background: transparent !important;
+    > a {
+      position: relative;
+      display: flex !important;
+      align-items: center;
+      gap: 0.15rem;
+      min-height: 40px;
+      padding: 0.55rem 0.8rem !important;
+      border-radius: 10px !important;
+      color: var(--sb-text) !important;
+      background: transparent !important;
+      font-size: 0.92rem;
+      font-weight: 500;
+      line-height: 1.2;
+      transition: background 0.15s, color 0.15s;
+      > i:first-child {
+        flex-shrink: 0;
+        width: 22px;
+        margin-right: 0.75rem !important;
+        font-size: 1.25rem !important;
+        line-height: 1;
+        color: var(--sb-muted) !important;
+        transition: color 0.15s;
+        /* keep icons still; the theme's bx-tada animation is distracting in a list */
+        animation: none !important;
+        transform: none !important;
+      }
+      .menu-title {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1 1 auto;
+        min-width: 0;
+        color: inherit !important;
+      }
+      .bxs-lock {
+        font-size: 0.95rem !important;
+        color: var(--sb-muted) !important;
+        opacity: 0.8;
+      }
+    }
+    &:hover > a {
+      background: var(--sb-hover) !important;
+      color: var(--sb-text-strong) !important;
+      > i:first-child {
+        color: var(--sb-text-strong) !important;
+      }
+    }
+    /* Active route */
+    &.active > a,
+    &.router-link-exact-active > a {
+      background: var(--sb-active-bg) !important;
+      color: var(--sb-text-strong) !important;
+      box-shadow: none !important;
+      > i:first-child {
+        color: var(--sb-active) !important;
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        left: -0.75rem;
+        top: 8px;
+        bottom: 8px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--sb-accent);
+      }
+    }
+    /* Locked / unavailable modules */
+    &[disabled="true"] > a,
+    &[style*="not-allowed"] > a {
+      color: var(--sb-muted) !important;
+      &:hover {
+        background: transparent !important;
+      }
+    }
+    /* Sub menus (Super / Import settings) */
+    > ul {
+      margin: 0.15rem 0 0.25rem;
+      padding: 0;
+      background: transparent !important;
+      li > a {
+        display: flex !important;
+        align-items: center;
+        padding: 0.45rem 0.8rem 0.45rem 2.4rem !important;
+        border-radius: 8px;
+        color: var(--sb-text) !important;
+        font-size: 0.87rem;
+        background: transparent !important;
+        i {
+          margin-right: 0.5rem;
+          color: var(--sb-muted) !important;
+        }
+        &:hover {
+          background: var(--sb-hover) !important;
+          color: var(--sb-text-strong) !important;
+        }
+      }
+      li.active > a,
+      li.router-link-exact-active > a {
+        color: var(--sb-active) !important;
+        background: transparent !important;
+      }
+    }
+  }
+
+  /* Support actions */
+  .zd-menu-action > a {
+    cursor: pointer;
+  }
+  .zd-menu-badge {
+    margin-left: auto;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(40, 199, 111, 0.16);
+    color: #5fd99a;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* Collapsed (icon-only) mode keeps the theme behaviour; just centre the icons */
+body.menu-collapsed #main-menu.zd-sidebar:not(:hover) {
+  /* show only the logo mark, centred */
+  .navbar-header {
+    width: 100% !important;
+    padding: 0 !important;
+    justify-content: center;
+    > ul.nav {
+      justify-content: center;
+      flex: 0 0 auto;
+      > li.nav-toggle {
+        display: none !important;
+      }
+    }
+    .navbar-brand {
+      width: 46px;
+      overflow: hidden;
+    }
+  }
+  .navigation > .navigation-header {
+    margin-left: 0 !important;
+    text-align: center;
+  }
+  .navigation > li.nav-item {
+    margin: 1px 0.5rem !important;
+    > a {
+      justify-content: center;
+      > i:first-child {
+        margin-right: 0 !important;
+      }
+      .menu-title,
+      .zd-menu-badge {
+        display: none !important;
+      }
+      &::before {
+        left: -0.5rem;
+      }
+    }
+  }
 }
 </style>
