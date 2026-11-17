@@ -59,8 +59,11 @@
           <!-- Toolbar : START -->
           <!-- v-show (not v-if): mounted() binds a keydown listener to #searchText -->
           <div class="lr-toolbar" v-show="getLeadResponseIds.length == 0">
-            <div class="lr-search">
-              <i class="bx bx-search"></i>
+            <div class="lr-search" :class="{ 'is-loading': isTableLoading }">
+              <i
+                class="bx"
+                :class="isTableLoading ? 'bx-loader-alt bx-spin text-primary' : 'bx-search'"
+              ></i>
               <input
                 type="text"
                 id="searchText"
@@ -627,7 +630,15 @@
 
 
           <!-- Table card : START -->
-          <div class="lr-card">
+          <div class="lr-card" style="position: relative;">
+            <!-- Loading Overlay -->
+            <div v-if="isTableLoading" class="zd-leads-loading-overlay">
+              <div class="zd-loading-indicator-card">
+                <i class="bx bx-loader-alt bx-spin text-primary"></i>
+                <span>Loading leads...</span>
+              </div>
+            </div>
+
             <div
               class="table-responsive lr-table-wrap check-bulk"
               :class="getCompact ? 'compact' : ''"
@@ -696,24 +707,35 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <lead-response-item
-                    v-for="item in getEntities"
-                    :allUsers="allUsers"
-                    :item="item"
-                    :childCheck="bulk_select"
-                    v-bind:key="item.id + '_item_listing_view'"
-                  ></lead-response-item>
-                  <tr v-if="getEntities.length == 0" class="lr-empty-row">
-                    <td :colspan="visibleColumnCount + 3">
-                      <div class="lr-empty">
-                        <i class="bx bx-user-x"></i>
-                        <p>No leads found</p>
-                        <span v-if="getSearch || getFilterState"
-                          >Try a different search or clear the filters.</span
-                        >
+                  <!-- Loading Indicator (when loading and empty or initial load) -->
+                  <tr v-if="!getLoadState || (isTableLoading && getEntities.length === 0)">
+                    <td :colspan="visibleColumnCount + 3" class="text-center py-5 text-muted">
+                      <div class="d-flex flex-column align-items-center justify-content-center py-4">
+                        <i class="bx bx-loader-alt bx-spin text-primary mb-2" style="font-size: 32px;"></i>
+                        <span style="font-size: 14px; font-weight: 500; color: #4b5563;">Loading leads...</span>
                       </div>
                     </td>
                   </tr>
+                  <template v-else>
+                    <lead-response-item
+                      v-for="item in getEntities"
+                      :allUsers="allUsers"
+                      :item="item"
+                      :childCheck="bulk_select"
+                      v-bind:key="item.id + '_item_listing_view'"
+                    ></lead-response-item>
+                    <tr v-if="getEntities.length == 0" class="lr-empty-row">
+                      <td :colspan="visibleColumnCount + 3">
+                        <div class="lr-empty">
+                          <i class="bx bx-user-x"></i>
+                          <p>No leads found</p>
+                          <span v-if="getSearch || getFilterState"
+                            >Try a different search or clear the filters.</span
+                          >
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
                 </tbody>
               </table>
             </div>
@@ -827,6 +849,7 @@ export default {
   data() {
     return {
       load: false,
+      isTableLoading: false,
       single_search_lead: null,
       page: 1,
       number_of_items: 100,
@@ -1066,6 +1089,7 @@ export default {
         }
       }
 
+      this.isTableLoading = true;
       await axios({
         method: "get",
         headers: {
@@ -1097,6 +1121,10 @@ export default {
           position: "bottom",
           title: `Search for ${search} has been completed.`,
         });
+      }).catch((err) => {
+        console.error("Search leads error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     changeCompact() {
@@ -1189,6 +1217,7 @@ export default {
       vm.sort_column = {};
       vm.sort_column[column] = order;
       formData.append("sort", JSON.stringify(vm.sort_column));
+      this.isTableLoading = true;
       axios({
         method: "post",
         data: formData,
@@ -1210,6 +1239,10 @@ export default {
 
         this.commitLoadState(false);
         vm.leadResponseListing();
+      }).catch((err) => {
+        console.error("Update sort column error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     filterLeads() {
@@ -1228,6 +1261,7 @@ export default {
         }
       }
 
+      this.isTableLoading = true;
       axios({
         method: "get",
         headers: {
@@ -1260,6 +1294,10 @@ export default {
           position: "bottom",
           title: `Lead has been filtered.`,
         });
+      }).catch((err) => {
+        console.error("Filter leads error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     resetFilters() {
@@ -1275,6 +1313,14 @@ export default {
         this.leadResponseListing(true);
       }
       this.commitFilterState(false);
+      this.$swal({
+        showConfirmButton: false,
+        icon: "success",
+        toast: true,
+        timer: 2000,
+        position: "bottom",
+        title: "Filters have been reset.",
+      });
     },
     changeLeadResponseView(id) {
       this.commitSearchString("");
@@ -1289,6 +1335,7 @@ export default {
 
       let vm = this;
       this.clearBulkSelection();
+      this.isTableLoading = true;
       axios({
         method: "get",
         headers: {
@@ -1343,6 +1390,10 @@ export default {
             title: "Lead User View Changed.",
           });
         });
+      }).catch((err) => {
+        console.error("Change lead response view error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
 
@@ -1376,6 +1427,7 @@ export default {
       url += "&items=";
       url += this.getEntitiesCount;
       this.clearBulkSelection();
+      this.isTableLoading = true;
 
       axios({
         method: "get",
@@ -1398,11 +1450,16 @@ export default {
         this.commitViewPager(pager);
         this.commitCurrentPage(parseInt(pager.currentPage));
         this.commitEntitiesCount(parseInt(pager.perPage));
+      }).catch((err) => {
+        console.error("Pagination error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     paginationWithUrl(url) {
       const vm = this;
       this.clearBulkSelection();
+      this.isTableLoading = true;
       axios({
         method: "get",
         headers: {
@@ -1424,6 +1481,10 @@ export default {
         this.commitViewPager(pager);
         this.commitCurrentPage(parseInt(pager.currentPage));
         this.commitEntitiesCount(parseInt(pager.perPage));
+      }).catch((err) => {
+        console.error("Pagination with url error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     lead_responses_views() {
@@ -1442,6 +1503,7 @@ export default {
       let vm = this;
 
       if (refresh || !this.getLoadState) {
+        this.isTableLoading = true;
         await axios({
           method: "get",
           headers: {
@@ -1473,6 +1535,10 @@ export default {
           this.lead_response_view_default = JSON.parse(
             JSON.stringify(Object.values(response.data.view)),
           );
+        }).catch((err) => {
+          console.error("Lead response listing error:", err);
+        }).finally(() => {
+          this.isTableLoading = false;
         });
 
         this.commitLoadState(true);
@@ -1879,15 +1945,20 @@ export default {
     position: absolute;
     right: 12px;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(calc(-50% - 1px));
     color: var(--lr-muted);
     font-size: 1.15rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
   }
   .lr-select-sm {
-    height: 36px;
-    min-width: 76px;
-    font-size: 0.9rem;
+    height: 30px;
+    min-width: 68px;
+    font-size: 0.85rem;
+    padding: 2px 24px 2px 8px;
   }
   .lr-link-btn {
     border: 0;
@@ -2049,6 +2120,7 @@ export default {
 
   /* ---------- Table card ---------- */
   .lr-card {
+    position: relative;
     background: var(--lr-surface);
     border: 1px solid var(--lr-border);
     border-radius: var(--lr-radius);
@@ -2058,6 +2130,41 @@ export default {
     min-height: 0;
     display: flex;
     flex-direction: column;
+
+    .zd-leads-loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.76);
+      backdrop-filter: blur(2px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--lr-radius);
+      pointer-events: all;
+
+      .zd-loading-indicator-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.85rem 1.6rem;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        color: #374151;
+        font-size: 0.95rem;
+        font-weight: 600;
+
+        i {
+          font-size: 1.45rem;
+          color: #5a8dee;
+        }
+      }
+    }
   }
   .lr-table-wrap {
     flex: 1 1 auto;
@@ -2089,7 +2196,7 @@ export default {
       text-transform: none;
       letter-spacing: normal;
       white-space: nowrap;
-      padding: 0.95rem 1rem;
+      padding: 0.5rem 0.75rem;
       border-bottom: 1px solid var(--lr-border);
       min-width: 150px;
       &.lr-col-wide {
@@ -2101,20 +2208,20 @@ export default {
     }
     th.lr-col-check,
     td.lr-col-check {
-      width: 52px;
-      min-width: 52px;
-      padding-left: 1.25rem;
+      width: 44px;
+      min-width: 44px;
+      padding-left: 1rem;
       padding-right: 0.25rem;
     }
     th.lr-col-avatar,
     td.lr-col-avatar {
-      width: 92px;
-      min-width: 92px;
+      width: 82px;
+      min-width: 82px;
     }
     th.lr-col-actions,
     td.lr-col-actions {
-      width: 56px;
-      min-width: 56px;
+      width: 50px;
+      min-width: 50px;
       text-align: center;
     }
 
@@ -2151,10 +2258,12 @@ export default {
       }
     }
     tbody td {
-      padding: 0.85rem 1rem;
+      padding: 0.45rem 0.75rem;
       border-bottom: 1px solid #eef1f5;
       vertical-align: middle;
       text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.3;
     }
     tbody tr:last-child td {
       border-bottom: 0;
@@ -2177,23 +2286,23 @@ export default {
     gap: 0.5rem;
   }
   .lr-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     letter-spacing: 0.02em;
     flex-shrink: 0;
     cursor: pointer;
   }
   .lr-avatar-sm {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     cursor: inherit;
   }
   .lr-snapshot-btn {
@@ -2363,19 +2472,20 @@ export default {
 
   /* Compact mode */
   .compact .lr-table {
-    font-size: 0.875rem;
+    font-size: 0.825rem;
     thead th {
-      padding-top: 0.6rem;
-      padding-bottom: 0.6rem;
+      padding-top: 0.35rem;
+      padding-bottom: 0.35rem;
     }
     tbody td {
-      padding-top: 0.4rem;
-      padding-bottom: 0.4rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
     }
     .lr-avatar {
-      width: 30px;
-      height: 30px;
-      font-size: 0.75rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      font-size: 0.68rem;
     }
     .lr-date small {
       display: none;
@@ -2387,47 +2497,47 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
-    padding: 0.9rem 1.25rem;
+    padding: 0.4rem 1.25rem;
     border-top: 1px solid var(--lr-border);
     background: var(--lr-surface);
   }
   .lr-footer-info {
     color: var(--lr-text-2);
-    font-size: 0.95rem;
+    font-size: 0.875rem;
   }
   .lr-footer-right {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
     flex-wrap: wrap;
   }
   .lr-pagination {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.2rem;
     list-style: none;
     margin: 0;
-    padding: 0.25rem;
+    padding: 0.15rem;
     border: 1px solid var(--lr-border);
-    border-radius: 10px;
+    border-radius: 8px;
   }
   .lr-page-btn {
-    min-width: 36px;
-    height: 36px;
-    padding: 0 0.6rem;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 0.45rem;
     border: 1px solid transparent;
-    border-radius: 8px;
+    border-radius: 6px;
     background: transparent;
     color: var(--lr-text-2);
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     i {
-      font-size: 1.25rem;
+      font-size: 1.05rem;
     }
     &:hover:not(:disabled):not(.active) {
       background: #f1f4f8;
@@ -2446,17 +2556,17 @@ export default {
   }
   .lr-page-gap {
     display: inline-block;
-    min-width: 24px;
+    min-width: 20px;
     text-align: center;
     color: var(--lr-muted);
   }
   .lr-per-page {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     margin: 0;
     color: var(--lr-text-2);
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     text-transform: none;
   }
 

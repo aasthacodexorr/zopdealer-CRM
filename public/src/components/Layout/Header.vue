@@ -102,39 +102,16 @@
                   <span>Overdue Invoice(s)</span>
                 </a>
               </li>
-              <li class="nav-item d-none d-md-inline-block d-lg-inline-block">
-                <router-link
-                    tag="a"
-                    class="dropdown-item zd-action zd-action--primary"
-                    type="button"
-                    :to="{ name: 'download-center' }"
-                    exact
-                ><i
-                    class="bx bxs-download mr-50"
-                    style="vertical-align: middle"
-                ></i>
-                  <span>Downloads</span>
-                </router-link>
-              </li>
-              <!-- Customer Support and Refer & Save moved to the sidebar (Menu.vue); their modals stay below -->
-              <li class="nav-item d-none">
-                <a class="dropdown-item"
-                  ><i class="bx bxs-data" style="vertical-align: middle"></i>
-                  <span class=""> {{ getAvailableSMSCredits }} </span></a
-                >
-              </li>
-
-              <li class="nav-item d-none d-md-inline-block d-lg-inline-block">
-                <a
-                  class="dropdown-item zd-action"
-                  :href="form.business_website"
-                  target="_blank"
-                  ><i
-                    class="bx bx-link-external mr-50"
-                    style="vertical-align: middle"
-                  ></i>
-                  <span>Visit Website</span></a
-                >
+              <!-- Call Icon Button Only -->
+              <li
+                v-if="sms.sms_phone_number != null"
+                class="nav-item zd-call-item"
+                :title="`Call: ${formatNumber}`"
+                @click="copyPhoneNumber"
+              >
+                <a class="nav-link p-0" type="button" aria-label="Call">
+                  <i class="ficon bx bxs-phone"></i>
+                </a>
               </li>
 
               <li class="dropdown nav-item zd-user-item">
@@ -161,16 +138,31 @@
                     ></i>
                     {{ rooftop_id }}</a
                   >
-                  <a
-                    v-show="sms.sms_phone_number != null"
+
+                  <router-link
+                    tag="a"
+                    :to="{ name: 'download-center' }"
                     class="dropdown-item"
-                    @click="copyPhoneNumber"
-                    ><i
-                      class="bx bxs-phone mr-50"
+                    exact
+                  >
+                    <i
+                      class="bx bxs-download mr-50"
                       style="vertical-align: middle"
                     ></i>
-                    {{ formatNumber }}</a
+                    Downloads
+                  </router-link>
+
+                  <a
+                    class="dropdown-item"
+                    :href="form.business_website"
+                    target="_blank"
                   >
+                    <i
+                      class="bx bx-link-external mr-50"
+                      style="vertical-align: middle"
+                    ></i>
+                    Visit Website
+                  </a>
 
                   <router-link
                     tag="a"
@@ -2331,6 +2323,34 @@ export default {
 .zd-topbar .zd-action--danger.dropdown-item:hover {
   background: #fbd3d3;
   color: #a12626;
+}
+
+/* Call button */
+.zd-topbar .zd-call-item {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: #4b5563;
+  cursor: pointer;
+  margin-right: 0.25rem;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: #eef4ff;
+    color: #5a8dee;
+  }
+
+  i.ficon,
+  i {
+    font-size: 1.3rem;
+    color: inherit;
+    line-height: 1;
+    position: static;
+    top: 0;
+  }
 }
 
 /* User chip */

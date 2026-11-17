@@ -4,7 +4,6 @@
     class="main-menu menu-fixed menu-light menu-accordion menu-shadow zd-sidebar"
     data-scroll-to-active="true"
     id="main-menu"
-    style="overflow: auto;"
   >
     <div class="navbar-header">
       <ul class="nav navbar-nav flex-row">
@@ -790,6 +789,26 @@
         <!-- Support : END -->
       </ul>
     </div>
+
+    <!-- User Profile Footer (Fixed at bottom of sidebar) -->
+    <div class="zd-sidebar-user-footer">
+      <div class="zd-sidebar-user-info">
+        <div class="zd-sidebar-user-avatar">
+          <img v-if="userPicture" :src="userPicture" alt="User Avatar" />
+          <span v-else class="zd-sidebar-user-initials">{{ userInitials }}</span>
+        </div>
+        <div class="zd-sidebar-user-details">
+          <span class="zd-sidebar-user-name" :title="userName">{{ userName }}</span>
+          <span class="zd-sidebar-user-role" :title="userRole">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <a class="zd-sidebar-logout" href="api/admin/logout">
+        <i class="bx bx-log-out"></i>
+        <span>Log out</span>
+      </a>
+
+    </div>
   </div>
   <!-- END: Main Menu-->
 </template>
@@ -799,7 +818,7 @@ import { mapActions } from "vuex";
 
 export default {
   name: "Menu",
-  props: ["application", "app_metadata"],
+  props: ["application", "app_metadata", "user_metadata"],
   data() {
     return {
       selected: undefined,
@@ -855,6 +874,41 @@ export default {
       if (this.app_metadata.role == "Super Owner") {
         return true;
       } else false;
+    },
+    userName() {
+      if (this.user_metadata && this.user_metadata.name) {
+        return this.user_metadata.name;
+      }
+      let g = window.global || this.global;
+      if (g && g.user_metadata && g.user_metadata.name) {
+        return g.user_metadata.name;
+      }
+      return "Daniel Carter";
+    },
+    userRole() {
+      if (this.user_metadata && this.user_metadata.title) {
+        return this.user_metadata.title;
+      }
+      if (this.app_metadata && this.app_metadata.role) {
+        return this.app_metadata.role;
+      }
+      return "Sales Manager";
+    },
+    userPicture() {
+      if (this.user_metadata && (this.user_metadata.picture || this.user_metadata.avatar || this.user_metadata.image)) {
+        return this.user_metadata.picture || this.user_metadata.avatar || this.user_metadata.image;
+      }
+      let g = window.global || this.global;
+      if (g && g.user_metadata && (g.user_metadata.picture || g.user_metadata.avatar)) {
+        return g.user_metadata.picture || g.user_metadata.avatar;
+      }
+      return null;
+    },
+    userInitials() {
+      const name = this.userName || "";
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      const letters = (parts[0] || "").charAt(0) + (parts[1] || "").charAt(0);
+      return letters ? letters.toUpperCase() : "DC";
     },
   },
   methods: {
@@ -960,6 +1014,11 @@ export default {
         }
       },
     );
+
+    // Disable duplicate PerfectScrollbar on menu content so only 1 styled scrollbar is rendered
+    if (window.$ && window.$.app && window.$.app.menu && window.$.app.menu.manualScroller) {
+      window.$.app.menu.manualScroller.disable();
+    }
   },
 };
 </script>
@@ -991,24 +1050,21 @@ export default {
   --sb-active: #8fb2ff;
   --sb-accent: #5a8dee;
 
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
   background: var(--sb-bg) !important;
   border-right: 1px solid rgba(255, 255, 255, 0.04);
   box-shadow: none;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
-
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 6px;
-  }
 
   /* Brand row */
   /* Vertically centre the logo + pin toggle inside the brand row
      (the theme's margins pushed the logo past the bottom border). */
   .navbar-header {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     height: 68px !important;
@@ -1065,7 +1121,36 @@ export default {
   }
 
   .main-menu-content {
-    padding-bottom: 1.5rem;
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 1rem;
+
+    /* Hide PerfectScrollbar so there is never a duplicate scrollbar */
+    .ps__rail-y,
+    .ps__rail-x {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* Single clean modern scrollbar */
+    &::-webkit-scrollbar {
+      width: 5px !important;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16) !important;
+      border-radius: 5px !important;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
   }
   .navigation {
     background: transparent !important;
@@ -1210,10 +1295,116 @@ export default {
     font-weight: 600;
     letter-spacing: 0.02em;
   }
+
+  /* User profile footer (fixed at bottom of sidebar) */
+  .zd-sidebar-user-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--sb-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+
+    .zd-sidebar-user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .zd-sidebar-user-avatar {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #5a8dee;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .zd-sidebar-user-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+
+      .zd-sidebar-user-name {
+        color: var(--sb-text-strong);
+        font-weight: 600;
+        font-size: 0.92rem;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .zd-sidebar-user-role {
+        color: var(--sb-muted);
+        font-size: 0.78rem;
+        line-height: 1.2;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .zd-sidebar-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: var(--sb-text);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.15s;
+      width: fit-content;
+
+      i {
+        font-size: 1.2rem;
+        color: var(--sb-text);
+        transition: color 0.15s;
+      }
+
+      &:hover {
+        color: var(--sb-text-strong);
+        i {
+          color: var(--sb-text-strong);
+        }
+      }
+    }
+  }
 }
 
 /* Collapsed (icon-only) mode keeps the theme behaviour; just centre the icons */
 body.menu-collapsed #main-menu.zd-sidebar:not(:hover) {
+  .zd-sidebar-user-footer {
+    padding: 0.75rem 0.5rem;
+    align-items: center;
+
+    .zd-sidebar-user-details,
+    .zd-sidebar-logout span {
+      display: none !important;
+    }
+
+    .zd-sidebar-logout {
+      width: auto;
+      justify-content: center;
+    }
+  }
   /* show only the logo mark, centred */
   .navbar-header {
     width: 100% !important;

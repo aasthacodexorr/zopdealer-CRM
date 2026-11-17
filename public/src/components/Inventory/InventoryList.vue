@@ -2,434 +2,638 @@
   <!-- BEGIN: Content-->
   <div class="app-content content">
     <div class="content-overlay"></div>
-    <!-- form layout section start -->
-    <div class="content-body">
-      <form class="webapp-form">
-        <section id="table-transactions">
-          <div
-            class="border-bottom mt-3 bg-white header-navbar set-dable-layer"
-            style="background-color: transparent; z-index: 2"
-          >
-            <div class="content-wrapper pt-0 pb-1 mt-0">
-              <div class="card shadow-none mb-0">
-                <div class="row">
-                  <div class="d-none d-sm-none d-md-block col-md-3">
-                    <ul
-                      class="ml-0 mt-1 list-group list-group-horizontal"
-                      v-if="getInventoryIds.length == 0"
-                    >
-                      <li class="d-inline-block mr-1">
-                        <div
-                          class="btn-group mb-0 drop-value-set list-size-fillter"
-                        >
-                          <div class="dropdown">
-                            <div class="dropdown">
-                              <button
-                                class="btn btn-outline-light dropdown-toggle mr-1"
-                                type="button"
-                                id="dropdownMenuButton"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                              >
-                                {{ selected_inventory }}
-                              </button>
-                              <div
-                                class="dropdown-menu"
-                                aria-labelledby="dropdownMenuButton"
-                              >
-                                <p class="border-bottom">
-                                  <strong>Views</strong>
-                                </p>
-                                <p class="border-bottom border-top">
-                                  <strong>Default Views</strong>
-                                </p>
-                                <a
-                                  style="cursor: pointer"
-                                  class="dropdown-item dropdown-item d-flex justify-content-between flex-row"
-                                  v-for="inventory_view in getDefaultViews"
-                                  :key="inventory_view.id"
-                                  ><span
-                                    class="d-inline-block flex-fill"
-                                    @click="
-                                      changeInventoryView(inventory_view.id)
-                                    "
-                                    >{{
-                                      $helpers.truncate(
-                                        inventory_view.header,
-                                        25,
-                                        "..."
-                                      )
-                                    }}</span
-                                  ><router-link
-                                    tag="td"
-                                    class="d-inline-block"
-                                    :to="{
-                                      name: 'inventory-view-update',
-                                      params: { id: inventory_view.id },
-                                    }"
-                                    exact
-                                    :key="
-                                      `inventory_default_view_${inventory_view.id}`
-                                    "
-                                  >
-                                    <i
-                                      class="bx bx-edit-alt smart-view-edit-action"
-                                    ></i> </router-link
-                                ></a>
+    <div class="content-body" id="inventory-response-section">
+      <div class="inventory-module-page">
+        <!-- 1. HEADER SECTION: Title & Split Add Inventory Dropdown -->
+        <header class="inventory-header">
+          <div class="inventory-title-wrap">
+            <h1 class="inventory-page-title">Inventory</h1>
+          </div>
 
-                                <p class="border-bottom border-top">
-                                  <strong>Custom Views</strong>
-                                </p>
-                                <span
-                                  style="
-                                    max-height: 200px;
-                                    overflow-y: auto;
-                                    width: 100%;
-                                    display: inline-block;
-                                  "
-                                >
-                                  <a
-                                    style="cursor: pointer"
-                                    class="dropdown-item dropdown-item d-flex justify-content-between flex-row"
-                                    v-for="inventory_view in getCustomViews"
-                                    :key="inventory_view.id"
-                                    ><span
-                                      class="d-inline-block flex-fill"
-                                      @click="
-                                        changeInventoryView(inventory_view.id)
-                                      "
-                                      >{{
-                                        $helpers.truncate(
-                                          inventory_view.header,
-                                          25,
-                                          "..."
-                                        )
-                                      }}</span
-                                    ><router-link
-                                      tag="td"
-                                      class="d-inline-block"
-                                      :to="{
-                                        name: 'inventory-view-update',
-                                        params: { id: inventory_view.id },
-                                      }"
-                                      exact
-                                      :key="
-                                        `inventory_custom_view_${inventory_view.id}`
-                                      "
-                                    >
-                                      <i
-                                        class="bx bx-edit-alt smart-view-edit-action"
-                                      ></i> </router-link
-                                  ></a>
-                                </span>
-                                <p class="border-top">
-                                  <router-link
-                                    tag="a"
-                                    :to="{ name: 'inventory-view-create' }"
-                                    class="btn btn-primary w-100 text-center"
-                                    exact
-                                  >
-                                    + New Custom View</router-link
-                                  >
-                                </p>
-                              </div>
-                            </div>
+            <!-- Header Right: Unified Split Dropdown Button for Add Inventory -->
+            <div class="inventory-header-right">
+              <div class="btn-group split-inventory-btn-group dropdown" :class="{ show: isAddMenuOpen }">
+                <router-link
+                  :to="{ name: 'inventory-create' }"
+                  class="btn-split-main"
+                >
+                  <i class="bx bx-plus mr-50"></i> Add Inventory
+                </router-link>
+                <button
+                  type="button"
+                  class="btn-split-toggle dropdown-toggle dropdown-toggle-split"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  :aria-expanded="isAddMenuOpen ? 'true' : 'false'"
+                  title="Inventory Actions Menu"
+                  @click.stop="isAddMenuOpen = !isAddMenuOpen"
+                >
+                  <i class="bx bxs-down-arrow" style="font-size: 9px;"></i>
+                </button>
+                <div
+                  class="dropdown-menu dropdown-menu-right shadow-sm border-0"
+                  :class="{ show: isAddMenuOpen }"
+                  style="min-width: 210px; margin-top: 4px;"
+                >
+                  <router-link
+                    v-if="isAuthorized"
+                    :to="{ name: 'inventory-updates-pricing' }"
+                    class="dropdown-item d-flex align-items-center"
+                    @click="isAddMenuOpen = false"
+                  >
+                    <i class="bx bxs-dollar-circle mr-1 text-primary"></i> Bulk Price Updates
+                  </router-link>
+                  <router-link
+                    v-if="isAuthorized"
+                    :to="{ name: 'inventory-updates-description' }"
+                    class="dropdown-item d-flex align-items-center"
+                    @click="isAddMenuOpen = false"
+                  >
+                    <i class="bx bx-text mr-1 text-info"></i> Bulk Description Updates
+                  </router-link>
+                  <a
+                    v-if="isAuthorized"
+                    href="javascript:void(0)"
+                    class="dropdown-item d-flex align-items-center text-danger"
+                    @click="isAddMenuOpen = false; warningForPurgeDeletingInventories()"
+                  >
+                    <i class="bx bxs-eraser mr-1"></i> Empty Recycle Bin
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <router-link
+                    :to="{ name: 'third-party-inventory' }"
+                    class="dropdown-item d-flex align-items-center"
+                    @click="isAddMenuOpen = false"
+                  >
+                    <i class="bx bxs-file-import mr-1 text-secondary"></i> Bulk Import CSV
+                  </router-link>
+                  <router-link
+                    :to="{ name: 'inventory-import' }"
+                    class="dropdown-item d-flex align-items-center"
+                    @click="isAddMenuOpen = false"
+                  >
+                    <i class="bx bx-upload mr-1 text-success"></i> Quick Inventory Import
+                  </router-link>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- 2. SUBBAR (Directly above search bar): Views Selector + Action Icons with Tooltips -->
+          <div class="inventory-subbar">
+            <!-- Left: Views Selector Dropdown -->
+            <div class="inventory-views-dropdown dropdown">
+              <button
+                class="btn-views-toggle dropdown-toggle"
+                type="button"
+                id="inventoryViewsMenu"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="bx bx-list-ul mr-1 text-primary"></i>
+                <span>{{ selected_inventory }}</span>
+              </button>
+              <div class="dropdown-menu shadow-sm" aria-labelledby="inventoryViewsMenu">
+                <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
+                  Default Views
+                </h6>
+                <a
+                  v-for="inventory_view in getDefaultViews"
+                  :key="inventory_view.id"
+                  class="dropdown-item d-flex justify-content-between align-items-center"
+                  href="javascript:void(0)"
+                  @click="changeInventoryView(inventory_view.id)"
+                >
+                  <span>{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
+                  <router-link
+                    :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
+                    class="text-muted ml-2"
+                    @click.stop
+                  >
+                    <i class="bx bx-edit-alt"></i>
+                  </router-link>
+                </a>
+
+                <div class="dropdown-divider"></div>
+                <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
+                  Custom Views
+                </h6>
+                <div class="custom-views-scrollable">
+                  <a
+                    v-for="inventory_view in getCustomViews"
+                    :key="inventory_view.id"
+                    class="dropdown-item d-flex justify-content-between align-items-center"
+                    href="javascript:void(0)"
+                    @click="changeInventoryView(inventory_view.id)"
+                  >
+                    <span>{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
+                    <router-link
+                      :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
+                      class="text-muted ml-2"
+                      @click.stop
+                    >
+                      <i class="bx bx-edit-alt"></i>
+                    </router-link>
+                  </a>
+                </div>
+
+                <div class="dropdown-divider"></div>
+                <router-link
+                  :to="{ name: 'inventory-view-create' }"
+                  class="dropdown-item text-primary font-weight-bold d-flex align-items-center"
+                >
+                  <i class="bx bx-plus mr-1"></i> New Custom View
+                </router-link>
+              </div>
+            </div>
+
+            <!-- Right: Action Icons with Hover Tooltips (Above Search Bar) -->
+            <div class="inventory-actions-toolbar">
+              <!-- Filter Action -->
+              <div class="custom-tooltip-wrapper">
+                <button
+                  type="button"
+                  class="btn-action-icon"
+                  data-toggle="modal"
+                  data-target="#filters"
+                  :class="{ active: getFilterState }"
+                >
+                  <i class="bx bxs-filter-alt"></i>
+                </button>
+                <span class="custom-tooltip-text">Filters</span>
+              </div>
+
+              <!-- Column Customize Action -->
+              <div class="custom-tooltip-wrapper">
+                <button
+                  type="button"
+                  class="btn-action-icon"
+                  data-toggle="modal"
+                  data-target="#grid-list"
+                >
+                  <i class="bx bxs-grid"></i>
+                </button>
+                <span class="custom-tooltip-text">Customize Columns</span>
+              </div>
+
+              <!-- Density Toggle Action -->
+              <div class="custom-tooltip-wrapper">
+                <button
+                  type="button"
+                  class="btn-action-icon"
+                  @click="changeCompact"
+                >
+                  <i class="bx" :class="getCompact ? 'bx-expand' : 'bx-collapse'"></i>
+                </button>
+                <span class="custom-tooltip-text">Compact View</span>
+              </div>
+
+              <!-- Syndication View Toggle Action -->
+              <div v-if="isAuthorized" class="custom-tooltip-wrapper">
+                <button
+                  type="button"
+                  class="btn-action-icon"
+                  :class="{ active: getCurrentSyndicationViewStatus }"
+                  @click="changeSyndicationViewStatus"
+                >
+                  <i class="bx bx-transfer"></i>
+                </button>
+                <span class="custom-tooltip-text">Bulk Syndication</span>
+              </div>
+
+              <!-- Settings Action -->
+              <div class="custom-tooltip-wrapper">
+                <router-link
+                  :to="{ name: 'inventory-settings' }"
+                  class="btn-action-icon"
+                >
+                  <i class="bx bxs-cog"></i>
+                </router-link>
+                <span class="custom-tooltip-text">Settings</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. TOOLBAR CARD: Transforms between Filters and Bulk Actions -->
+          <section class="inventory-toolbar-card shadow-sm">
+            <!-- STATE A: Bulk Actions Toolbar (Shown when items are selected) -->
+            <div v-if="getInventoryIds.length > 0" class="toolbar-bulk-mode">
+              <div class="bulk-mode-left">
+                <span class="bulk-count-pill">
+                  <i class="bx bx-check-circle mr-50"></i>
+                  <strong>{{ getInventoryIds.length }}</strong>&nbsp;selected
+                </span>
+
+                <button
+                  type="button"
+                  class="btn-bulk-cancel"
+                  title="Deselect all rows"
+                  @click="clearBulkSelection"
+                >
+                  <i class="bx bx-x mr-25"></i> Cancel Selection
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-bulk-item btn-bulk-danger"
+                  @click="confirmDeleteAction"
+                >
+                  <i class="bx bx-trash mr-50"></i> Delete
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-bulk-item btn-bulk-primary"
+                  data-toggle="modal"
+                  data-target="#bulk-list"
+                >
+                  <i class="bx bx-edit mr-50"></i> Bulk Update
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-bulk-item btn-bulk-purple"
+                  data-toggle="modal"
+                  data-target="#bulk-syndication-update"
+                >
+                  <i class="bx bx-transfer mr-50"></i> Bulk Syndication
+                </button>
+              </div>
+            </div>
+
+            <!-- STATE B: Search & Filters (Shown when NO items are selected) -->
+            <div v-else class="toolbar-filter-mode">
+              <div class="toolbar-search-wrapper" :class="{ 'is-loading': isTableLoading }">
+                <i
+                  class="bx search-icon"
+                  :class="isTableLoading ? 'bx-loader-alt bx-spin text-primary' : 'bx-search'"
+                ></i>
+                <input
+                  type="text"
+                  id="searchText"
+                  class="toolbar-search-input"
+                  v-debounce:600ms="searchAction"
+                  v-model="searchString"
+                  placeholder="Search by make, model, year, stock # or VIN..."
+                />
+                <button
+                  v-if="searchString"
+                  type="button"
+                  class="clear-search-btn"
+                  title="Clear search"
+                  @click="clearSearch"
+                >
+                  <i class="bx bx-x"></i>
+                </button>
+              </div>
+
+              <div class="toolbar-filters-group">
+                <!-- Dropdown: Makes -->
+                <div class="filter-dropdown-wrapper">
+                  <select
+                    class="toolbar-select"
+                    v-model="selectedMake"
+                    @change="onToolbarFilterChange('make', selectedMake)"
+                  >
+                    <option value="">All Makes</option>
+                    <option v-for="make in getMakes" :key="'mk_' + make" :value="make">
+                      {{ make }}
+                    </option>
+                  </select>
+                  <i class="bx bx-chevron-down select-chevron"></i>
+                </div>
+
+                <!-- Dropdown: Models -->
+                <div class="filter-dropdown-wrapper">
+                  <select
+                    class="toolbar-select"
+                    v-model="selectedModel"
+                    @change="onToolbarFilterChange('model', selectedModel)"
+                  >
+                    <option value="">All Models</option>
+                    <option v-for="model in filteredModels" :key="'md_' + model" :value="model">
+                      {{ model }}
+                    </option>
+                  </select>
+                  <i class="bx bx-chevron-down select-chevron"></i>
+                </div>
+
+                <!-- Dropdown: Years -->
+                <div class="filter-dropdown-wrapper">
+                  <select
+                    class="toolbar-select"
+                    v-model="selectedYear"
+                    @change="onToolbarFilterChange('year', selectedYear)"
+                  >
+                    <option value="">All Years</option>
+                    <option v-for="year in getYears" :key="'yr_' + year" :value="year">
+                      {{ year }}
+                    </option>
+                  </select>
+                  <i class="bx bx-chevron-down select-chevron"></i>
+                </div>
+
+                <!-- Dropdown: Statuses -->
+                <div class="filter-dropdown-wrapper">
+                  <select
+                    class="toolbar-select"
+                    v-model="selectedStatus"
+                    @change="onToolbarFilterChange('status', selectedStatus)"
+                  >
+                    <option value="">All Statuses</option>
+                    <option v-for="status in getStatuses" :key="'st_' + status" :value="status">
+                      {{ status }}
+                    </option>
+                  </select>
+                  <i class="bx bx-chevron-down select-chevron"></i>
+                </div>
+
+                <!-- Clear Active Filters Pill -->
+                <button
+                  v-if="hasActiveFilters"
+                  type="button"
+                  class="btn-reset-filters"
+                  title="Reset all filters"
+                  @click="resetAllFilters"
+                >
+                  <i class="bx bx-refresh mr-25"></i> Reset
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. MAIN WORKSPACE: TABLE + PREVIEW PANEL (Side-by-Side) -->
+          <div class="inventory-main-layout" :class="{ 'with-preview-open': isPreviewOpen }">
+            <!-- LEFT: Table & Pagination Container -->
+            <div class="inventory-table-container">
+              <div class="inventory-table-card shadow-sm" style="position: relative;">
+                <!-- Loading Overlay when filtering, searching, or paging -->
+                <div v-if="isTableLoading" class="zd-inventory-loading-overlay">
+                  <div class="zd-loading-indicator-card">
+                    <i class="bx bx-loader-alt bx-spin text-primary"></i>
+                    <span>Loading inventory...</span>
+                  </div>
+                </div>
+
+                <div class="table-responsive inventory-table-responsive" :class="{ compact: getCompact }">
+                  <table class="inventory-main-table">
+                    <thead>
+                      <tr class="inventory-table-head-row">
+                        <!-- 1. Checkbox Column -->
+                        <th class="th-checkbox">
+                          <label class="custom-chk-container">
+                            <input
+                              class="custom-chk-input"
+                              type="checkbox"
+                              v-model="bulk_select"
+                              :true-value="'1'"
+                              :false-value="'0'"
+                            />
+                            <span class="custom-chk-box"></span>
+                          </label>
+                        </th>
+
+                        <!-- 2. Photo Column -->
+                        <th class="th-photo">Photo</th>
+
+                        <!-- 3. Year Column with Sort -->
+                        <th class="th-year th-sortable" @click="toggleSort('year')">
+                          <span class="lr-sort">
+                            <span>Year</span>
+                            <i v-if="isSortAsc('year')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('year')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 4. Make / Model Column with Sort -->
+                        <th class="th-make-model th-sortable" @click="toggleSort('make')">
+                          <span class="lr-sort">
+                            <span>Make / Model</span>
+                            <i v-if="isSortAsc('make')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('make')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 5. VIN Column with Sort -->
+                        <th class="th-vin th-sortable" @click="toggleSort('vin')">
+                          <span class="lr-sort">
+                            <span>VIN</span>
+                            <i v-if="isSortAsc('vin')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('vin')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 6. Stock # Column with Sort -->
+                        <th class="th-stock th-sortable" @click="toggleSort('stock_no')">
+                          <span class="lr-sort">
+                            <span>Stock #</span>
+                            <i v-if="isSortAsc('stock_no')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('stock_no')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 7. Status Column with Sort -->
+                        <th class="th-status th-sortable" @click="toggleSort('status')">
+                          <span class="lr-sort">
+                            <span>Status</span>
+                            <i v-if="isSortAsc('status')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('status')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 8. Price Column with Sort -->
+                        <th class="th-price th-sortable" @click="toggleSort('price')">
+                          <span class="lr-sort">
+                            <span>Price</span>
+                            <i v-if="isSortAsc('price')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('price')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 9. KMs Column with Sort -->
+                        <th class="th-kms th-sortable" @click="toggleSort('odometer')">
+                          <span class="lr-sort">
+                            <span>KMs</span>
+                            <i v-if="isSortAsc('odometer')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('odometer')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 10. Last Sync Column with Sort -->
+                        <th class="th-last-sync th-sortable" @click="toggleSort('updated_at')">
+                          <span class="lr-sort">
+                            <span>Last Sync</span>
+                            <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 11. Website / VDP Column -->
+                        <th class="th-action text-center">Website / VDP</th>
+
+                        <!-- 12. CARFAX Column: Only visible if CARFAX data exists in backend and not in syndication view -->
+                        <th v-if="hasCarfaxInListing" class="th-action text-center">CARFAX</th>
+
+                        <!-- 13. Repair Report Column -->
+                        <th class="th-action text-center">Repair Report</th>
+
+                        <!-- Dynamic Syndication Headers -->
+                        <template v-if="getCurrentSyndicationViewStatus">
+                          <th
+                            class="text-center th-syndication-header"
+                            v-for="active_syndication in getActiveSyndicationList"
+                            :key="`inventory_${active_syndication.slug}_header`"
+                          >
+                            {{ active_syndication.label }}
+                          </th>
+                        </template>
+                      </tr>
+                    </thead>
+
+                    <!-- Table Body -->
+                    <tbody>
+                      <!-- Loading Indicator (Initial load or loading when empty) -->
+                      <tr v-if="!getLoadState || (isTableLoading && getEntities.length === 0)">
+                        <td colspan="15" class="text-center py-5 text-muted">
+                          <div class="d-flex flex-column align-items-center justify-content-center py-4">
+                            <i class="bx bx-loader-alt bx-spin text-primary mb-2" style="font-size: 32px;"></i>
+                            <span style="font-size: 14px; font-weight: 500; color: #4b5563;">Loading vehicles...</span>
                           </div>
-                        </div>
-                      </li>
-                    </ul>
-                    <!-- bulk update buttons -->
-                    <div
-                      class="ml-0 mt-1 list-group list-group-horizontal"
-                      role="alert"
-                      v-else-if="!getCurrentSyndicationViewStatus"
-                    >
-                      <div class="d-inline-block mr-1">
-                        <ul class="bulk-list" style="margin-bottom: 0px">
-                          <li class="d-inline-block mr-1">
-                            <span
-                              class="form-control btn-outline-danger"
-                              style="cursor: pointer"
-                              @click="confirmDeleteAction"
-                            >
-                              Delete
-                            </span>
-                          </li>
-                          <li class="d-inline-block mr-1">
-                            <a
-                              href="#"
-                              data-toggle="modal"
-                              data-target="#bulk-list"
-                              class="btn btn-outline-primary"
-                              >Bulk Update</a
-                            >
-                          </li>
-                          <li class="mr-1 d-none">
-                            <select class="form-control btn-outline-primary">
-                              <option selected="" disabled="">
-                                Bulk Actions
-                              </option>
-                              <option>Print Window Sticker</option>
-                              <option>Print Buyer Guide</option>
-                            </select>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <!-- end bulk update buttons -->
-                    <!-- bulk syndication button : START -->
-                    <div
-                      class="ml-0 mt-1 list-group list-group-horizontal"
-                      role="alert"
-                      v-else-if="getCurrentSyndicationViewStatus"
-                    >
-                      <div class="d-inline-block mr-1">
-                        <ul class="bulk-list" style="margin-bottom: 0px">
-                          <li class="d-inline-block mr-1">
-                            <a
-                              href="#"
-                              data-toggle="modal"
-                              data-target="#bulk-syndication-update"
-                              class="btn btn-outline-primary"
-                              >Bulk Syndication</a
-                            >
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <!-- bulk syndication button : END -->
-                  </div>
-                  <div class="col-md-4 col-xs-12 col-xl-5">
-                    <div class="col-12">
-                      <fieldset
-                        class="form-label-group form-group position-relative has-icon-right mt-1"
-                      >
-                        <input
-                          type="text"
-                          id="searchText"
-                          v-debounce:1000ms="searchAction"
-                          v-model="searchString"
-                          class="form-control round"
-                          style="height: 2.6em"
-                          placeholder="Search Anything ..."
-                        />
+                        </td>
+                      </tr>
 
-                        <div class="form-control-position">
-                          <i class="bx bx-search"></i>
-                        </div>
-                      </fieldset>
-                    </div>
-                  </div>
-                  <div class="col-md-5 col-xl-4">
-                    <ul class="mt-1 mt-1">
-                      <li class="d-inline-block">
-                        <div
-                          class="btn-feild-box"
-                          style="top: 16px; right: 15px"
-                        >
-                          <ul>
-                            <router-link
-                              tag="li"
-                              :to="{ name: 'inventory-create' }"
-                              class="d-inline-block"
-                              exact
-                            >
-                              <a class="btn btn-primary">Add Inventory</a>
-                            </router-link>
-                            <li class="d-none d-sm-none d-md-inline-block">
-                              <span
-                                href="#"
-                                :class="
-                                  getFilterState
-                                    ? 'bg-secondary bx-tada text-white'
-                                    : ''
-                                "
-                                class="list-space border bx bxs-filter-alt"
-                                title="Filters"
-                                data-toggle="modal"
-                                data-target="#filters"
-                              ></span>
-                            </li>
-                            <li class="d-none d-sm-none d-md-inline-block">
-                              <span
-                                href="#"
-                                title="Modify View"
-                                class="list-space border bx bxs-grid"
-                                data-toggle="modal"
-                                data-target="#grid-list"
-                              ></span>
-                            </li>
+                      <!-- Empty State -->
+                      <tr v-else-if="getEntities.length === 0">
+                        <td colspan="15" class="text-center py-4 text-muted">
+                          <i class="bx bx-search-alt mb-1" style="font-size: 28px;"></i>
+                          <p class="mb-0">No vehicles found matching current criteria.</p>
+                        </td>
+                      </tr>
 
-                            <li class="d-inline-block" @click="changeCompact">
-                              <span
-                                title="Compact View"
-                                class="list-space border bx"
-                                :class="
-                                  getCompact ? 'bx-expand' : 'bx-collapse'
-                                "
-                              ></span>
-                            </li>
-                            <li
-                              v-if="
-                                isAuthorized && !getCurrentSyndicationViewStatus
-                              "
-                              @click="changeSyndicationViewStatus"
-                              class="d-inline-block"
-                              style="cursor: pointer"
-                            >
-                              <span
-                                title="Bulk Syndication Change"
-                                class="list-space border bx bx-transfer"
-                              ></span>
-                            </li>
-                            <li
-                              v-else-if="getCurrentSyndicationViewStatus"
-                              @click="changeSyndicationViewStatus"
-                              class="d-inline-block"
-                              style="cursor: pointer"
-                            >
-                              <span
-                                title="Inventory View"
-                                class="list-space border bx bx-transfer bg-secondary bx-tada text-white"
-                              ></span>
-                            </li>
-                            <router-link
-                              tag="li"
-                              title="Settings"
-                              :to="{ name: 'inventory-settings' }"
-                              class="d-inline-block"
-                              exact
-                            >
-                              <span
-                                style="cursor: pointer"
-                                class="list-space border bx bxs-cog"
-                              ></span>
-                            </router-link>
-                            <li class="d-inline-block">
-                              <div class="dropdown">
-                                <span
-                                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer list-space border"
-                                  data-toggle="dropdown"
-                                  aria-haspopup="true"
-                                  aria-expanded="false"
-                                  role="menu"
-                                ></span>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                  <router-link
-                                    v-if="isAuthorized"
-                                    tag="a"
-                                    title="Bulk Price Updates"
-                                    :to="{ name: 'inventory-updates-pricing' }"
-                                    class="dropdown-item"
-                                    exact
-                                  >
-                                    <span
-                                      style="cursor: pointer"
-                                      class="bx bxs-dollar-circle mr-1"
-                                    ></span>
-                                    Bulk Price Updates
-                                  </router-link>
-                                  <router-link
-                                    v-if="isAuthorized"
-                                    tag="a"
-                                    title="Bulk Description Updates"
-                                    :to="{
-                                      name: 'inventory-updates-description',
-                                    }"
-                                    class="dropdown-item"
-                                    exact
-                                  >
-                                    <span
-                                      style="cursor: pointer"
-                                      class="bx bx-text mr-1"
-                                    ></span>
-                                    Bulk Description Updates
-                                  </router-link>
-                                  <a
-                                    v-if="isAuthorized"
-                                    class="dropdown-item"
-                                    @click="warningForPurgeDeletingInventories"
-                                    style="cursor: pointer"
-                                    title="Empty Recycle Bin"
-                                  >
-                                    <span class="bx bxs-eraser mr-1"></span>
-                                    Empty Recycle Bin
-                                  </a>
-                                  <router-link
-                                    tag="a"
-                                    title="Bulk Import from Third Party Using CSV"
-                                    :to="{ name: 'third-party-inventory' }"
-                                    class="dropdown-item"
-                                    exact
-                                  >
-                                    <span
-                                      style="cursor: pointer"
-                                      class="bx bxs-file-import mr-1"
-                                    ></span>
-                                    Bulk Import from Third Party Using CSV
-                                  </router-link>
-                                  <router-link
-                                    tag="a"
-                                    title="Quick Inventory Import Manually or via PDF"
-                                    :to="{ name: 'inventory-import' }"
-                                    class="dropdown-item"
-                                    exact
-                                  >
-                                    <span
-                                      style="cursor: pointer"
-                                      class="bx bx-upload mr-1"
-                                    ></span>
-                                    Quick Inventory Import
-                                  </router-link>
-                                </div>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-                    </ul>
+                      <!-- Vehicle Rows -->
+                      <template v-else>
+                        <inventory-item
+                          v-for="item in getEntities"
+                          :key="item.inventory_id + '_item_listing_view'"
+                          :item="item"
+                          :time_zone="timeZoneName"
+                          :childCheck="bulk_select"
+                          :placeholder_image="placeholder_image"
+                          :app_metadata="app_metadata"
+                          :isSelected="selectedInventoryId === item.inventory_id"
+                          :isCompact="Boolean(getCompact)"
+                          :showCarfaxColumn="hasCarfaxInListing"
+                          @select-row="handleRowSelect"
+                        ></inventory-item>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 5. PAGINATION FOOTER: Docked & Always Visible -->
+                <div class="inventory-pagination-footer">
+                  <div class="pagination-info">
+                    Showing {{ paginationStart }}–{{ paginationEnd }} of {{ totalInventoryCount }} vehicles
+                  </div>
+
+                  <!-- Center/Right Pagination Buttons -->
+                  <div class="pagination-controls">
+                    <button
+                      type="button"
+                      class="pagination-nav-btn"
+                      :disabled="getPager.previous == null"
+                      @click="paginationWithUrl(getPager.previous)"
+                      title="Previous Page"
+                    >
+                      <i class="bx bx-chevron-left"></i>
+                    </button>
+
+                    <!-- Page Number Buttons -->
+                    <button
+                      v-for="p in visiblePageNumbers"
+                      :key="'page_' + p"
+                      type="button"
+                      class="pagination-num-btn"
+                      :class="{ active: p === getCurrentPage, ellipsis: p === '...' }"
+                      :disabled="p === '...'"
+                      @click="p !== '...' && pagination(p)"
+                    >
+                      {{ p }}
+                    </button>
+
+                    <button
+                      type="button"
+                      class="pagination-nav-btn"
+                      :disabled="getPager.next == null"
+                      @click="paginationWithUrl(getPager.next)"
+                      title="Next Page"
+                    >
+                      <i class="bx bx-chevron-right"></i>
+                    </button>
+                  </div>
+
+                  <!-- Page Size Selector -->
+                  <div class="pagination-page-size">
+                    <span class="mr-1 text-muted">Rows per page</span>
+                    <select
+                      class="page-size-select"
+                      v-model="getNumberOfEntities"
+                    >
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- RIGHT: INVENTORY PREVIEW PANEL (Opened when a row is clicked) -->
+            <transition name="slide-panel">
+              <inventory-preview-panel
+                v-if="isPreviewOpen && selectedVehicleItem"
+                :item="selectedVehicleItem"
+                :app_metadata="app_metadata"
+                :time_zone="timeZoneName"
+                :placeholder_image="placeholder_image"
+                @close="closePreviewPanel"
+                @open-vdp="openInventoryNewTab"
+              ></inventory-preview-panel>
+            </transition>
           </div>
-          <!--grid list modal -->
+
+          <!-- 6. PRESERVED MODALS: Custom Columns Draggable List Modal -->
           <div
             class="modal fade text-left"
             id="grid-list"
             tabindex="-1"
             role="dialog"
-            aria-labelledby="myModalLabel19"
+            aria-labelledby="gridListLabel"
             aria-hidden="true"
           >
-            <div
-              class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm"
-              role="document"
-            >
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm" role="document">
               <div class="modal-content">
                 <div class="modal-header pl-1 pr-1">
-                  <h3 class="content-header-title" id="myModalLabel19">
-                    Column List
-                  </h3>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
+                  <h4 class="modal-title font-weight-bold" id="gridListLabel">Column List</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="bx bx-x"></i>
                   </button>
                 </div>
                 <div class="modal-body p-0">
-                  <!-- Draggable List : OPEN -->
                   <draggable
                     tag="transition-group"
-                    :component-data="{
-                      tag: 'ul',
-                      type: 'transition',
-                      name: 'flip-list'
-                    }"
+                    :component-data="{ tag: 'ul', type: 'transition', name: 'flip-list' }"
                     :list="list"
                     v-bind="dragOptions"
                     @start="isDragging = true"
@@ -440,369 +644,48 @@
                     item-key="header"
                   >
                     <template #item="{ element, index }">
-                      <li class="list-group-item">
-                        <span
-                          style="cursor: pointer"
-                          class="bx bx-grid-vertical pr-1 handle"
-                        ></span>
-                        <div class="checkbox">
+                      <li class="list-group-item d-flex align-items-center">
+                        <span style="cursor: pointer" class="bx bx-grid-vertical pr-1 handle text-muted"></span>
+                        <div class="checkbox mb-0">
                           <input
                             type="checkbox"
                             @change="unsavedView"
                             v-model="element.visibility"
                             class="checkbox-input"
-                            value="photodrag"
                             :id="'dragging_' + index"
                             :true-value="'1'"
                             :false-value="'0'"
                           />
-                          <label :for="'dragging_' + index">{{
-                            element.header
-                          }}</label>
+                          <label :for="'dragging_' + index" class="mb-0 ml-1">{{ element.header }}</label>
                         </div>
                       </li>
                     </template>
                   </draggable>
-                  <!-- Draggable List : CLOSE -->
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- bulk syndication : START -->
-          <div
-            class="modal fade text-left"
-            id="bulk-syndication-update"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="Bulk Syndication Modal"
-            aria-hidden="true"
-          >
-            <div
-              class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-              role="document"
-            >
-              <div class="modal-content">
-                <div class="modal-header pl-1 pr-1">
-                  <h3 class="content-header-title" id="myModalLabel19">
-                    Bulk Syndication Update
-                  </h3>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <i class="bx bx-x"></i>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="row">
-                    <div class="col-md-5">
-                      <label>Action</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <select
-                        class="custom-select form-control"
-                        v-model="syndication.action"
-                        id="feature_listing"
-                        name="feature_listing"
-                      >
-                        <option value="" disabled="">- Select Action -</option>
-                        <option value="ADD">ADD</option>
-                        <option value="REMOVE">REMOVE</option>
-                      </select>
-                    </div>
-                    <div class="col-md-12">
-                      <label>Available List</label>
-                    </div>
-                    <div
-                      class="col-md-6"
-                      :key="`inventory_${active_syndication.slug}_checkbox`"
-                      v-for="active_syndication in getActiveSyndicationList"
-                    >
-                      <div class="checkbox">
-                        <input
-                          type="checkbox"
-                          class="checkbox-input"
-                          :id="
-                            active_syndication.slug + '_syndication_checkbox'
-                          "
-                          v-model="syndication.slugs"
-                          :value="active_syndication.slug"
-                        />
-                        <label
-                          :for="
-                            active_syndication.slug + '_syndication_checkbox'
-                          "
-                        >
-                          {{ active_syndication.label }}
-                        </label>
-                      </div>
-                    </div>
-                    <div class="col-sm-12 d-flex justify-content-left pb-1">
-                      <button
-                        type="close"
-                        @click="confirmBulkSyndicationUpdate"
-                        class="btn mr-1 mt-1"
-                        :class="getBulkSydnicationConfirmButtonClass"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        {{ syndication.action }}
-                      </button>
-                      <button
-                        type="close"
-                        @click="resetSyndicationColumns"
-                        class="btn btn-light-secondary mr-1 mt-1"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- bulk syndication : END -->
-
-          <!-- bulk grid list modal -->
-          <div
-            class="modal fade text-left"
-            id="bulk-list"
-            tabindex="-1"
-            role="dialog"
-            aria-labelledby="myModalLabel19"
-            aria-hidden="true"
-          >
-            <div
-              class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-              role="document"
-            >
-              <div class="modal-content">
-                <div class="modal-header pl-1 pr-1">
-                  <h3 class="content-header-title" id="myModalLabel19">
-                    Inventory Bulk Update
-                  </h3>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <i class="bx bx-x"></i>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <div class="row">
-                    <div class="col-md-5">
-                      <label>Featured Vehicle</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <select
-                        class="custom-select form-control"
-                        v-model="form.feature_listing"
-                        id="feature_listing"
-                        name="feature_listing"
-                      >
-                        <option value="" selected="" disabled="">
-                          - Select Featured -
-                        </option>
-                        <option value="1">Featured</option>
-                        <option value="0">Not Featured</option>
-                      </select>
-                    </div>
-                    <div class="col-md-5">
-                      <label>Status</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <fieldset>
-                        <div class="input-group">
-                          <select
-                            class="custom-select form-control"
-                            v-model="form.status"
-                            id="status"
-                            name="status"
-                          >
-                            <option value="" selected disabled>
-                              - Select Status -
-                            </option>
-                            <option
-                              :value="status"
-                              v-for="status in getStatuses"
-                              :key="status"
-                            >
-                              {{ status }}
-                            </option>
-                          </select>
-                        </div>
-                      </fieldset>
-                    </div>
-                    <div class="col-md-5">
-                      <label>Sub Status</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <fieldset>
-                        <div class="input-group">
-                          <select
-                            class="custom-select form-control"
-                            v-model="form.sub_status"
-                            id="sub_status"
-                            name="sub_status"
-                          >
-                            <option value="" selected disabled>
-                              - Select Sub Status -
-                            </option>
-                            <option
-                              :value="status"
-                              v-for="status in getSubStatues"
-                              :key="status"
-                            >
-                              {{ status }}
-                            </option>
-                          </select>
-                        </div>
-                      </fieldset>
-                    </div>
-                    <div class="col-md-5">
-                      <label>Vehicle Type</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <select
-                        class="custom-select form-control"
-                        v-model="form.vehicle_type"
-                        id="vehicle_type"
-                        name="vehicle_type"
-                      >
-                        <option value="" selected disabled>
-                          - Select Vehicle Type -
-                        </option>
-                        <option
-                          :value="vehicle_tyoe"
-                          v-for="vehicle_tyoe in getVehicleTypes"
-                          :key="vehicle_tyoe"
-                        >
-                          {{ vehicle_tyoe }}
-                        </option>
-                      </select>
-                    </div>
-                    <div class="col-md-5">
-                      <label>Visibility</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <select
-                        class="custom-select form-control"
-                        v-model="form.visibility"
-                        id="visibility"
-                        name="visibility"
-                      >
-                        <option value="" selected="" disabled="">
-                          - Select Visibility -
-                        </option>
-                        <option value="1">ON</option>
-                        <option value="0">OFF</option>
-                      </select>
-                    </div>
-                    <div class="col-md-5">
-                      <label>Body Type</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <select
-                        class="custom-select form-control mr-1"
-                        v-model="form.body_type"
-                        id="body_type"
-                        name="body_type"
-                      >
-                        <option value="" selected disabled>
-                          - Select Body Type -
-                        </option>
-                        <option
-                          :value="body_type"
-                          v-for="body_type in body_types"
-                          :key="body_type"
-                          v-text="body_type"
-                        ></option>
-                      </select>
-                    </div>
-                    <div class="col-md-5">
-                      <label>Transmission</label>
-                    </div>
-                    <div class="col-md-7 form-group">
-                      <select
-                        class="custom-select form-control mr-1"
-                        id="transmission"
-                        v-model="form.transmission"
-                        name="transmission"
-                      >
-                        <option value="" selected disabled>
-                          - Select Transmission -
-                        </option>
-                        <option
-                          :value="transmission"
-                          v-for="transmission in transmissions"
-                          :key="transmission"
-                          v-text="transmission"
-                        ></option>
-                      </select>
-                    </div>
-                    <div class="col-sm-12 d-flex justify-content-left pb-1">
-                      <button
-                        type="close"
-                        @click="applyBulkOptions"
-                        class="btn btn-primary mr-1 mt-1"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        Update Fields
-                      </button>
-                      <button
-                        type="close"
-                        @click="resetBulkColumns"
-                        class="btn btn-light-secondary mr-1 mt-1"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Filter Model : START -->
+          <!-- 7. PRESERVED MODALS: Advanced Filters Modal -->
           <div
             class="modal fade text-left"
             id="filters"
             tabindex="-1"
             role="dialog"
-            aria-labelledby="myModalLabel19"
+            aria-labelledby="filtersModalLabel"
             aria-hidden="true"
           >
-            <div
-              class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-              role="document"
-            >
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
               <div class="modal-content" id="filterInventoryModel">
                 <div class="modal-header pl-1 pr-1">
-                  <h3 class="content-header-title">Filters</h3>
-                  <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close"
-                  >
+                  <h4 class="modal-title font-weight-bold" id="filtersModalLabel">Advanced Filters</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="bx bx-x"></i>
                   </button>
                 </div>
                 <div class="modal-body">
                   <div class="row">
-                    <!-- year : START -->
-                    <div class="col-md-5">
-                      <label>Year</label>
-                    </div>
+                    <div class="col-md-5"><label>Year</label></div>
                     <div class="col-md-7 form-group">
                       <v-select
                         id="filter-year"
@@ -810,15 +693,10 @@
                         v-model="yearFilter"
                         clearable
                         :options="getYears"
-                      >
-                      </v-select>
+                      ></v-select>
                     </div>
-                    <!-- year : END -->
 
-                    <!-- make : START -->
-                    <div class="col-md-5">
-                      <label>Make</label>
-                    </div>
+                    <div class="col-md-5"><label>Make</label></div>
                     <div class="col-md-7 form-group">
                       <v-select
                         id="filter-make"
@@ -826,15 +704,10 @@
                         v-model="makeFilter"
                         clearable
                         :options="getMakes"
-                      >
-                      </v-select>
+                      ></v-select>
                     </div>
-                    <!-- make : END -->
 
-                    <!-- model : START -->
-                    <div class="col-md-5">
-                      <label>Model</label>
-                    </div>
+                    <div class="col-md-5"><label>Model</label></div>
                     <div class="col-md-7 form-group">
                       <v-select
                         id="filter-model"
@@ -842,15 +715,10 @@
                         v-model="modelFilter"
                         clearable
                         :options="getModels"
-                      >
-                      </v-select>
+                      ></v-select>
                     </div>
-                    <!-- model : END -->
 
-                    <!-- status : START -->
-                    <div class="col-md-5">
-                      <label>Status</label>
-                    </div>
+                    <div class="col-md-5"><label>Status</label></div>
                     <div class="col-md-7 form-group">
                       <v-select
                         id="filter-status"
@@ -858,15 +726,10 @@
                         v-model="statusFilter"
                         clearable
                         :options="getStatuses"
-                      >
-                      </v-select>
+                      ></v-select>
                     </div>
-                    <!-- status : END -->
 
-                    <!-- visibility : START -->
-                    <div class="col-md-5">
-                      <label>Visibility</label>
-                    </div>
+                    <div class="col-md-5"><label>Visibility</label></div>
                     <div class="col-md-7 form-group">
                       <v-select
                         id="filter-visibility"
@@ -874,33 +737,24 @@
                         v-model="visibilityFilter"
                         clearable
                         :reduce="(visibility) => visibility.value"
-                        :options="[
-                          { label: 'ON', value: '1' },
-                          { label: 'OFF', value: '0' },
-                        ]"
-                      >
-                      </v-select>
+                        :options="[{ label: 'ON', value: '1' }, { label: 'OFF', value: '0' }]"
+                      ></v-select>
                     </div>
-                    <!-- visibility : END -->
 
-                    <div class="col-xs-12 p-1"></div>
-
-                    <div class="col-sm-12 d-flex justify-content-left pb-1">
+                    <div class="col-sm-12 d-flex justify-content-left pt-1">
                       <button
-                        type="close"
+                        type="button"
                         @click="filterInventory"
-                        class="btn btn-primary mr-1 mt-1"
+                        class="btn btn-primary mr-1"
                         data-dismiss="modal"
-                        aria-label="Close"
                       >
                         Apply Filters
                       </button>
                       <button
-                        type="close"
+                        type="button"
                         @click="resetFilters"
-                        class="btn btn-light-secondary mr-1 mt-1"
+                        class="btn btn-light-secondary"
                         data-dismiss="modal"
-                        aria-label="Reset"
                       >
                         Reset
                       </button>
@@ -910,443 +764,211 @@
               </div>
             </div>
           </div>
-          <!-- Filter Model : END -->
-          <div class="pr-0 pl-0">
-            <div class="content-body">
-              <div class="card shadow-none mb-0">
-                <div
-                  class="table-responsive tab-wid check-bulk"
-                  :class="getCompact ? 'compact' : ''"
-                  style="height: 70vh"
-                >
-                  <table
-                    id="table-extended-transactions"
-                    class="list-page-content-p mt-0 mb-0"
-                  >
-                    <thead>
-                      <tr class="bg-grey">
-                        <th
-                          class="left-space-box"
-                          id="d-list"
-                          style="width: 40px"
-                        >
-                          <input
-                            class="select_check"
-                            type="checkbox"
-                            v-model="bulk_select"
-                            :true-value="'1'"
-                            :false-value="'0'"
-                          />
-                        </th>
-                        <th style="width: 20px"></th>
-                        <th style="width: 100px"></th>
-                        <th style="width: 90px" class="left-set">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('year')"
-                          >
-                            <span
-                              @click="updateSortColumn('year', 'ASC')"
-                              v-if="getSortColumn['year'] == 'DESC'"
-                              >Year <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('year', 'DESC')"
-                              v-else-if="getSortColumn['year'] == 'ASC'"
-                              >Year <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('year', 'ASC')"
-                            v-else
-                            >Year <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <th style="width: 90px" class="left-set">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('make')"
-                          >
-                            <span
-                              @click="updateSortColumn('make', 'ASC')"
-                              v-if="getSortColumn['make'] == 'DESC'"
-                              >Make <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('make', 'DESC')"
-                              v-else-if="getSortColumn['make'] == 'ASC'"
-                              >Make <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('make', 'ASC')"
-                            v-else
-                            >Make <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <th style="width: 100px" class="left-set">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('model')"
-                          >
-                            <span
-                              @click="updateSortColumn('model', 'ASC')"
-                              v-if="getSortColumn['model'] == 'DESC'"
-                              >Model <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('model', 'DESC')"
-                              v-else-if="getSortColumn['model'] == 'ASC'"
-                              >Model <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('model', 'ASC')"
-                            v-else
-                            >Model <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <th style="width: 90px" class="left-set">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('trim')"
-                          >
-                            <span
-                              @click="updateSortColumn('trim', 'ASC')"
-                              v-if="getSortColumn['trim'] == 'DESC'"
-                              >Trim <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('trim', 'DESC')"
-                              v-else-if="getSortColumn['trim'] == 'ASC'"
-                              >Trim <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('trim', 'ASC')"
-                            v-else
-                            >Trim <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <th style="width: 90px" class="left-set">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('vin')"
-                          >
-                            <span
-                              @click="updateSortColumn('vin', 'ASC')"
-                              v-if="getSortColumn['vin'] == 'DESC'"
-                              >VIN <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('vin', 'DESC')"
-                              v-else-if="getSortColumn['vin'] == 'ASC'"
-                              >VIN <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('vin', 'ASC')"
-                            v-else
-                            >VIN <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <th style="width: 160px" class="left-set">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('stock_no')"
-                          >
-                            <span
-                              @click="updateSortColumn('stock_no', 'ASC')"
-                              v-if="getSortColumn['stock_no'] == 'DESC'"
-                              >Stock <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('stock_no', 'DESC')"
-                              v-else-if="getSortColumn['stock_no'] == 'ASC'"
-                              >Stock <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('stock_no', 'ASC')"
-                            v-else
-                            >Stock <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <th style="min-width: 150px" class="text-center">
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            v-if="getSortColumn.hasOwnProperty('days_in_stock')"
-                          >
-                            <span
-                              @click="updateSortColumn('days_in_stock', 'ASC')"
-                              v-if="getSortColumn['days_in_stock'] == 'DESC'"
-                              >DIS <i class="bx bx-sort-down"></i>
-                            </span>
-                            <span
-                              @click="updateSortColumn('days_in_stock', 'DESC')"
-                              v-else-if="
-                                getSortColumn['days_in_stock'] == 'ASC'
-                              "
-                              >DIS <i class="bx bx-sort-up"></i>
-                            </span>
-                          </span>
-                          <span
-                            style="cursor: pointer"
-                            class="btn btn-link p-0"
-                            @click="updateSortColumn('days_in_stock', 'ASC')"
-                            v-else
-                            >DIS <i class="bx bx-menu"></i>
-                          </span>
-                        </th>
-                        <template v-for="element in list">
-                          <th
-                            class="text-center"
-                            style="min-width: 150px"
-                            :key="element.header"
-                            v-if="
-                              element.visibility == '1' &&
-                                !getCurrentSyndicationViewStatus
-                            "
-                          >
-                            <span
-                              style="cursor: pointer"
-                              class="btn btn-link p-0"
-                              v-if="
-                                getSortColumn.hasOwnProperty(element.column)
-                              "
-                            >
-                              <span
-                                @click="updateSortColumn(element.column, 'ASC')"
-                                v-if="getSortColumn[element.column] == 'DESC'"
-                                >{{ element.header }}
-                                <i class="bx bx-sort-down"></i>
-                              </span>
-                              <span
-                                @click="
-                                  updateSortColumn(element.column, 'DESC')
-                                "
-                                v-else-if="
-                                  getSortColumn[element.column] == 'ASC'
-                                "
-                                >{{ element.header }}
-                                <i class="bx bx-sort-up"></i>
-                              </span>
-                            </span>
-                            <span
-                              style="cursor: pointer"
-                              class="btn btn-link p-0"
-                              @click="updateSortColumn(element.column, 'ASC')"
-                              v-else
-                              >{{ element.header }} <i class="bx bx-menu"></i>
-                            </span>
-                          </th>
-                        </template>
-                        <template v-if="getCurrentSyndicationViewStatus">
-                          <th
-                            class="text-center"
-                            style="min-width: 150px"
-                            :key="`inventory_${active_syndication.slug}_header`"
-                            v-for="active_syndication in getActiveSyndicationList"
-                          >
-                            {{ active_syndication.label }}
-                          </th>
-                        </template>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <inventory-item
-                        v-for="item in getEntities"
-                        :placeholder_image="placeholder_image"
-                        :item="item"
-                        :time_zone="timeZoneName"
-                        :childCheck="bulk_select"
-                        :app_metadata="app_metadata"
-                        v-bind:key="item.inventory_id + '_item_listing_view'"
-                      ></inventory-item>
-                    </tbody>
-                  </table>
-                </div>
-                <!-- datatable ends -->
 
-                <!-- Navigation Pagination : START -->
-                <div class="row content-wrapper mt-1 pt-0">
-                  <div class="col-sm-4">
-                    <div
-                      class="dataTables_info"
-                      id="table-extended-transactions_info"
-                      role="status"
-                      aria-live="polite"
-                    >
-                      Total Records {{ getPager.total }}
+          <!-- 8. PRESERVED MODALS: Bulk Update Modal -->
+          <div
+            class="modal fade text-left"
+            id="bulk-list"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="bulkListModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+              <div class="modal-content">
+                <div class="modal-header pl-1 pr-1">
+                  <h4 class="modal-title font-weight-bold" id="bulkListModalLabel">Bulk Update Vehicles</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="bx bx-x"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-5"><label>Featured Vehicle</label></div>
+                    <div class="col-md-7 form-group">
+                      <select class="custom-select form-control" v-model="form.feature_listing">
+                        <option value="" selected disabled>- Select Featured -</option>
+                        <option value="1">Featured</option>
+                        <option value="0">Not Featured</option>
+                      </select>
                     </div>
-                  </div>
-                  <div class="col-sm-5 text-right d-list-box">
-                    <div
-                      class="dataTables_length"
-                      id="table-extended-transactions_length"
-                    >
-                      <label>
-                        <select
-                          v-model="getNumberOfEntities"
-                          name="table-extended-transactions_length"
-                          aria-controls="table-extended-transactions"
-                          class="custom-select custom-select-sm form-control form-control-sm"
-                        >
-                          <option value="10">10</option>
-                          <option value="25">25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                          <option value="200">200</option>
-                          <option value="250">250</option>
-                        </select>
-                        per Page
-                      </label>
+
+                    <div class="col-md-5"><label>Status</label></div>
+                    <div class="col-md-7 form-group">
+                      <select class="custom-select form-control" v-model="form.status">
+                        <option value="" selected disabled>- Select Status -</option>
+                        <option :value="status" v-for="status in getStatuses" :key="status">
+                          {{ status }}
+                        </option>
+                      </select>
                     </div>
-                  </div>
-                  <div class="col-sm-3 text-right">
-                    <div
-                      class="dataTables_paginate paging_simple_numbers"
-                      id="table-extended-transactions_paginate"
-                    >
-                      <ul class="pagination">
-                        <li
-                          style="cursor: pointer; padding-right: 0.2em"
-                          class="paginate_button page-item previous"
-                          @click="paginationWithUrl(getPager.previous)"
-                          :class="{ disabled: getPager.previous == null }"
-                          id="table-extended-transactions_previous"
-                        >
-                          <a
-                            aria-controls="table-extended-transactions"
-                            data-dt-idx="0"
-                            tabindex="0"
-                            class="page-link"
-                            >&lt;</a
-                          >
-                        </li>
-                        <li
-                          style="cursor: pointer; padding-right: 0.2em"
-                          class="paginate_button page-item"
-                          :class="{ active: n === getCurrentPage }"
-                          v-show="
-                            n >= getCurrentPage - 2 && n <= getCurrentPage + 2
-                          "
-                          v-for="n in getPager.pageCount"
-                          :key="'nav_id' + n"
-                        >
-                          <a
-                            aria-controls="table-extended-transactions"
-                            @click="pagination(n)"
-                            :data-dt-idx="n"
-                            tabindex="0"
-                            class="page-link"
-                            >{{ n }}</a
-                          >
-                        </li>
-                        <li
-                          style="cursor: pointer; padding-right: 0.2em"
-                          class="paginate_button page-item next"
-                          :class="{ disabled: getPager.next == null }"
-                          id="table-extended-transactions_next"
-                        >
-                          <a
-                            aria-controls="table-extended-transactions"
-                            @click="paginationWithUrl(getPager.next)"
-                            data-dt-idx="3"
-                            tabindex="0"
-                            class="page-link"
-                            >&gt;</a
-                          >
-                        </li>
-                      </ul>
+
+                    <div class="col-md-5"><label>Sub Status</label></div>
+                    <div class="col-md-7 form-group">
+                      <select class="custom-select form-control" v-model="form.sub_status">
+                        <option value="" selected disabled>- Select Sub Status -</option>
+                        <option :value="status" v-for="status in getSubStatues" :key="status">
+                          {{ status }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-5"><label>Vehicle Type</label></div>
+                    <div class="col-md-7 form-group">
+                      <select class="custom-select form-control" v-model="form.vehicle_type">
+                        <option value="" selected disabled>- Select Vehicle Type -</option>
+                        <option :value="vt" v-for="vt in getVehicleTypes" :key="vt">
+                          {{ vt }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-5"><label>Visibility</label></div>
+                    <div class="col-md-7 form-group">
+                      <select class="custom-select form-control" v-model="form.visibility">
+                        <option value="" selected disabled>- Select Visibility -</option>
+                        <option value="1">ON</option>
+                        <option value="0">OFF</option>
+                      </select>
+                    </div>
+
+                    <div class="col-sm-12 d-flex justify-content-left pt-1">
+                      <button
+                        type="button"
+                        @click="applyBulkOptions"
+                        class="btn btn-primary mr-1"
+                        data-dismiss="modal"
+                      >
+                        Update Fields
+                      </button>
+                      <button
+                        type="button"
+                        @click="resetBulkColumns"
+                        class="btn btn-light-secondary"
+                        data-dismiss="modal"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>
                 </div>
-                <!-- Navigation Pagination : END -->
               </div>
             </div>
           </div>
-        </section>
-        <!-- form layout section end -->
-      </form>
+
+          <!-- 9. PRESERVED MODALS: Bulk Syndication Modal -->
+          <div
+            class="modal fade text-left"
+            id="bulk-syndication-update"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="bulkSyndicationModalLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+              <div class="modal-content">
+                <div class="modal-header pl-1 pr-1">
+                  <h4 class="modal-title font-weight-bold" id="bulkSyndicationModalLabel">Bulk Syndication Update</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="bx bx-x"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-5"><label>Action</label></div>
+                    <div class="col-md-7 form-group">
+                      <select class="custom-select form-control" v-model="syndication.action">
+                        <option value="ADD">ADD</option>
+                        <option value="REMOVE">REMOVE</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-5"><label>Syndication Partners</label></div>
+                    <div class="col-md-7 form-group">
+                      <v-select
+                        multiple
+                        v-model="syndication.slugs"
+                        :reduce="(partner) => partner.slug"
+                        :options="getActiveSyndicationList"
+                      ></v-select>
+                    </div>
+
+                    <div class="col-sm-12 d-flex justify-content-left pt-1">
+                      <button
+                        type="button"
+                        @click="confirmBulkSyndicationUpdate"
+                        class="btn mr-1"
+                        :class="getBulkSydnicationConfirmButtonClass"
+                        data-dismiss="modal"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        type="button"
+                        @click="resetSyndicationColumns"
+                        class="btn btn-light-secondary"
+                        data-dismiss="modal"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <inventory-snap-shot></inventory-snap-shot>
-  </div>
   <!-- END: Content-->
 </template>
+
 <script>
+const moment = require("moment");
 import draggable from "vuedraggable";
 import InventoryItem from "./InventoryItem.vue";
+import InventoryPreviewPanel from "./InventoryPreviewPanel.vue";
 import { mapGetters, mapActions } from "vuex";
 import Toast from "../../library/Toast";
 import vSelect from "vue-select";
-import InventorySnapShot from "./InventorySnapShot.vue";
 
 export default {
+  name: "InventoryList",
   props: {
     application: { required: true },
     app_metadata: { required: true },
     user_metadata: { required: true },
   },
-  name: "InventoryList",
   components: {
     "v-select": vSelect,
     InventoryItem,
+    InventoryPreviewPanel,
     draggable,
-    InventorySnapShot,
-  },
-  watch: {
-    single_search_inventory: function(newVal, oldVal) {
-      if (newVal.hasOwnProperty("inventory_id")) {
-        if (!isNaN(newVal.inventory_id)) {
-          this.$router.push({
-            name: "inventory-update",
-            params: { id: newVal.inventory_id },
-          });
-        }
-      }
-    },
   },
   data() {
     return {
       load: false,
       page: 1,
       bulk_select: "0",
-      inventory_heading: "Inventories",
-      inventory_listing: "",
-      pager: "",
+      selected_inventory: "All Inventories",
       inventory_views: [],
-      inventory_items: [],
-      single_search_inventory: null,
-      inventory_id: 1,
-      dragging: true,
-      inventory_view_flag: 1,
-      inventory_view_default: [],
+      placeholder_image: "",
+      sort_column: { created_at: "DESC" },
       body_types: [],
       transmissions: [],
-      sort_column: { created_at: "DESC" },
-      placeholder_image: "",
-      search: false,
-      search_string: "",
+      isDragging: false,
+      isAddMenuOpen: false,
+      isTableLoading: false,
+      // Toolbar Filter State
+      selectedMake: "",
+      selectedModel: "",
+      selectedYear: "",
+      selectedStatus: "",
+      // Right-side preview panel state
+      isPreviewOpen: false,
+      selectedInventoryId: null,
+      selectedVehicleItem: null,
+      // Bulk update forms
       form: {
         feature_listing: "",
         status: "",
@@ -1357,8 +979,8 @@ export default {
         transmission: "",
       },
       syndication: {
-        slugs: [],
         action: "ADD",
+        slugs: [],
       },
     };
   },
@@ -1374,7 +996,6 @@ export default {
       "getLoadState",
       "getEntitiesCount",
       "getCurrentPage",
-      "getCurrentEntity",
       "getSearchString",
       "getSearch",
       "getCompact",
@@ -1387,11 +1008,75 @@ export default {
       "getCurrentSyndicationViewStatus",
       "getActiveSyndicationList",
     ]),
+    hasCarfaxInListing() {
+      if (this.getCurrentSyndicationViewStatus) return false;
+      return Boolean(
+        this.getEntities &&
+        this.getEntities.some(
+          (item) =>
+            item.carfax_url ||
+            (item.carfax && item.carfax !== "0" && item.carfax !== 0) ||
+            item.has_carfax === 1 ||
+            item.has_carfax === "1"
+        )
+      );
+    },
+    totalInventoryCount() {
+      return (this.getPager && this.getPager.total != null) ? this.getPager.total : this.getEntities.length;
+    },
+    paginationStart() {
+      if (this.totalInventoryCount === 0) return 0;
+      return (this.getCurrentPage - 1) * this.getEntitiesCount + 1;
+    },
+    paginationEnd() {
+      return Math.min(this.getCurrentPage * this.getEntitiesCount, this.totalInventoryCount);
+    },
+    visiblePageNumbers() {
+      const pageCount = (this.getPager && this.getPager.pageCount) ? this.getPager.pageCount : 1;
+      const current = this.getCurrentPage || 1;
+      const delta = 2;
+      const range = [];
+      const rangeWithDots = [];
+      let l;
+
+      for (let i = 1; i <= pageCount; i++) {
+        if (i === 1 || i === pageCount || (i >= current - delta && i <= current + delta)) {
+          range.push(i);
+        }
+      }
+
+      for (const i of range) {
+        if (l) {
+          if (i - l === 2) {
+            rangeWithDots.push(l + 1);
+          } else if (i - l !== 1) {
+            rangeWithDots.push("...");
+          }
+        }
+        rangeWithDots.push(i);
+        l = i;
+      }
+
+      return rangeWithDots;
+    },
+    hasActiveFilters() {
+      return (
+        Boolean(this.selectedMake) ||
+        Boolean(this.selectedModel) ||
+        Boolean(this.selectedYear) ||
+        Boolean(this.selectedStatus) ||
+        Boolean(this.searchString) ||
+        this.getFilterState
+      );
+    },
+    filteredModels() {
+      return this.getModels;
+    },
     getDefaultViews() {
-      return this.inventory_views.filter((view) => view.default == "1");
+      return this.inventory_views.filter((view) => view.default === "1");
     },
     getCustomViews() {
-      return this.inventory_views.filter((view) => view.default == "0");
+      return this.inventory_views.filter((view) => view.default === "0");
     },
     timeZoneName() {
       return this.user_metadata && this.user_metadata.hasOwnProperty("timezone")
@@ -1409,42 +1094,22 @@ export default {
     getBulkSydnicationConfirmButtonClass() {
       return this.syndication.action === "ADD" ? "btn-primary" : "btn-danger";
     },
-    selected_inventory() {
-      return this.getViewTitle.length > 12
-        ? this.getViewTitle.substring(0, 12 - 3) + "..."
-        : this.getViewTitle;
-    },
     getYears() {
-      if (this.getAvailableFilters.hasOwnProperty("year")) {
-        if (Array.isArray(this.getAvailableFilters["year"])) {
-          return this.getAvailableFilters["year"]
-            .filter((x) => x.name != "")
-            .map((x) => x.name);
-        }
+      if (this.getAvailableFilters.hasOwnProperty("year") && Array.isArray(this.getAvailableFilters.year)) {
+        return this.getAvailableFilters.year.filter((x) => x.name !== "").map((x) => x.name);
       }
-
       return [];
     },
     getMakes() {
-      if (this.getAvailableFilters.hasOwnProperty("make")) {
-        if (Array.isArray(this.getAvailableFilters["make"])) {
-          return this.getAvailableFilters["make"]
-            .filter((x) => x.name != "")
-            .map((x) => x.name);
-        }
+      if (this.getAvailableFilters.hasOwnProperty("make") && Array.isArray(this.getAvailableFilters.make)) {
+        return this.getAvailableFilters.make.filter((x) => x.name !== "").map((x) => x.name);
       }
-
       return [];
     },
     getModels() {
-      if (this.getAvailableFilters.hasOwnProperty("model")) {
-        if (Array.isArray(this.getAvailableFilters["model"])) {
-          return this.getAvailableFilters["model"]
-            .filter((x) => x.name != "")
-            .map((x) => x.name);
-        }
+      if (this.getAvailableFilters.hasOwnProperty("model") && Array.isArray(this.getAvailableFilters.model)) {
+        return this.getAvailableFilters.model.filter((x) => x.name !== "").map((x) => x.name);
       }
-
       return [];
     },
     getNumberOfEntities: {
@@ -1461,6 +1126,7 @@ export default {
         return this.getFilters.year;
       },
       set(value) {
+        this.selectedYear = value || "";
         this.commitFilters({ name: "year", value: value });
       },
     },
@@ -1469,6 +1135,7 @@ export default {
         return this.getFilters.make;
       },
       set(value) {
+        this.selectedMake = value || "";
         this.commitFilters({ name: "make", value: value });
       },
     },
@@ -1477,6 +1144,7 @@ export default {
         return this.getFilters.model;
       },
       set(value) {
+        this.selectedModel = value || "";
         this.commitFilters({ name: "model", value: value });
       },
     },
@@ -1485,6 +1153,7 @@ export default {
         return this.getFilters.status;
       },
       set(value) {
+        this.selectedStatus = value || "";
         this.commitFilters({ name: "status", value: value });
       },
     },
@@ -1508,6 +1177,26 @@ export default {
       return this.$helpers.isAuthorized(this.app_metadata.role);
     },
   },
+  watch: {
+    getViewTitle: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.selected_inventory = val.length > 20 ? val.substring(0, 18) + "..." : val;
+        }
+      },
+    },
+    getEntities: {
+      handler(newEntities) {
+        if (this.selectedInventoryId && newEntities && newEntities.length > 0) {
+          const match = newEntities.find((e) => e.inventory_id === this.selectedInventoryId);
+          if (match) {
+            this.selectedVehicleItem = match;
+          }
+        }
+      },
+    },
+  },
   methods: {
     ...mapActions("inventory", [
       "removeEveryInventoryId",
@@ -1515,7 +1204,6 @@ export default {
     ]),
     ...mapActions("inventoryView", [
       "updateView",
-
       "commitViewId",
       "commitViewTitle",
       "commitViewEntities",
@@ -1534,11 +1222,28 @@ export default {
       "commitCurrentSyndicationViewStatus",
       "commitActiveSyndicationList",
     ]),
-    searchAction(value, e) {
-      if (value.length >= 3) {
+    handleRowSelect(item) {
+      this.selectedInventoryId = item.inventory_id;
+      this.selectedVehicleItem = item;
+      this.isPreviewOpen = true;
+    },
+    closePreviewPanel() {
+      this.isPreviewOpen = false;
+      this.selectedInventoryId = null;
+      this.selectedVehicleItem = null;
+    },
+    openInventoryNewTab(id) {
+      const routeData = this.$router.resolve({
+        name: "inventory-update",
+        params: { id: id },
+      });
+      window.open(routeData.href, "_blank");
+    },
+    searchAction(value) {
+      const q = value !== undefined ? value : this.searchString;
+      if (q && q.length >= 3) {
         this.commitSearchState(true);
-        // this.commitSearchString(value);
-        this.searchInventory(this.getSearchString);
+        this.searchInventory(q);
       } else {
         if (this.getSearch) {
           this.inventoryListing(true);
@@ -1546,158 +1251,87 @@ export default {
         }
       }
     },
-    changeCompact() {
-      this.commitCompactFlag(!this.getCompact);
-    },
-    changeSyndicationViewStatus() {
-      this.commitCurrentSyndicationViewStatus(
-        !this.getCurrentSyndicationViewStatus,
-      );
-    },
-    unsavedView() {
-      const vm = this;
-      //check for the flag if flag is 0 that means the pop up is there and dont do any thing.
-      // If flag is 1 that means reset the value to 0, show the popup
-      if (this.inventory_view_flag == 1) {
-        this.inventory_view_flag = 0;
-        this.$swal({
-          showConfirmButton: true,
-          showCancelButton: true,
-          cancelButtonText: "Revert",
-          confirmButtonText: "Save",
-          toast: true,
-          position: "bottom",
-          text: "Do you like the view ? Save It.",
-        }).then((result) => {
-          if (result.hasOwnProperty("dismiss")) {
-            this.updateView(
-              JSON.parse(JSON.stringify(this.inventory_view_default)),
-            );
-          } else if (result.hasOwnProperty("value") && result.value) {
-            //Save the inventory view.
-            let formData = new FormData();
-            formData.append("view", JSON.stringify(vm.list));
-            axios({
-              method: "post",
-              data: formData,
-              headers: {
-                Authorization: "Bearer " + window.$cookies.get("_token"),
-              },
-              url:
-                window.location.origin +
-                `/api/business/inventories/views/update/${this.getViewId}`,
-            }).then((response) => {
-              this.$swal({
-                showConfirmButton: false,
-                icon: "success",
-                toast: true,
-                timer: 2000,
-                position: "bottom",
-                title: "Inventory View Changed.",
-              });
-            });
-          }
-          this.inventory_view_flag = 1;
-        });
+    clearSearch() {
+      this.searchString = "";
+      this.commitSearchString("");
+      if (this.getSearch) {
+        this.commitSearchState(false);
+        this.inventoryListing(true);
       }
     },
-    resetFilters() {
+    onToolbarFilterChange(filterName, value) {
+      this.commitFilters({ name: filterName, value: value || "" });
+      this.filterInventory();
+    },
+    resetAllFilters() {
+      this.selectedMake = "";
+      this.selectedModel = "";
+      this.selectedYear = "";
+      this.selectedStatus = "";
+      this.searchString = "";
+      this.commitSearchString("");
+      this.commitSearchState(false);
+      this.commitFilterState(false);
       this.commitFilters({ name: "model", value: "" });
       this.commitFilters({ name: "year", value: "" });
       this.commitFilters({ name: "make", value: "" });
       this.commitFilters({ name: "status", value: "" });
       this.commitFilters({ name: "visibility", value: "" });
-
-      if (this.getSearch) {
-        this.searchInventory(this.getSearchString);
-      } else {
-        this.inventoryListing(true);
-      }
-      this.commitFilterState(false);
+      this.inventoryListing(true);
     },
-    purgeDeletedInventories() {
-      const vm = this;
-
-      //message during request
-      let request_message = `Cleaning deleted inventories...`;
-
-      const toast = new Toast(request_message);
-      toast.fire();
-
-      axios({
-        method: "post",
-        url: window.location.origin + "/api/business/inventory/delete/purge",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-          "Content-Type": "multipart/form-data",
-        },
-      })
-        .then(({ data }) => {
-          toast.success(data.success);
-          toast.close();
-        })
-        .catch(function(error) {
-          let error_message = error.response.data;
-          toast.fail(error_message);
-          toast.close();
-        });
+    resetFilters() {
+      this.resetAllFilters();
     },
-    async warningForPurgeDeletingInventories() {
-      const vm = this;
-      await this.$swal({
-        showConfirmButton: true,
-        showCancelButton: true,
-        cancelButtonText: "Back",
-        confirmButtonText: "I Understand",
-        toast: false,
-        position: "center",
-        text: `This action will clean the old deleted inventories. This action is permanent and inventories cannot be recovered back once cleaned.`,
-      }).then((result) => {
-        console.log(result);
-        if (result.isDismissed) {
-        } else if (result.isConfirmed) {
-          vm.purgeDeletedInventories();
-        }
-      });
+    changeCompact() {
+      this.commitCompactFlag(!this.getCompact);
+    },
+    changeSyndicationViewStatus() {
+      this.commitCurrentSyndicationViewStatus(!this.getCurrentSyndicationViewStatus);
+    },
+    toggleSort(column) {
+      let currentOrder = (this.getSortColumn && this.getSortColumn[column]) || "";
+      let nextOrder = currentOrder === "ASC" ? "DESC" : "ASC";
+      this.updateSortColumn(column, nextOrder);
+    },
+    isSortAsc(column) {
+      return Boolean(this.getSortColumn && this.getSortColumn[column] === "ASC");
+    },
+    isSortDesc(column) {
+      return Boolean(this.getSortColumn && this.getSortColumn[column] === "DESC");
+    },
+    toggleAddMenu() {
+      this.isAddMenuOpen = !this.isAddMenuOpen;
     },
     filterInventory() {
-      let vm = this;
-      let url = window.location.origin;
-      url += `/api/business/inventory?all=true`;
-
-      if (this.getSearch) {
+      let url = `${window.location.origin}/api/business/inventory?all=true`;
+      if (this.getSearch && this.getSearchString) {
         url += `&search=${this.getSearchString}`;
       }
-
       for (const key in this.getFilters) {
-        if (this.getFilters.hasOwnProperty(key)) {
-          if (this.getFilters[key]) {
-            url += `&zm_${key}[]=${this.getFilters[key]}`;
-          }
+        if (this.getFilters.hasOwnProperty(key) && this.getFilters[key]) {
+          url += `&zm_${key}[]=${this.getFilters[key]}`;
         }
       }
+      this.isTableLoading = true;
       axios({
         method: "get",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
         url: url,
       }).then((response) => {
         this.commitViewEntities(response.data.inventory);
         this.commitRequestUrl(url);
 
         let pager = response.data.pager;
-        pager.next =
-          pager.next == null ? null : "/api" + pager.next.split("api")[1];
-        pager.previous =
-          pager.previous == null
-            ? null
-            : "/api" + pager.previous.split("api")[1];
-
-        this.commitViewPager(pager);
-        this.commitCurrentPage(parseInt(pager.currentPage));
-        this.commitEntitiesCount(parseInt(pager.perPage));
-        this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+        if (pager) {
+          pager.next = pager.next == null ? null : "/api" + pager.next.split("api")[1];
+          pager.previous = pager.previous == null ? null : "/api" + pager.previous.split("api")[1];
+          this.commitViewPager(pager);
+          this.commitCurrentPage(parseInt(pager.currentPage));
+          this.commitEntitiesCount(parseInt(pager.perPage));
+        }
+        if (response.data.sort) {
+          this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+        }
         this.commitFilterState(true);
 
         this.$swal({
@@ -1706,50 +1340,43 @@ export default {
           toast: true,
           timer: 2000,
           position: "bottom",
-          title: `Inventory has been filtered.`,
+          title: "Inventory has been filtered.",
         });
+      }).catch((err) => {
+        console.error("Filter inventory error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     searchInventory(search) {
-      let vm = this;
-
-      let url = window.location.origin;
-      url += `/api/business/inventory?all=true`;
-
-      url += `&search=${this.getSearchString}`;
-
+      let url = `${window.location.origin}/api/business/inventory?all=true&search=${this.getSearchString}`;
       if (this.getFilterState) {
         for (const key in this.getFilters) {
-          if (this.getFilters.hasOwnProperty(key)) {
-            if (this.getFilters[key]) {
-              url += `&zm_${key}[]=${this.getFilters[key]}`;
-            }
+          if (this.getFilters.hasOwnProperty(key) && this.getFilters[key]) {
+            url += `&zm_${key}[]=${this.getFilters[key]}`;
           }
         }
       }
-
+      this.isTableLoading = true;
       axios({
         method: "get",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
         url: url,
       }).then((response) => {
         this.commitViewEntities(response.data.inventory);
         this.commitRequestUrl(url);
 
         let pager = response.data.pager;
-        pager.next =
-          pager.next == null ? null : "/api" + pager.next.split("api")[1];
-        pager.previous =
-          pager.previous == null
-            ? null
-            : "/api" + pager.previous.split("api")[1];
-
-        this.commitViewPager(pager);
-        this.commitCurrentPage(parseInt(pager.currentPage));
-        this.commitEntitiesCount(parseInt(pager.perPage));
-        this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+        if (pager) {
+          pager.next = pager.next == null ? null : "/api" + pager.next.split("api")[1];
+          pager.previous = pager.previous == null ? null : "/api" + pager.previous.split("api")[1];
+          this.commitViewPager(pager);
+          this.commitCurrentPage(parseInt(pager.currentPage));
+          this.commitEntitiesCount(parseInt(pager.perPage));
+        }
+        if (response.data.sort) {
+          this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+        }
 
         this.$swal({
           showConfirmButton: false,
@@ -1757,8 +1384,12 @@ export default {
           toast: true,
           timer: 2000,
           position: "bottom",
-          title: `Search for ${search} has been completed.`,
+          title: `Search for ${this.getSearchString} has been completed.`,
         });
+      }).catch((err) => {
+        console.error("Search inventory error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
     updateSortColumn(column, order) {
@@ -1769,25 +1400,21 @@ export default {
           toast: true,
           timer: 2000,
           position: "bottom",
-          title: "Sort order for view cannot be updated while searching.",
+          title: "Sort order cannot be updated while search or filter is active.",
         });
         return;
       }
-      const vm = this;
       let formData = new FormData();
-      vm.sort_column = {};
-      vm.sort_column[column] = order;
-      formData.append("sort", JSON.stringify(vm.sort_column));
+      this.sort_column = {};
+      this.sort_column[column] = order;
+      formData.append("sort", JSON.stringify(this.sort_column));
+      this.isTableLoading = true;
       axios({
         method: "post",
         data: formData,
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-        url:
-          window.location.origin +
-          `/api/business/inventories/views/update/${this.getViewId}`,
-      }).then((response) => {
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+        url: `${window.location.origin}/api/business/inventories/views/update/${this.getViewId}`,
+      }).then(() => {
         this.$swal({
           showConfirmButton: false,
           icon: "success",
@@ -1797,233 +1424,193 @@ export default {
           title: "Inventory View Changed.",
         });
         this.commitLoadState(false);
-        vm.inventoryListing();
+        this.inventoryListing();
+      }).catch((err) => {
+        console.error("Update sort column error:", err);
+        this.isTableLoading = false;
       });
     },
     changeInventoryView(id) {
-      this.commitSearchString("");
-      this.commitSearchState(false);
-      this.commitFilterState(false);
-      this.commitFilters({ name: "model", value: "" });
-      this.commitFilters({ name: "year", value: "" });
-      this.commitFilters({ name: "make", value: "" });
-      this.commitFilters({ name: "status", value: "" });
-      this.commitFilters({ name: "visibility", value: "" });
-
-      //this.getViewId = id;
-      let vm = this;
+      this.resetAllFilters();
       this.clearBulkSelection();
+      this.isTableLoading = true;
       axios({
         method: "get",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-        url:
-          window.location.origin +
-          `/api/business/inventories/views/result/${id}`,
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+        url: `${window.location.origin}/api/business/inventories/views/result/${id}`,
       }).then((response) => {
         this.commitViewId(response.data.inventory_id);
         this.commitViewTitle(response.data.header);
         this.commitViewEntities(response.data.inventory);
-        this.commitRequestUrl(
-          window.location.origin +
-            `/api/business/inventories/views/result/${id}`,
-        );
+        this.commitRequestUrl(`${window.location.origin}/api/business/inventories/views/result/${id}`);
 
         let pager = response.data.pager;
-        pager.next =
-          pager.next == null ? null : "/api" + pager.next.split("api")[1];
-        pager.previous =
-          pager.previous == null
-            ? null
-            : "/api" + pager.previous.split("api")[1];
+        if (pager) {
+          pager.next = pager.next == null ? null : "/api" + pager.next.split("api")[1];
+          pager.previous = pager.previous == null ? null : "/api" + pager.previous.split("api")[1];
+          this.commitViewPager(pager);
+          this.commitCurrentPage(parseInt(pager.currentPage));
+          this.commitEntitiesCount(parseInt(pager.perPage));
+        }
+        if (response.data.view) {
+          this.updateView(Object.values(response.data.view));
+        }
+        if (response.data.sort) {
+          this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+        }
 
-        this.commitViewPager(pager);
-        this.commitCurrentPage(parseInt(pager.currentPage));
-        this.commitEntitiesCount(parseInt(pager.perPage));
+        this.$swal({
+          showConfirmButton: false,
+          icon: "success",
+          toast: true,
+          timer: 2000,
+          position: "bottom",
+          title: "Inventory View Changed.",
+        });
 
-        this.updateView(Object.values(response.data.view));
-        this.inventory_view_default = JSON.parse(
-          JSON.stringify(Object.values(response.data.view)),
-        );
-
-        this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
         axios({
           method: "get",
-          headers: {
-            Authorization: "Bearer " + window.$cookies.get("_token"),
-          },
-          url:
-            window.location.origin +
-            `/api/business/user/inventory/update?id=${this.getViewId}`,
-        }).then((response) => {
-          this.$swal({
-            showConfirmButton: false,
-            icon: "success",
-            toast: true,
-            timer: 2000,
-            position: "bottom",
-            title: "Inventory View Changed.",
-          });
+          headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+          url: `${window.location.origin}/api/business/user/inventory/update?id=${this.getViewId}`,
         });
+      }).catch((err) => {
+        console.error("Change inventory view error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
       });
     },
-
     pagination(n = 1) {
-      const vm = this;
       let url = window.location.origin;
       if (this.getSearch || this.getFilterState) {
         url += `/api/business/inventory?all=true`;
-
         if (this.getSearch) {
           url += `&search=${this.getSearchString}`;
         }
-
         if (this.getFilterState) {
           for (const key in this.getFilters) {
-            if (this.getFilters.hasOwnProperty(key)) {
-              if (this.getFilters[key]) {
-                url += `&zm_${key}[]=${this.getFilters[key]}`;
-              }
+            if (this.getFilters.hasOwnProperty(key) && this.getFilters[key]) {
+              url += `&zm_${key}[]=${this.getFilters[key]}`;
             }
           }
         }
-
         url += `&page=`;
       } else {
         url += `/api/business/inventories/views/result/${this.getViewId}?page=`;
       }
       url += n;
-      url += "&items=";
-      url += this.getEntitiesCount;
+      url += "&items=" + this.getEntitiesCount;
       this.clearBulkSelection();
-
-      axios({
-        method: "get",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-        url: url,
-      }).then((response) => {
-        this.commitViewEntities(response.data.inventory);
-        this.commitRequestUrl(url);
-
-        let pager = response.data.pager;
-        pager.next =
-          pager.next == null ? null : "/api" + pager.next.split("api")[1];
-        pager.previous =
-          pager.previous == null
-            ? null
-            : "/api" + pager.previous.split("api")[1];
-
-        this.commitViewPager(pager);
-        this.commitCurrentPage(parseInt(pager.currentPage));
-        this.commitEntitiesCount(parseInt(pager.perPage));
-      });
+      this.fetchPageData(url);
     },
     paginationWithUrl(url) {
-      const vm = this;
+      if (!url) return;
       this.clearBulkSelection();
+      this.fetchPageData(url);
+    },
+    fetchPageData(url) {
+      this.isTableLoading = true;
       axios({
         method: "get",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
         url: url,
       }).then((response) => {
         this.commitViewEntities(response.data.inventory);
         this.commitRequestUrl(url);
 
         let pager = response.data.pager;
-        pager.next =
-          pager.next == null ? null : "/api" + pager.next.split("api")[1];
-        pager.previous =
-          pager.previous == null
-            ? null
-            : "/api" + pager.previous.split("api")[1];
-
-        this.commitViewPager(pager);
-        this.commitCurrentPage(parseInt(pager.currentPage));
-        this.commitEntitiesCount(parseInt(pager.perPage));
-      });
-    },
-    view_inventories() {
-      let vm = this;
-      axios({
-        method: "get",
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-        url: window.location.origin + "/api/business/inventories/views",
-      }).then((response) => {
-        vm.$data.inventory_views = response.data.inventory_views;
-      });
-    },
-    async inventoryListing(refresh = false) {
-      let vm = this;
-
-      if (refresh || !this.getLoadState) {
-        await axios({
-          method: "get",
-          headers: {
-            Authorization: "Bearer " + window.$cookies.get("_token"),
-          },
-          url: window.location.origin + `/api/business/user/inventory`,
-        }).then((response) => {
-          this.commitViewId(response.data.inventory_id);
-          this.commitViewTitle(response.data.header);
-          this.commitViewEntities(response.data.inventory);
-          this.commitRequestUrl(
-            window.location.origin + `/api/business/user/inventory`,
-          );
-
-          let pager = response.data.pager;
-          pager.next =
-            pager.next == null ? null : "/api" + pager.next.split("api")[1];
-          pager.previous =
-            pager.previous == null
-              ? null
-              : "/api" + pager.previous.split("api")[1];
-
+        if (pager) {
+          pager.next = pager.next == null ? null : "/api" + pager.next.split("api")[1];
+          pager.previous = pager.previous == null ? null : "/api" + pager.previous.split("api")[1];
           this.commitViewPager(pager);
           this.commitCurrentPage(parseInt(pager.currentPage));
           this.commitEntitiesCount(parseInt(pager.perPage));
-          this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+        }
+      }).catch((err) => {
+        console.error("Fetch page data error:", err);
+      }).finally(() => {
+        this.isTableLoading = false;
+      });
+    },
+    async inventoryListing(refresh = false) {
+      if (refresh || !this.getLoadState) {
+        this.isTableLoading = true;
+        try {
+          await axios({
+            method: "get",
+            headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+            url: `${window.location.origin}/api/business/user/inventory`,
+          }).then((response) => {
+            this.commitViewId(response.data.inventory_id);
+            this.commitViewTitle(response.data.header);
+            this.commitViewEntities(response.data.inventory);
+            this.commitRequestUrl(`${window.location.origin}/api/business/user/inventory`);
 
-          this.updateView(Object.values(response.data.view));
-          this.inventory_view_default = JSON.parse(
-            JSON.stringify(Object.values(response.data.view)),
-          );
-        });
-
-        this.commitLoadState(true);
+            let pager = response.data.pager;
+            if (pager) {
+              pager.next = pager.next == null ? null : "/api" + pager.next.split("api")[1];
+              pager.previous = pager.previous == null ? null : "/api" + pager.previous.split("api")[1];
+              this.commitViewPager(pager);
+              this.commitCurrentPage(parseInt(pager.currentPage));
+              this.commitEntitiesCount(parseInt(pager.perPage));
+            }
+            if (response.data.sort) {
+              this.commitSortColumn(JSON.parse(JSON.stringify(response.data.sort)));
+            }
+            if (response.data.view) {
+              this.updateView(Object.values(response.data.view));
+            }
+          });
+          this.commitLoadState(true);
+        } catch (err) {
+          console.error("Inventory listing error:", err);
+        } finally {
+          this.isTableLoading = false;
+        }
       }
     },
     clearBulkSelection() {
       this.bulk_select = "0";
       this.removeEveryInventoryId();
     },
+    closeDropdowns(e) {
+      if (!this.$el?.querySelector(".split-inventory-btn-group")?.contains(e.target)) {
+        this.isAddMenuOpen = false;
+      }
+    },
+    view_inventories() {
+      axios({
+        method: "get",
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+        url: `${window.location.origin}/api/business/inventories/views`,
+      }).then((response) => {
+        this.inventory_views = response.data.inventory_views || [];
+      });
+    },
     getBodyTypes() {
-      axios
-        .get("/json/body_type.json")
-        .then(({ data }) => (this.body_types = data));
+      axios.get("/json/body_type.json").then(({ data }) => (this.body_types = data)).catch(() => {});
     },
     getTransmissions() {
-      axios
-        .get("/json/transmission.json")
-        .then(({ data }) => (this.transmissions = data));
+      axios.get("/json/transmission.json").then(({ data }) => (this.transmissions = data)).catch(() => {});
+    },
+    getPlaceholder() {
+      axios({
+        method: "get",
+        url: `${window.location.origin}/api/business/image/placeholder`,
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+      })
+        .then(({ data }) => {
+          this.placeholder_image = this.$helpers.parseAbsoluteOrRelativeUrl(window.global.cdn, data.image_url);
+        })
+        .catch(() => {});
     },
     resetBulkColumns() {
-      Object.keys(this.form).forEach((key) => {
-        this.form[key] = "";
-      });
+      Object.keys(this.form).forEach((k) => (this.form[k] = ""));
     },
     resetSyndicationColumns() {
       this.syndication.slugs = [];
       this.syndication.action = "ADD";
     },
     applyBulkOptions() {
-      const vm = this;
       let formData = new FormData();
       formData.append("inventory_ids", this.getInventoryIds);
       for (const key in this.form) {
@@ -2031,139 +1618,96 @@ export default {
           formData.append(key, this.form[key]);
         }
       }
-
-      let message = `Updating selected inventories...`;
-      const toast = new Toast(message);
+      const toast = new Toast("Updating selected inventories...");
       toast.fire();
-
       axios({
         method: "post",
         data: formData,
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-        url: window.location.origin + `/api/business/inventory/updates`,
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+        url: `${window.location.origin}/api/business/inventory/updates`,
       })
-        .then((response) => {
+        .then(() => {
           this.resetBulkColumns();
-          /** Purposefully set to 0 (integer) to fail the prop check so subcomponents become reactive to change */
-          vm.$data.bulk_select = 0;
-
+          this.bulk_select = "0";
           setTimeout(() => {
             this.pagination(this.getCurrentPage);
-            toast.success(`Inventories are updated successfully.`);
+            toast.success("Inventories updated successfully.");
             toast.close();
           }, 1000);
         })
-        .catch(function(error) {
-          vm.resetBulkColumns();
-          vm.$data.bulk_select = 0;
-          setTimeout(() => {
-            vm.$swal({
-              showConfirmButton: false,
-              icon: "error",
-              toast: true,
-              timer: 2000,
-              position: "bottom",
-              title: "No columns or rows were selected.",
-            });
-          }, 1000);
+        .catch(() => {
+          this.resetBulkColumns();
+          this.bulk_select = "0";
+          toast.fail("No columns or rows were selected.");
         });
     },
     confirmBulkSyndicationUpdate() {
-      const vm = this;
       this.$swal({
         showConfirmButton: true,
         showCancelButton: true,
         cancelButtonText: "Cancel",
         confirmButtonText: "Confirm",
-        toast: false,
-        position: "center",
-        text: `Do you want to ${
-          this.syndication.action
-        } ${this.syndication.slugs.join(", ").toUpperCase()} for inventories?`,
+        text: `Do you want to ${this.syndication.action} ${this.syndication.slugs.join(", ").toUpperCase()} for selected inventories?`,
       }).then((result) => {
-        console.log(result);
-        if (result.isDismissed) {
-        } else if (result.isConfirmed) {
-          vm.updateBulkSyndication(
-            vm.syndication.slugs,
-            vm.getInventoryIds,
-            vm.syndication.action,
-          );
+        if (result.isConfirmed) {
+          this.updateBulkSyndication(this.syndication.slugs, this.getInventoryIds, this.syndication.action);
         }
       });
     },
     updateBulkSyndication(slugs, inventory_ids, action) {
-      const vm = this;
       let formData = new FormData();
       formData.append("slugs", slugs);
       formData.append("inventory_ids", inventory_ids);
       formData.append("action", action);
-
-      let message = `Updating selected inventories...`;
-      const toast = new Toast(message);
+      const toast = new Toast("Updating syndication...");
       toast.fire();
-
       axios({
         method: "post",
         data: formData,
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
         url: `${window.location.origin}/api/business/inventory/syndication/updates`,
       })
-        .then((response) => {
+        .then(() => {
           this.resetSyndicationColumns();
-          /** Purposefully set to 0 (integer) to fail the prop check so subcomponents become reactive to change */
-          vm.$data.bulk_select = 0;
-
+          this.bulk_select = "0";
           setTimeout(() => {
             this.pagination(this.getCurrentPage);
-            toast.success(`Inventories are updated successfully.`);
+            toast.success("Syndication updated successfully.");
             toast.close();
           }, 1000);
         })
-        .catch(function(error) {
-          vm.resetSyndicationColumns();
-          vm.$data.bulk_select = 0;
-          setTimeout(() => {
-            vm.$swal({
-              showConfirmButton: false,
-              icon: "error",
-              toast: true,
-              timer: 2000,
-              position: "bottom",
-              title: "No columns or rows were selected.",
-            });
-          }, 1000);
+        .catch(() => {
+          this.resetSyndicationColumns();
+          this.bulk_select = "0";
+          toast.fail("Failed to update syndication.");
         });
-
-      this.$helpers.gTagClickEvent(
-        this,
-        "zd_action",
-        "inventory",
-        "inventory_bulk_syndication",
-        "",
-      );
+    },
+    confirmDeleteAction() {
+      this.$swal({
+        showConfirmButton: true,
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+        confirmButtonText: "Confirm Delete",
+        confirmButtonColor: "#ef4444",
+        text: "Please confirm if you want to delete the selected inventories.",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.applyBulkDelete();
+        }
+      });
     },
     applyBulkDelete() {
-      const vm = this;
       let formData = new FormData();
       formData.append("inventory_ids", this.getInventoryIds);
       axios({
         method: "post",
         data: formData,
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-        url: window.location.origin + `/api/business/inventory/deletes`,
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+        url: `${window.location.origin}/api/business/inventory/deletes`,
       })
-        .then((response) => {
+        .then(() => {
           this.resetBulkColumns();
-          /** Purposefully set to 0 (integer) to fail the prop check so subcomponents become reactive to change */
-          vm.$data.bulk_select = 0;
-
+          this.bulk_select = "0";
           setTimeout(() => {
             this.pagination(this.getCurrentPage);
             this.$swal({
@@ -2172,63 +1716,63 @@ export default {
               toast: true,
               timer: 2000,
               position: "bottom",
-              title: "Selected data has been deleted.",
+              title: "Selected inventories have been deleted.",
             });
           }, 1000);
         })
-        .catch(function(error) {
-          vm.resetBulkColumns();
-          vm.$data.bulk_select = 0;
-          setTimeout(() => {
-            vm.$swal({
-              showConfirmButton: false,
-              icon: "error",
-              toast: true,
-              timer: 2000,
-              position: "bottom",
-              title: "There were some errors in deleting data.",
-            });
-          }, 1000);
+        .catch(() => {
+          this.resetBulkColumns();
+          this.bulk_select = "0";
+          this.$swal({
+            showConfirmButton: false,
+            icon: "error",
+            toast: true,
+            timer: 2000,
+            position: "bottom",
+            title: "Errors occurred while deleting data.",
+          });
         });
     },
-    confirmDeleteAction() {
-      const vm = this;
+    warningForPurgeDeletingInventories() {
       this.$swal({
         showConfirmButton: true,
         showCancelButton: true,
         cancelButtonText: "Cancel",
-        confirmButtonText: "Confirm",
-        toast: false,
-        position: "center",
-        text: "Please confirm if you want to delete the inventories.",
+        confirmButtonText: "Empty Recycle Bin",
+        confirmButtonColor: "#ef4444",
+        text: "This action will permanently delete all vehicles in the recycle bin. Are you sure?",
       }).then((result) => {
-        console.log(result);
-        if (result.isDismissed) {
-          //@TODO   Reset the selection
-        } else if (result.isConfirmed) {
-          vm.applyBulkDelete();
+        if (result.isConfirmed) {
+          axios({
+            method: "delete",
+            headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+            url: `${window.location.origin}/api/business/inventory/trash/empty`,
+          }).then(() => {
+            this.inventoryListing(true);
+            this.$swal({
+              showConfirmButton: false,
+              icon: "success",
+              toast: true,
+              timer: 2000,
+              position: "bottom",
+              title: "Recycle bin has been emptied.",
+            });
+          });
         }
       });
     },
-    getPlaceholder() {
-      let request_url =
-        window.location.origin + "/api/business/image/placeholder";
+    unsavedView() {
+      let formData = new FormData();
+      formData.append("view", JSON.stringify(this.list));
       axios({
-        method: "get",
-        url: request_url,
-        headers: {
-          Authorization: "Bearer " + window.$cookies.get("_token"),
-        },
-      }).then(({ data }) => {
-        this.placeholder_image = this.$helpers.parseAbsoluteOrRelativeUrl(
-          window.global.cdn,
-          data.image_url,
-        );
+        method: "post",
+        data: formData,
+        headers: { Authorization: "Bearer " + window.$cookies.get("_token") },
+        url: `${window.location.origin}/api/business/inventories/views/update/${this.getViewId}`,
       });
     },
   },
   created() {
-    let vm = this;
     moment.tz.setDefault(this.timeZoneName);
     this.view_inventories();
 
@@ -2237,7 +1781,7 @@ export default {
     } else {
       this.inventoryListing();
     }
-    
+
     this.getBodyTypes();
     this.getTransmissions();
     this.getPlaceholder();
@@ -2248,102 +1792,928 @@ export default {
     }
   },
   mounted() {
-    const vm = this;
-    if (Number.isInteger(parseInt(this.getCurrentEntity))) {
-      let rows = document.querySelector("#inventory_" + this.getCurrentEntity);
-
-      // line is zero-based
-      // line is the row number that you want to see into view after scroll
-      rows.style.background = "#e7e7e7";
-      rows.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-
-    var input = document.getElementById("searchText");
-    input.addEventListener("keydown", function(event) {
-      if (event.keyCode === 13) {
-        event.preventDefault();
-        this.searchAction();
-      }
+    Event.listen("update_bulk_syndication", ({ slugs, inventory_ids, action }) => {
+      this.updateBulkSyndication(slugs, inventory_ids, action);
     });
-
-    Event.listen(
-      "update_bulk_syndication",
-      ({ slugs, inventory_ids, action }) => {
-        vm.updateBulkSyndication(slugs, inventory_ids, action);
-      },
-    );
+    document.addEventListener("click", this.closeDropdowns);
   },
   beforeUnmount() {
     Event.vue.$off("update_bulk_syndication", null);
+    document.removeEventListener("click", this.closeDropdowns);
   },
 };
 </script>
 
-<style lang="scss">
-.compact > table.list-page-content-p th,
-.compact > table.list-page-content-p th {
-  padding: 2px !important;
-  margin: 0px !important;
-  min-width: auto !important;
-  width: auto !important;
-  font-size: 0.9em;
-  span,
-  a {
-    font-size: 0.9em;
-  }
+<style scoped lang="scss">
+/* Page container inside CRM - matching Leads page spacing */
+.inventory-module-page {
+  /* top padding clears the fixed theme navbar (~45px) */
+  /* bottom padding leaves room for the theme's fixed footer */
+  padding: calc(45px + 1.5rem) 1.75rem 2.75rem;
+  background-color: #f6f8fb;
+  font-family: inherit;
+  height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.compact > table.list-page-content-p th,
-.compact > table.list-page-content-p td {
-  padding: 2px !important;
-  margin: 0px !important;
-  min-width: auto !important;
-  width: auto !important;
-  font-size: 0.9em;
-  span,
-  a {
-    font-size: 0.9em;
-  }
+/* 1. Header Section */
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
 }
 
-@media (max-width: 1280px) {
-  table.list-page-content-p th,
-  table.list-page-content-p th {
-    padding: 2px !important;
-    margin: 0px !important;
-    min-width: auto !important;
-    width: auto !important;
-    font-size: 0.9em;
-    span,
-    a {
-      font-size: 0.9em;
+.inventory-title-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.inventory-vehicle-count {
+  font-size: 1rem;
+  color: #8a94a6;
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+/* Header Right: Split Add Inventory Button Group */
+.inventory-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.split-inventory-btn-group {
+  display: inline-flex;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+
+  .btn-split-main {
+    display: inline-flex;
+    align-items: center;
+    background: #2563eb;
+    color: #ffffff !important;
+    font-size: 14.5px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border: none;
+    text-decoration: none;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: #1d4ed8;
     }
   }
 
-  table.list-page-content-p th,
-  table.list-page-content-p td {
-    padding: 5px !important;
-    margin: 5px !important;
-    min-width: auto !important;
-    width: auto !important;
-    font-size: 0.9em;
-    span,
-    a {
-      font-size: 0.9em;
+  .btn-split-toggle {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 8px 12px;
+    font-size: 14px;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: #1d4ed8;
+    }
+
+    &::after {
+      display: none; /* Hide default bootstrap caret, boxicons chevron is used */
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: none !important;
+    margin-top: 6px !important;
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    min-width: 220px !important;
+    z-index: 1050 !important;
+    padding: 6px 0 !important;
+    display: none;
+
+    &.show {
+      display: block !important;
+    }
+
+    .dropdown-item {
+      padding: 9px 16px;
+      font-size: 13.5px;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+      }
     }
   }
 }
 
-#filterInventoryModel .vs__dropdown-menu {
-  max-height: 200px;
+/* 2. Subbar (Above Search Bar): Views Dropdown + Action Icons */
+.inventory-subbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-.smart-view-edit-action {
+.btn-views-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
   &:hover {
-    font-weight: 800;
+    border-color: #d1d5db;
+    background: #f9fafb;
+    color: #111827;
   }
+}
+
+.custom-views-scrollable {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Action Icons Toolbar with Tooltips */
+.inventory-actions-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Custom Tooltip Styling matching Screenshot */
+.custom-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+
+  .btn-action-icon {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+
+    &:hover {
+      border-color: #d1d5db;
+      background: #f9fafb;
+      color: #111827;
+    }
+
+    &.active {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #bfdbfe;
+    }
+  }
+
+  .custom-tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1e293b;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 5px 9px;
+    border-radius: 6px;
+    z-index: 100;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      margin-left: -4px;
+      border-width: 4px;
+      border-style: solid;
+      border-color: transparent transparent #1e293b transparent;
+    }
+  }
+
+  &:hover .custom-tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* 3. Toolbar Card (Normal Filters vs Bulk Actions) */
+.inventory-toolbar-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+/* State A: Bulk Mode */
+.toolbar-bulk-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.bulk-mode-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bulk-count-pill {
+  background: #eff6ff;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid #bfdbfe;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-bulk-item {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid #e5e7eb;
+
+  &.btn-bulk-danger {
+    background: #ffffff;
+    border-color: #fca5a5;
+    color: #dc2626;
+
+    &:hover {
+      background: #fee2e2;
+    }
+  }
+
+  &.btn-bulk-primary,
+  &.btn-bulk-purple {
+    background: #ffffff;
+    border-color: #e5e7eb;
+    color: #4b5563;
+
+    i {
+      color: #6b7280;
+    }
+
+    &:hover {
+      background: #f3f4f6;
+      border-color: #d1d5db;
+      color: #111827;
+
+      i {
+        color: #111827;
+      }
+    }
+  }
+}
+
+.btn-bulk-cancel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+
+  i {
+    color: #6b7280;
+  }
+
+  &:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #111827;
+
+    i {
+      color: #111827;
+    }
+  }
+}
+
+/* State B: Normal Filter Mode */
+.toolbar-filter-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.toolbar-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 18px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.toolbar-search-input {
+  width: 100%;
+  height: 38px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0 32px 0 36px;
+  font-size: 13.5px;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  }
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: #374151;
+  }
+}
+
+.toolbar-filters-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-dropdown-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.toolbar-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0 28px 0 12px;
+  height: 38px;
+  line-height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+  min-width: 110px;
+
+  &:hover {
+    border-color: #d1d5db;
+  }
+
+  &:focus {
+    border-color: #2563eb;
+  }
+}
+
+.select-chevron {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(calc(-50% - 2px));
+  font-size: 14px;
+  line-height: 1;
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-reset-filters {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #4b5563;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #111827;
+  }
+}
+
+/* 4. Main Workspace: Table + Preview Panel */
+.inventory-main-layout {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.inventory-table-container {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.inventory-table-card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e6eaf0;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  margin-bottom: 0;
+}
+
+/* Loading Overlay for Inventory Table */
+.zd-inventory-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(2px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  pointer-events: all;
+
+  .zd-loading-indicator-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.6rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    color: #374151;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    i {
+      font-size: 1.45rem;
+      color: #5a8dee;
+    }
+  }
+}
+
+.inventory-table-responsive {
+  flex: 1 1 auto;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  min-height: 200px;
+
+  &.compact {
+    .inventory-table-head-row th {
+      padding: 0.35rem 0.65rem !important;
+      font-size: 0.825rem !important;
+    }
+    .inventory-table-row td {
+      padding: 0.25rem 0.65rem !important;
+      font-size: 0.825rem !important;
+    }
+  }
+
+  /* Custom slim scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+.inventory-main-table {
+  width: 100%;
+  min-width: 1150px;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+.inventory-table-head-row {
+  background: #f8fafc;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+
+  th {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4b5563;
+    border-bottom: 1px solid #e6eaf0;
+    white-space: nowrap;
+    background: #f8fafc;
+  }
+
+  .th-checkbox {
+    width: 44px;
+    min-width: 44px;
+    text-align: center;
+  }
+
+  .th-photo {
+    width: 65px;
+    min-width: 65px;
+  }
+
+  .th-year {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  .th-make-model {
+    min-width: 160px;
+  }
+
+  .th-vin {
+    width: 150px;
+    min-width: 150px;
+  }
+
+  .th-stock {
+    width: 95px;
+    min-width: 95px;
+  }
+
+  .th-status {
+    width: 110px;
+    min-width: 110px;
+  }
+
+  .th-price {
+    width: 105px;
+    min-width: 105px;
+  }
+
+  .th-kms {
+    width: 110px;
+    min-width: 110px;
+  }
+
+  .th-last-sync {
+    width: 125px;
+    min-width: 125px;
+  }
+
+  .th-action {
+    width: 50px;
+    min-width: 50px;
+  }
+
+  .th-syndication-header {
+    min-width: 110px;
+  }
+
+  .th-sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: #1f2937;
+    }
+  }
+
+  .lr-sort {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    user-select: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #4b5563;
+
+    > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    i {
+      font-size: 1rem;
+      color: #5a8dee;
+      line-height: 1;
+    }
+    .lr-sort-idle {
+      color: #b4bccb;
+    }
+    &:hover .lr-sort-idle {
+      color: #1f2937;
+    }
+  }
+}
+
+/* Custom Checkbox */
+.custom-chk-container {
+  display: inline-flex;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+
+  .custom-chk-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+
+    &:checked ~ .custom-chk-box {
+      background-color: #2563eb;
+      border-color: #2563eb;
+
+      &:after {
+        display: block;
+      }
+    }
+  }
+
+  .custom-chk-box {
+    position: relative;
+    display: inline-block;
+    height: 19px;
+    width: 19px;
+    background-color: #ffffff;
+    border: 1.5px solid #d1d5db;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+
+    &:after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+  }
+
+  &:hover .custom-chk-box {
+    border-color: #9ca3af;
+  }
+}
+
+/* 5. Pagination Footer */
+.inventory-pagination-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0.4rem 1.25rem;
+  border-top: 1px solid #e6eaf0;
+  background: #ffffff;
+  z-index: 5;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pagination-nav-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e6eaf0;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: #f1f4f8;
+    color: #1f2937;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.pagination-num-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e6eaf0;
+  color: #4b5563;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled):not(.active) {
+    background: #f1f4f8;
+    color: #1f2937;
+  }
+
+  &.active {
+    background: #eef4ff;
+    border-color: #5a8dee;
+    color: #5a8dee;
+    font-weight: 600;
+  }
+
+  &.ellipsis {
+    border: none;
+    background: transparent;
+    cursor: default;
+    color: #8a94a6;
+  }
+}
+
+.pagination-page-size {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.page-size-select {
+  border: 1px solid #e6eaf0;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.85rem;
+  color: #1f2937;
+  outline: none;
+  background: #ffffff;
+  cursor: pointer;
+
+  &:focus {
+    border-color: #5a8dee;
+  }
+}
+
+/* Transitions for Right Preview Panel */
+.slide-panel-enter-active,
+.slide-panel-leave-active {
+  transition: all 0.2s ease-in-out;
+}
+
+.slide-panel-enter-from,
+.slide-panel-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+@media (max-width: 1200px) {
+  .inventory-main-layout {
+    flex-direction: column;
+  }
+}
+</style>
+
+<style lang="scss">
+/* Suppress pace progress and header shadow */
+.pace,
+.pace-progress {
+  display: none !important;
+}
+.header-navbar-shadow {
+  display: none !important;
 }
 </style>
