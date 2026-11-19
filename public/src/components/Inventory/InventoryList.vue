@@ -417,7 +417,17 @@
                           </span>
                         </th>
 
-                        <!-- 5. VIN Column with Sort -->
+                        <!-- 5. Body Type Column with Sort -->
+                        <th class="th-body-type th-sortable" @click="toggleSort('body_type')">
+                          <span class="lr-sort">
+                            <span>Body Type</span>
+                            <i v-if="isSortAsc('body_type')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('body_type')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 6. VIN Column with Sort -->
                         <th class="th-vin th-sortable" @click="toggleSort('vin')">
                           <span class="lr-sort">
                             <span>VIN</span>
@@ -427,7 +437,7 @@
                           </span>
                         </th>
 
-                        <!-- 6. Stock # Column with Sort -->
+                        <!-- 7. Stock # Column with Sort -->
                         <th class="th-stock th-sortable" @click="toggleSort('stock_no')">
                           <span class="lr-sort">
                             <span>Stock #</span>
@@ -437,17 +447,17 @@
                           </span>
                         </th>
 
-                        <!-- 7. Status Column with Sort -->
-                        <th class="th-status th-sortable" @click="toggleSort('status')">
+                        <!-- 8. DIS Column with Sort -->
+                        <th class="th-dis th-sortable" @click="toggleSort('days_in_stock')">
                           <span class="lr-sort">
-                            <span>Status</span>
-                            <i v-if="isSortAsc('status')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('status')" class="bx bx-down-arrow-alt"></i>
+                            <span>DIS</span>
+                            <i v-if="isSortAsc('days_in_stock')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('days_in_stock')" class="bx bx-down-arrow-alt"></i>
                             <i v-else class="bx bx-sort lr-sort-idle"></i>
                           </span>
                         </th>
 
-                        <!-- 8. Price Column with Sort -->
+                        <!-- 9. Price Column with Sort -->
                         <th class="th-price th-sortable" @click="toggleSort('price')">
                           <span class="lr-sort">
                             <span>Price</span>
@@ -457,34 +467,54 @@
                           </span>
                         </th>
 
-                        <!-- 9. KMs Column with Sort -->
-                        <th class="th-kms th-sortable" @click="toggleSort('odometer')">
+                        <!-- 10. Odometer Column with Sort -->
+                        <th class="th-odometer th-sortable" @click="toggleSort('odometer')">
                           <span class="lr-sort">
-                            <span>KMs</span>
+                            <span>Odometer</span>
                             <i v-if="isSortAsc('odometer')" class="bx bx-up-arrow-alt"></i>
                             <i v-else-if="isSortDesc('odometer')" class="bx bx-down-arrow-alt"></i>
                             <i v-else class="bx bx-sort lr-sort-idle"></i>
                           </span>
                         </th>
 
-                        <!-- 10. Last Sync Column with Sort -->
-                        <th class="th-last-sync th-sortable" @click="toggleSort('updated_at')">
+                        <!-- 11. Status Column with Sort -->
+                        <th class="th-status th-sortable" @click="toggleSort('status')">
                           <span class="lr-sort">
-                            <span>Last Sync</span>
+                            <span>Status</span>
+                            <i v-if="isSortAsc('status')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('status')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 12. Website / VDP Column -->
+                        <th class="th-action text-center">Website / VDP</th>
+
+                        <!-- 13. CARFAX Column: Only visible if CARFAX data exists in backend and not in syndication view -->
+                        <th v-if="hasCarfaxInListing" class="th-action text-center">CARFAX</th>
+
+                        <!-- 14. Repair Report Column -->
+                        <th class="th-action text-center">Repair Report</th>
+
+                        <!-- 15. Created At Column with Sort -->
+                        <th class="th-created-at th-sortable" @click="toggleSort('created_at')">
+                          <span class="lr-sort">
+                            <span>Created At</span>
+                            <i v-if="isSortAsc('created_at')" class="bx bx-up-arrow-alt"></i>
+                            <i v-else-if="isSortDesc('created_at')" class="bx bx-down-arrow-alt"></i>
+                            <i v-else class="bx bx-sort lr-sort-idle"></i>
+                          </span>
+                        </th>
+
+                        <!-- 16. Modified At Column with Sort -->
+                        <th class="th-modified-at th-sortable" @click="toggleSort('updated_at')">
+                          <span class="lr-sort">
+                            <span>Modified At</span>
                             <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt"></i>
                             <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt"></i>
                             <i v-else class="bx bx-sort lr-sort-idle"></i>
                           </span>
                         </th>
-
-                        <!-- 11. Website / VDP Column -->
-                        <th class="th-action text-center">Website / VDP</th>
-
-                        <!-- 12. CARFAX Column: Only visible if CARFAX data exists in backend and not in syndication view -->
-                        <th v-if="hasCarfaxInListing" class="th-action text-center">CARFAX</th>
-
-                        <!-- 13. Repair Report Column -->
-                        <th class="th-action text-center">Repair Report</th>
 
                         <!-- Dynamic Syndication Headers -->
                         <template v-if="getCurrentSyndicationViewStatus">
@@ -503,7 +533,7 @@
                     <tbody>
                       <!-- Loading Indicator (Initial load or loading when empty) -->
                       <tr v-if="!getLoadState || (isTableLoading && getEntities.length === 0)">
-                        <td colspan="15" class="text-center py-5 text-muted">
+                        <td colspan="20" class="text-center py-5 text-muted">
                           <div class="d-flex flex-column align-items-center justify-content-center py-4">
                             <i class="bx bx-loader-alt bx-spin text-primary mb-2" style="font-size: 32px;"></i>
                             <span style="font-size: 14px; font-weight: 500; color: #4b5563;">Loading vehicles...</span>
@@ -513,7 +543,7 @@
 
                       <!-- Empty State -->
                       <tr v-else-if="getEntities.length === 0">
-                        <td colspan="15" class="text-center py-4 text-muted">
+                        <td colspan="20" class="text-center py-4 text-muted">
                           <i class="bx bx-search-alt mb-1" style="font-size: 28px;"></i>
                           <p class="mb-0">No vehicles found matching current criteria.</p>
                         </td>
@@ -1223,9 +1253,10 @@ export default {
       "commitActiveSyndicationList",
     ]),
     handleRowSelect(item) {
-      this.selectedInventoryId = item.inventory_id;
-      this.selectedVehicleItem = item;
-      this.isPreviewOpen = true;
+      this.$router.push({
+        name: "inventory-update",
+        params: { id: item.inventory_id },
+      });
     },
     closePreviewPanel() {
       this.isPreviewOpen = false;
@@ -1809,8 +1840,8 @@ export default {
 .inventory-module-page {
   /* top padding clears the fixed theme navbar (~45px) */
   /* bottom padding leaves room for the theme's fixed footer */
-  padding: calc(45px + 1.5rem) 1.75rem 2.75rem;
-  background-color: #f6f8fb;
+  padding: 4rem 1.75rem 2.75rem;
+  background-color: #ffffff;
   font-family: inherit;
   height: 100vh;
   box-sizing: border-box;
@@ -1825,8 +1856,8 @@ export default {
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
   flex-shrink: 0;
 }
 
@@ -1836,7 +1867,7 @@ export default {
 }
 
 .inventory-page-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: #1f2937;
   line-height: 1.15;
@@ -1947,27 +1978,28 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .btn-views-toggle {
   display: inline-flex;
   align-items: center;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  padding: 7px 14px;
-  border-radius: 8px;
-  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  padding: 5px 12px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover {
-    border-color: #d1d5db;
-    background: #f9fafb;
-    color: #111827;
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
   }
 }
 
@@ -1980,7 +2012,7 @@ export default {
 .inventory-actions-toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* Custom Tooltip Styling matching Screenshot */
@@ -1990,23 +2022,23 @@ export default {
 
   .btn-action-icon {
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #4b5563;
-    font-size: 18px;
+    color: #475569;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.15s ease;
     text-decoration: none;
 
     &:hover {
-      border-color: #d1d5db;
-      background: #f9fafb;
-      color: #111827;
+      border-color: #cbd5e1;
+      background: #f8fafc;
+      color: #0f172a;
     }
 
     &.active {
@@ -2056,10 +2088,10 @@ export default {
 /* 3. Toolbar Card (Normal Filters vs Bulk Actions) */
 .inventory-toolbar-card {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 8px 14px;
-  margin-bottom: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
   transition: all 0.2s ease;
 }
 
@@ -2069,7 +2101,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -2077,15 +2109,15 @@ export default {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .bulk-count-pill {
   background: #eff6ff;
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
   border: 1px solid #bfdbfe;
   display: inline-flex;
   align-items: center;
@@ -2094,13 +2126,13 @@ export default {
 .btn-bulk-item {
   display: inline-flex;
   align-items: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
 
   &.btn-bulk-danger {
     background: #ffffff;
@@ -2115,20 +2147,20 @@ export default {
   &.btn-bulk-primary,
   &.btn-bulk-purple {
     background: #ffffff;
-    border-color: #e5e7eb;
-    color: #4b5563;
+    border-color: #e2e8f0;
+    color: #475569;
 
     i {
-      color: #6b7280;
+      color: #64748b;
     }
 
     &:hover {
-      background: #f3f4f6;
-      border-color: #d1d5db;
-      color: #111827;
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #0f172a;
 
       i {
-        color: #111827;
+        color: #0f172a;
       }
     }
   }
@@ -2136,11 +2168,11 @@ export default {
 
 .btn-bulk-cancel {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #4b5563;
-  font-size: 13px;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 12px;
   font-weight: 500;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
@@ -2148,16 +2180,16 @@ export default {
   transition: all 0.15s ease;
 
   i {
-    color: #6b7280;
+    color: #64748b;
   }
 
   &:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    color: #111827;
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
 
     i {
-      color: #111827;
+      color: #0f172a;
     }
   }
 }
@@ -2168,41 +2200,41 @@ export default {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .toolbar-search-wrapper {
   position: relative;
   flex: 1;
-  min-width: 240px;
-  max-width: 400px;
+  min-width: 220px;
+  max-width: 360px;
   display: flex;
   align-items: center;
 }
 
 .search-icon {
   position: absolute;
-  left: 12px;
-  font-size: 18px;
-  color: #9ca3af;
+  left: 9px;
+  font-size: 15px;
+  color: #94a3b8;
   pointer-events: none;
 }
 
 .toolbar-search-input {
   width: 100%;
-  height: 38px;
+  height: 30px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0 32px 0 36px;
-  font-size: 13.5px;
-  color: #111827;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0 26px 0 30px;
+  font-size: 12.5px;
+  color: #1e293b;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
   &::placeholder {
-    color: #9ca3af;
+    color: #94a3b8;
   }
 
   &:focus {
@@ -2213,18 +2245,18 @@ export default {
 
 .clear-search-btn {
   position: absolute;
-  right: 8px;
+  right: 6px;
   background: none;
   border: none;
-  color: #9ca3af;
-  font-size: 18px;
+  color: #94a3b8;
+  font-size: 15px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    color: #374151;
+    color: #475569;
   }
 }
 
@@ -2232,7 +2264,7 @@ export default {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
 .filter-dropdown-wrapper {
@@ -2245,21 +2277,21 @@ export default {
   appearance: none;
   -webkit-appearance: none;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0 28px 0 12px;
-  height: 38px;
-  line-height: 36px;
-  font-size: 13px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0 22px 0 9px;
+  height: 30px;
+  line-height: 28px;
+  font-size: 12px;
   font-weight: 500;
-  color: #374151;
+  color: #334155;
   cursor: pointer;
   outline: none;
   transition: border-color 0.15s ease;
-  min-width: 110px;
+  min-width: 95px;
 
   &:hover {
-    border-color: #d1d5db;
+    border-color: #cbd5e1;
   }
 
   &:focus {
@@ -2269,12 +2301,12 @@ export default {
 
 .select-chevron {
   position: absolute;
-  right: 10px;
+  right: 7px;
   top: 50%;
-  transform: translateY(calc(-50% - 2px));
-  font-size: 14px;
+  transform: translateY(-50%);
+  font-size: 13px;
   line-height: 1;
-  color: #9ca3af;
+  color: #94a3b8;
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -2282,21 +2314,22 @@ export default {
 }
 
 .btn-reset-filters {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  color: #4b5563;
-  font-size: 12.5px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 7px 12px;
-  border-radius: 8px;
+  height: 30px;
+  padding: 4px 9px;
+  border-radius: 6px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   transition: all 0.15s ease;
 
   &:hover {
-    background: #e5e7eb;
-    color: #111827;
+    background: #e2e8f0;
+    color: #0f172a;
   }
 }
 
@@ -2385,7 +2418,7 @@ export default {
       font-size: 0.825rem !important;
     }
     .inventory-table-row td {
-      padding: 0.25rem 0.65rem !important;
+      padding: 0.15rem 0.65rem !important;
       font-size: 0.825rem !important;
     }
   }
@@ -2410,83 +2443,99 @@ export default {
   border-collapse: separate;
   border-spacing: 0;
   margin: 0;
-  font-size: 0.9rem;
-  color: #1f2937;
+  font-size: 0.8125rem;
+  color: #1e293b;
+  background: #ffffff;
 }
 
 .inventory-table-head-row {
-  background: #f8fafc;
+  background: #f1f5f9;
   position: sticky;
   top: 0;
   z-index: 2;
 
   th {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #4b5563;
-    border-bottom: 1px solid #e6eaf0;
+    padding: 0.35rem 0.55rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
-    background: #f8fafc;
+    background: #f1f5f9;
   }
 
   .th-checkbox {
-    width: 44px;
-    min-width: 44px;
+    width: 36px;
+    min-width: 36px;
     text-align: center;
   }
 
   .th-photo {
-    width: 65px;
-    min-width: 65px;
+    width: 50px;
+    min-width: 50px;
   }
 
   .th-year {
-    width: 70px;
-    min-width: 70px;
+    width: 60px;
+    min-width: 60px;
   }
 
   .th-make-model {
-    min-width: 160px;
+    min-width: 140px;
+  }
+
+  .th-body-type {
+    width: 90px;
+    min-width: 90px;
   }
 
   .th-vin {
-    width: 150px;
-    min-width: 150px;
+    width: 135px;
+    min-width: 135px;
   }
 
   .th-stock {
+    width: 80px;
+    min-width: 80px;
+  }
+
+  .th-dis {
+    width: 60px;
+    min-width: 60px;
+  }
+
+  .th-price {
+    width: 95px;
+    min-width: 95px;
+  }
+
+  .th-odometer {
     width: 95px;
     min-width: 95px;
   }
 
   .th-status {
-    width: 110px;
-    min-width: 110px;
-  }
-
-  .th-price {
-    width: 105px;
-    min-width: 105px;
-  }
-
-  .th-kms {
-    width: 110px;
-    min-width: 110px;
-  }
-
-  .th-last-sync {
-    width: 125px;
-    min-width: 125px;
+    width: 100px;
+    min-width: 100px;
   }
 
   .th-action {
-    width: 50px;
-    min-width: 50px;
+    width: 44px;
+    min-width: 44px;
+  }
+
+  .th-created-at {
+    width: 95px;
+    min-width: 95px;
+  }
+
+  .th-modified-at {
+    width: 95px;
+    min-width: 95px;
   }
 
   .th-syndication-header {
-    min-width: 110px;
+    min-width: 100px;
   }
 
   .th-sortable {
@@ -2495,7 +2544,7 @@ export default {
     transition: color 0.15s ease;
 
     &:hover {
-      color: #1f2937;
+      color: #0f172a;
     }
   }
 
@@ -2503,27 +2552,27 @@ export default {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.25rem;
     user-select: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: #4b5563;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #475569;
 
     > span {
       display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.2rem;
     }
     i {
-      font-size: 1rem;
-      color: #5a8dee;
+      font-size: 0.9rem;
+      color: #2563eb;
       line-height: 1;
     }
     .lr-sort-idle {
-      color: #b4bccb;
+      color: #94a3b8;
     }
     &:hover .lr-sort-idle {
-      color: #1f2937;
+      color: #0f172a;
     }
   }
 }
@@ -2556,21 +2605,21 @@ export default {
   .custom-chk-box {
     position: relative;
     display: inline-block;
-    height: 19px;
-    width: 19px;
+    height: 15px;
+    width: 15px;
     background-color: #ffffff;
-    border: 1.5px solid #d1d5db;
-    border-radius: 4px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 3px;
     transition: all 0.15s ease;
 
     &:after {
       content: "";
       position: absolute;
       display: none;
-      left: 6px;
-      top: 2px;
-      width: 5px;
-      height: 10px;
+      left: 4.5px;
+      top: 1.5px;
+      width: 4px;
+      height: 8px;
       border: solid white;
       border-width: 0 2px 2px 0;
       transform: rotate(45deg);
@@ -2578,7 +2627,7 @@ export default {
   }
 
   &:hover .custom-chk-box {
-    border-color: #9ca3af;
+    border-color: #94a3b8;
   }
 }
 
@@ -2590,71 +2639,71 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 0.4rem 1.25rem;
-  border-top: 1px solid #e6eaf0;
+  padding: 0.25rem 0.85rem;
+  border-top: 1px solid #e2e8f0;
   background: #ffffff;
   z-index: 5;
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.8rem;
+  color: #64748b;
   font-weight: 500;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .pagination-nav-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
   background: #ffffff;
-  border: 1px solid #e6eaf0;
-  color: #4b5563;
+  border: 1px solid #e2e8f0;
+  color: #475569;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover:not(:disabled) {
-    background: #f1f4f8;
-    color: #1f2937;
+    background: #f1f5f9;
+    color: #0f172a;
   }
 
   &:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
   }
 }
 
 .pagination-num-btn {
-  min-width: 30px;
-  height: 30px;
-  padding: 0 6px;
-  border-radius: 6px;
+  min-width: 25px;
+  height: 25px;
+  padding: 0 4px;
+  border-radius: 4px;
   background: #ffffff;
-  border: 1px solid #e6eaf0;
-  color: #4b5563;
-  font-size: 0.875rem;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.775rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover:not(:disabled):not(.active) {
-    background: #f1f4f8;
-    color: #1f2937;
+    background: #f1f5f9;
+    color: #0f172a;
   }
 
   &.active {
-    background: #eef4ff;
-    border-color: #5a8dee;
-    color: #5a8dee;
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
     font-weight: 600;
   }
 
@@ -2662,29 +2711,30 @@ export default {
     border: none;
     background: transparent;
     cursor: default;
-    color: #8a94a6;
+    color: #94a3b8;
   }
 }
 
 .pagination-page-size {
   display: flex;
   align-items: center;
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
 .page-size-select {
-  border: 1px solid #e6eaf0;
-  border-radius: 6px;
-  padding: 2px 6px;
-  font-size: 0.85rem;
-  color: #1f2937;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-size: 0.775rem;
+  height: 25px;
+  color: #1e293b;
   outline: none;
   background: #ffffff;
   cursor: pointer;
 
   &:focus {
-    border-color: #5a8dee;
+    border-color: #2563eb;
   }
 }
 

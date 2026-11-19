@@ -35493,11 +35493,44 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       if (text.includes("not advertised") || text.includes("archive") || text.includes("unpub")) return "badge-not-advertised";
       return "badge-active";
     },
+    formattedDis: function formattedDis() {
+      if (this.item.days_in_stock !== null && this.item.days_in_stock !== undefined && this.item.days_in_stock !== "") {
+        return this.item.days_in_stock;
+      }
+      var baseDate = this.item.stock_date || this.item.created_at;
+      if (baseDate) {
+        try {
+          var diff = moment().diff(moment(baseDate), "days");
+          return !isNaN(diff) && diff >= 0 ? diff : "—";
+        } catch (e) {
+          return "—";
+        }
+      }
+      return "—";
+    },
+    formattedCreatedAt: function formattedCreatedAt() {
+      var dt = this.item.created_at;
+      if (!dt) return "—";
+      try {
+        return moment(dt).format("MMM D, YYYY");
+      } catch (e) {
+        return dt;
+      }
+    },
+    formattedModifiedAt: function formattedModifiedAt() {
+      var dt = this.item.updated_at || this.item.modified_at;
+      if (!dt) return "—";
+      try {
+        return moment(dt).format("MMM D, YYYY");
+      } catch (e) {
+        return dt;
+      }
+    },
     formattedLastSync: function formattedLastSync() {
       var dt = this.item.updated_at || this.item.created_at;
       if (!dt) return "—";
       try {
-        return moment(dt).format("MMM D, h:mm A");
+        return moment(dt).format("MMM D, YYYY");
       } catch (e) {
         return dt;
       }
@@ -35505,6 +35538,12 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   }),
   methods: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapActions)("inventory", ["addInventoryId", "removeInventoryId"])), (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapActions)("leadResponseView", ["commitSearchState", "commitSearchString", "commitLoadState"])), {}, {
     onRowClick: function onRowClick() {
+      this.$router.push({
+        name: "inventory-update",
+        params: {
+          id: this.item.inventory_id
+        }
+      });
       this.$emit("select-row", this.item);
     },
     copyVin: function copyVin() {
@@ -36184,9 +36223,12 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   },
   methods: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapActions)("inventory", ["removeEveryInventoryId", "addEveryInventoryId"])), (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapActions)("inventoryView", ["updateView", "commitViewId", "commitViewTitle", "commitViewEntities", "commitViewPager", "commitSortColumn", "commitLoadState", "commitEntitiesCount", "commitCurrentPage", "commitRequestUrl", "commitSearchState", "commitSearchString", "commitCompactFlag", "commitAvailableFilters", "commitFilters", "commitFilterState", "commitCurrentSyndicationViewStatus", "commitActiveSyndicationList"])), {}, {
     handleRowSelect: function handleRowSelect(item) {
-      this.selectedInventoryId = item.inventory_id;
-      this.selectedVehicleItem = item;
-      this.isPreviewOpen = true;
+      this.$router.push({
+        name: "inventory-update",
+        params: {
+          id: item.inventory_id
+        }
+      });
     },
     closePreviewPanel: function closePreviewPanel() {
       this.isPreviewOpen = false;
@@ -123837,22 +123879,34 @@ var _hoisted_8 = {
 var _hoisted_9 = {
   "class": "col-make-model text-muted-dark"
 };
-var _hoisted_10 = ["title"];
+var _hoisted_10 = {
+  "class": "vehicle-title-text"
+};
 var _hoisted_11 = {
-  "class": "col-stock text-muted-dark"
+  key: 0,
+  "class": "vehicle-trim-subtext"
 };
 var _hoisted_12 = {
+  "class": "col-body-type text-muted-dark"
+};
+var _hoisted_13 = ["title"];
+var _hoisted_14 = {
+  "class": "col-stock text-muted-dark"
+};
+var _hoisted_15 = {
+  "class": "col-dis text-muted-dark"
+};
+var _hoisted_16 = {
   "class": "col-status"
 };
-var _hoisted_13 = {
-  "class": "col-last-sync text-muted-sm"
-};
-var _hoisted_14 = {
+var _hoisted_17 = {
   key: 1,
   "class": "text-muted font-small-2"
 };
-var _hoisted_15 = ["title", "onClick"];
-var _hoisted_16 = ["onClick", "title"];
+var _hoisted_18 = ["title"];
+var _hoisted_19 = ["title"];
+var _hoisted_20 = ["title", "onClick"];
+var _hoisted_21 = ["onClick", "title"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
     id: 'inventory_' + $props.item.inventory_id,
@@ -123890,7 +123944,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_6), $props.item.image_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_7, [_cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-camera"
-  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.image_count), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. Year "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.year || '—'), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. Make / Model (Show ONLY Make and Model in same line, normal font) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.makeModelDisplay), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. VIN (Same font as stock) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.image_count), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. Year "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.year || '—'), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. Make / Model & Trim "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.makeModelDisplay), 1 /* TEXT */), $props.item.trim ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.trim), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. Body Type "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.body_type || '—'), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. VIN (Same font as stock) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-vin text-muted-dark",
     onClick: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.copyVin && $options.copyVin.apply($options, arguments);
@@ -123898,15 +123952,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "vin-display-text",
     title: 'Click to copy: ' + $props.item.vin
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.vin || '—'), 9 /* TEXT, PROPS */, _hoisted_10)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. Stock # "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.stock_no || '—'), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. Status Badge "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['status-badge', $options.statusBadgeClass])
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusBadgeText), 3 /* TEXT, CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. Price "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.vin || '—'), 9 /* TEXT, PROPS */, _hoisted_13)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. Stock # "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.stock_no || '—'), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. DIS (Days in Stock, after stock column) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedDis), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. Price "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-price font-weight-bold",
     onClick: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedPrice), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. KMs (Odometer) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
-    "class": "col-kms text-muted-dark",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedPrice), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 10. Odometer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    "class": "col-odometer text-muted-dark",
     onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedOdometer), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 10. Last Sync "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedLastSync), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 11. Website / VDP Link (Opens in new tab) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedOdometer), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 11. Status Badge "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['status-badge', $options.statusBadgeClass])
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusBadgeText), 3 /* TEXT, CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. Website / VDP Link (Opens in new tab) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-action-btn text-center",
     onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -123918,7 +123972,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, _toConsumableArray(_cache[17] || (_cache[17] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link-external"
-  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. CARFAX Button: Only visible if CARFAX data exists in backend and not in syndication view "), $props.showCarfaxColumn ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
+  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 13. CARFAX Button: Only visible if CARFAX data exists in backend and not in syndication view "), $props.showCarfaxColumn ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
     key: 0,
     "class": "col-action-btn text-center",
     onClick: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
@@ -123930,7 +123984,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[9] || (_cache[9] = function () {
       return $options.openCarfax && $options.openCarfax.apply($options, arguments);
     })
-  }, " CARFAX ")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_14, "—"))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 13. Repair Report Button "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, " CARFAX ")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_17, "—"))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 14. Repair Report Button "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-action-btn text-center",
     onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -123942,7 +123996,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, _toConsumableArray(_cache[18] || (_cache[18] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-file-pdf"
-  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dynamic Syndication Columns if Syndication View is Active "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 15. Created At "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    "class": "col-created-at text-muted-sm",
+    title: $props.item.created_at || ''
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedCreatedAt), 9 /* TEXT, PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 16. Modified At "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    "class": "col-modified-at text-muted-sm",
+    title: $props.item.updated_at || $props.item.modified_at || ''
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedModifiedAt), 9 /* TEXT, PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dynamic Syndication Columns if Syndication View is Active "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.getActiveSyndicationList, function (active_syndication) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
@@ -123960,7 +124020,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.updateSyndication([active_syndication.slug], 'REMOVE');
       }
-    }, " ACTIVE ", 8 /* PROPS */, _hoisted_15)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    }, " ACTIVE ", 8 /* PROPS */, _hoisted_20)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
       key: 1,
       "class": "btn badge badge-light-danger font-small-2",
       style: {
@@ -123970,7 +124030,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.updateSyndication([active_syndication.slug], 'ADD');
       },
       title: "".concat(active_syndication.label, " is INACTIVE for #").concat($props.item.stock_no)
-    }, " INACTIVE ", 8 /* PROPS */, _hoisted_16))]);
+    }, " INACTIVE ", 8 /* PROPS */, _hoisted_21))]);
   }), 128 /* KEYED_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 10 /* CLASS, PROPS */, _hoisted_1);
 }
 
@@ -124364,28 +124424,73 @@ var _hoisted_71 = {
   "class": "bx bx-sort lr-sort-idle"
 };
 var _hoisted_72 = {
+  "class": "lr-sort"
+};
+var _hoisted_73 = {
+  key: 0,
+  "class": "bx bx-up-arrow-alt"
+};
+var _hoisted_74 = {
+  key: 1,
+  "class": "bx bx-down-arrow-alt"
+};
+var _hoisted_75 = {
+  key: 2,
+  "class": "bx bx-sort lr-sort-idle"
+};
+var _hoisted_76 = {
   key: 0,
   "class": "th-action text-center"
 };
-var _hoisted_73 = {
-  key: 0
+var _hoisted_77 = {
+  "class": "lr-sort"
 };
-var _hoisted_74 = {
-  "class": "inventory-pagination-footer"
+var _hoisted_78 = {
+  key: 0,
+  "class": "bx bx-up-arrow-alt"
 };
-var _hoisted_75 = {
-  "class": "pagination-info"
+var _hoisted_79 = {
+  key: 1,
+  "class": "bx bx-down-arrow-alt"
 };
-var _hoisted_76 = {
-  "class": "pagination-controls"
-};
-var _hoisted_77 = ["disabled"];
-var _hoisted_78 = ["disabled", "onClick"];
-var _hoisted_79 = ["disabled"];
 var _hoisted_80 = {
-  "class": "pagination-page-size"
+  key: 2,
+  "class": "bx bx-sort lr-sort-idle"
 };
 var _hoisted_81 = {
+  "class": "lr-sort"
+};
+var _hoisted_82 = {
+  key: 0,
+  "class": "bx bx-up-arrow-alt"
+};
+var _hoisted_83 = {
+  key: 1,
+  "class": "bx bx-down-arrow-alt"
+};
+var _hoisted_84 = {
+  key: 2,
+  "class": "bx bx-sort lr-sort-idle"
+};
+var _hoisted_85 = {
+  key: 0
+};
+var _hoisted_86 = {
+  "class": "inventory-pagination-footer"
+};
+var _hoisted_87 = {
+  "class": "pagination-info"
+};
+var _hoisted_88 = {
+  "class": "pagination-controls"
+};
+var _hoisted_89 = ["disabled"];
+var _hoisted_90 = ["disabled", "onClick"];
+var _hoisted_91 = ["disabled"];
+var _hoisted_92 = {
+  "class": "pagination-page-size"
+};
+var _hoisted_93 = {
   "class": "modal fade text-left",
   id: "grid-list",
   tabindex: "-1",
@@ -124393,25 +124498,25 @@ var _hoisted_81 = {
   "aria-labelledby": "gridListLabel",
   "aria-hidden": "true"
 };
-var _hoisted_82 = {
+var _hoisted_94 = {
   "class": "modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm",
   role: "document"
 };
-var _hoisted_83 = {
+var _hoisted_95 = {
   "class": "modal-content"
 };
-var _hoisted_84 = {
+var _hoisted_96 = {
   "class": "modal-body p-0"
 };
-var _hoisted_85 = {
+var _hoisted_97 = {
   "class": "list-group-item d-flex align-items-center"
 };
-var _hoisted_86 = {
+var _hoisted_98 = {
   "class": "checkbox mb-0"
 };
-var _hoisted_87 = ["onUpdate:modelValue", "id"];
-var _hoisted_88 = ["for"];
-var _hoisted_89 = {
+var _hoisted_99 = ["onUpdate:modelValue", "id"];
+var _hoisted_100 = ["for"];
+var _hoisted_101 = {
   "class": "modal fade text-left",
   id: "filters",
   tabindex: "-1",
@@ -124419,39 +124524,39 @@ var _hoisted_89 = {
   "aria-labelledby": "filtersModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_90 = {
+var _hoisted_102 = {
   "class": "modal-dialog modal-dialog-centered modal-dialog-scrollable",
   role: "document"
 };
-var _hoisted_91 = {
+var _hoisted_103 = {
   "class": "modal-content",
   id: "filterInventoryModel"
 };
-var _hoisted_92 = {
+var _hoisted_104 = {
   "class": "modal-body"
 };
-var _hoisted_93 = {
+var _hoisted_105 = {
   "class": "row"
 };
-var _hoisted_94 = {
+var _hoisted_106 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_95 = {
+var _hoisted_107 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_96 = {
+var _hoisted_108 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_97 = {
+var _hoisted_109 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_98 = {
+var _hoisted_110 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_99 = {
+var _hoisted_111 = {
   "class": "col-sm-12 d-flex justify-content-left pt-1"
 };
-var _hoisted_100 = {
+var _hoisted_112 = {
   "class": "modal fade text-left",
   id: "bulk-list",
   tabindex: "-1",
@@ -124459,41 +124564,41 @@ var _hoisted_100 = {
   "aria-labelledby": "bulkListModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_101 = {
+var _hoisted_113 = {
   "class": "modal-dialog modal-dialog-centered modal-dialog-scrollable",
   role: "document"
 };
-var _hoisted_102 = {
+var _hoisted_114 = {
   "class": "modal-content"
 };
-var _hoisted_103 = {
+var _hoisted_115 = {
   "class": "modal-body"
 };
-var _hoisted_104 = {
+var _hoisted_116 = {
   "class": "row"
 };
-var _hoisted_105 = {
+var _hoisted_117 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_106 = {
+var _hoisted_118 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_107 = ["value"];
-var _hoisted_108 = {
+var _hoisted_119 = ["value"];
+var _hoisted_120 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_109 = ["value"];
-var _hoisted_110 = {
+var _hoisted_121 = ["value"];
+var _hoisted_122 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_111 = ["value"];
-var _hoisted_112 = {
+var _hoisted_123 = ["value"];
+var _hoisted_124 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_113 = {
+var _hoisted_125 = {
   "class": "col-sm-12 d-flex justify-content-left pt-1"
 };
-var _hoisted_114 = {
+var _hoisted_126 = {
   "class": "modal fade text-left",
   id: "bulk-syndication-update",
   tabindex: "-1",
@@ -124501,26 +124606,26 @@ var _hoisted_114 = {
   "aria-labelledby": "bulkSyndicationModalLabel",
   "aria-hidden": "true"
 };
-var _hoisted_115 = {
+var _hoisted_127 = {
   "class": "modal-dialog modal-dialog-centered modal-dialog-scrollable",
   role: "document"
 };
-var _hoisted_116 = {
+var _hoisted_128 = {
   "class": "modal-content"
 };
-var _hoisted_117 = {
+var _hoisted_129 = {
   "class": "modal-body"
 };
-var _hoisted_118 = {
+var _hoisted_130 = {
   "class": "row"
 };
-var _hoisted_119 = {
+var _hoisted_131 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_120 = {
+var _hoisted_132 = {
   "class": "col-md-7 form-group"
 };
-var _hoisted_121 = {
+var _hoisted_133 = {
   "class": "col-sm-12 d-flex justify-content-left pt-1"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -124530,9 +124635,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_draggable = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("draggable");
   var _component_v_select = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-select");
   var _directive_debounce = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("debounce");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" BEGIN: Content"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [_cache[139] || (_cache[139] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" BEGIN: Content"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [_cache[145] || (_cache[145] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "content-overlay"
-  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 1. HEADER SECTION: Title & Split Add Inventory Dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("header", _hoisted_4, [_cache[64] || (_cache[64] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 1. HEADER SECTION: Title & Split Add Inventory Dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("header", _hoisted_4, [_cache[67] || (_cache[67] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "inventory-title-wrap"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", {
     "class": "inventory-page-title"
@@ -124547,7 +124652,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn-split-main"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[56] || (_cache[56] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[59] || (_cache[59] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bx-plus mr-50"
       }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Add Inventory ", -1 /* CACHED */)]));
     }),
@@ -124562,7 +124667,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $data.isAddMenuOpen = !$data.isAddMenuOpen;
     }, ["stop"]))
-  }, _toConsumableArray(_cache[57] || (_cache[57] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[60] || (_cache[60] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-down-arrow",
     style: {
       "font-size": "9px"
@@ -124586,7 +124691,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[58] || (_cache[58] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[61] || (_cache[61] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bxs-dollar-circle mr-1 text-primary"
       }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bulk Price Updates ", -1 /* CACHED */)]));
     }),
@@ -124602,7 +124707,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[59] || (_cache[59] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[62] || (_cache[62] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bx-text mr-1 text-info"
       }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bulk Description Updates ", -1 /* CACHED */)]));
     }),
@@ -124615,9 +124720,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       $data.isAddMenuOpen = false;
       $options.warningForPurgeDeletingInventories();
     })
-  }, _toConsumableArray(_cache[60] || (_cache[60] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[63] || (_cache[63] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-eraser mr-1"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Empty Recycle Bin ", -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _cache[63] || (_cache[63] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Empty Recycle Bin ", -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _cache[66] || (_cache[66] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "dropdown-divider"
   }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     to: {
@@ -124629,7 +124734,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[61] || (_cache[61] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[64] || (_cache[64] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bxs-file-import mr-1 text-secondary"
       }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bulk Import CSV ", -1 /* CACHED */)]));
     }),
@@ -124644,14 +124749,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[62] || (_cache[62] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[65] || (_cache[65] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bx-upload mr-1 text-success"
       }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Quick Inventory Import ", -1 /* CACHED */)]));
     }),
     _: 1 /* STABLE */
-  })], 2 /* CLASS */)], 2 /* CLASS */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 2. SUBBAR (Directly above search bar): Views Selector + Action Icons with Tooltips "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Left: Views Selector Dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_9, [_cache[65] || (_cache[65] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  })], 2 /* CLASS */)], 2 /* CLASS */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 2. SUBBAR (Directly above search bar): Views Selector + Action Icons with Tooltips "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Left: Views Selector Dropdown "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_9, [_cache[68] || (_cache[68] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-list-ul mr-1 text-primary"
-  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selected_inventory), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [_cache[69] || (_cache[69] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", {
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selected_inventory), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [_cache[72] || (_cache[72] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", {
     "class": "dropdown-header text-uppercase font-small-2 font-weight-bold"
   }, " Default Views ", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getDefaultViews, function (inventory_view) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
@@ -124672,15 +124777,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-        return _toConsumableArray(_cache[66] || (_cache[66] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+        return _toConsumableArray(_cache[69] || (_cache[69] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
           "class": "bx bx-edit-alt"
         }, null, -1 /* CACHED */)]));
       }),
       _: 1 /* STABLE */
     }, 8 /* PROPS */, ["to"])], 8 /* PROPS */, _hoisted_11);
-  }), 128 /* KEYED_FRAGMENT */)), _cache[70] || (_cache[70] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }), 128 /* KEYED_FRAGMENT */)), _cache[73] || (_cache[73] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "dropdown-divider"
-  }, null, -1 /* CACHED */)), _cache[71] || (_cache[71] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", {
+  }, null, -1 /* CACHED */)), _cache[74] || (_cache[74] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h6", {
     "class": "dropdown-header text-uppercase font-small-2 font-weight-bold"
   }, " Custom Views ", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getCustomViews, function (inventory_view) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
@@ -124701,13 +124806,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-        return _toConsumableArray(_cache[67] || (_cache[67] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+        return _toConsumableArray(_cache[70] || (_cache[70] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
           "class": "bx bx-edit-alt"
         }, null, -1 /* CACHED */)]));
       }),
       _: 1 /* STABLE */
     }, 8 /* PROPS */, ["to"])], 8 /* PROPS */, _hoisted_13);
-  }), 128 /* KEYED_FRAGMENT */))]), _cache[72] || (_cache[72] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }), 128 /* KEYED_FRAGMENT */))]), _cache[75] || (_cache[75] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "dropdown-divider"
   }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     to: {
@@ -124716,7 +124821,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "dropdown-item text-primary font-weight-bold d-flex align-items-center"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[68] || (_cache[68] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[71] || (_cache[71] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bx-plus mr-1"
       }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" New Custom View ", -1 /* CACHED */)]));
     }),
@@ -124728,11 +124833,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }]),
     "data-toggle": "modal",
     "data-target": "#filters"
-  }, _toConsumableArray(_cache[73] || (_cache[73] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[76] || (_cache[76] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-filter-alt"
-  }, null, -1 /* CACHED */)])), 2 /* CLASS */), _cache[74] || (_cache[74] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, -1 /* CACHED */)])), 2 /* CLASS */), _cache[77] || (_cache[77] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "custom-tooltip-text"
-  }, "Filters", -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Column Customize Action "), _cache[80] || (_cache[80] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Filters", -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Column Customize Action "), _cache[83] || (_cache[83] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "custom-tooltip-wrapper"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
@@ -124751,7 +124856,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["bx", _ctx.getCompact ? 'bx-expand' : 'bx-collapse'])
-  }, null, 2 /* CLASS */)]), _cache[75] || (_cache[75] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 2 /* CLASS */)]), _cache[78] || (_cache[78] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "custom-tooltip-text"
   }, "Compact View", -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Syndication View Toggle Action "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
@@ -124761,9 +124866,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[9] || (_cache[9] = function () {
       return $options.changeSyndicationViewStatus && $options.changeSyndicationViewStatus.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[76] || (_cache[76] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[79] || (_cache[79] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-transfer"
-  }, null, -1 /* CACHED */)])), 2 /* CLASS */), _cache[77] || (_cache[77] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, -1 /* CACHED */)])), 2 /* CLASS */), _cache[80] || (_cache[80] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "custom-tooltip-text"
   }, "Bulk Syndication", -1 /* CACHED */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Settings Action "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     to: {
@@ -124772,23 +124877,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "btn-action-icon"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[78] || (_cache[78] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[81] || (_cache[81] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bxs-cog"
       }, null, -1 /* CACHED */)]));
     }),
     _: 1 /* STABLE */
-  }), _cache[79] || (_cache[79] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }), _cache[82] || (_cache[82] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "custom-tooltip-text"
-  }, "Settings", -1 /* CACHED */))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. TOOLBAR CARD: Transforms between Filters and Bulk Actions "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" STATE A: Bulk Actions Toolbar (Shown when items are selected) "), _ctx.getInventoryIds.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_22, [_cache[81] || (_cache[81] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, "Settings", -1 /* CACHED */))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. TOOLBAR CARD: Transforms between Filters and Bulk Actions "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" STATE A: Bulk Actions Toolbar (Shown when items are selected) "), _ctx.getInventoryIds.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_22, [_cache[84] || (_cache[84] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-check-circle mr-50"
-  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.getInventoryIds.length), 1 /* TEXT */), _cache[82] || (_cache[82] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" selected ", -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.getInventoryIds.length), 1 /* TEXT */), _cache[85] || (_cache[85] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" selected ", -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn-bulk-cancel",
     title: "Deselect all rows",
     onClick: _cache[10] || (_cache[10] = function () {
       return $options.clearBulkSelection && $options.clearBulkSelection.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[83] || (_cache[83] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[86] || (_cache[86] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x mr-25"
   }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Cancel Selection ", -1 /* CACHED */)]))), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
@@ -124796,16 +124901,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[11] || (_cache[11] = function () {
       return $options.confirmDeleteAction && $options.confirmDeleteAction.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[84] || (_cache[84] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[87] || (_cache[87] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-trash mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Delete ", -1 /* CACHED */)]))), _cache[85] || (_cache[85] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Delete ", -1 /* CACHED */)]))), _cache[88] || (_cache[88] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn-bulk-item btn-bulk-primary",
     "data-toggle": "modal",
     "data-target": "#bulk-list"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-edit mr-50"
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bulk Update ")], -1 /* CACHED */)), _cache[86] || (_cache[86] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Bulk Update ")], -1 /* CACHED */)), _cache[89] || (_cache[89] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "btn-bulk-item btn-bulk-purple",
     "data-toggle": "modal",
@@ -124836,7 +124941,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[13] || (_cache[13] = function () {
       return $options.clearSearch && $options.clearSearch.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[87] || (_cache[87] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[90] || (_cache[90] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
   }, null, -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown: Makes "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "toolbar-select",
@@ -124846,14 +124951,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: _cache[15] || (_cache[15] = function ($event) {
       return $options.onToolbarFilterChange('make', $data.selectedMake);
     })
-  }, [_cache[88] || (_cache[88] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[91] || (_cache[91] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Makes", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getMakes, function (make) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: 'mk_' + make,
       value: make
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(make), 9 /* TEXT, PROPS */, _hoisted_26);
-  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedMake]]), _cache[89] || (_cache[89] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedMake]]), _cache[92] || (_cache[92] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-chevron"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown: Models "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "toolbar-select",
@@ -124863,14 +124968,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: _cache[17] || (_cache[17] = function ($event) {
       return $options.onToolbarFilterChange('model', $data.selectedModel);
     })
-  }, [_cache[90] || (_cache[90] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[93] || (_cache[93] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Models", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredModels, function (model) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: 'md_' + model,
       value: model
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(model), 9 /* TEXT, PROPS */, _hoisted_28);
-  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedModel]]), _cache[91] || (_cache[91] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedModel]]), _cache[94] || (_cache[94] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-chevron"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown: Years "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "toolbar-select",
@@ -124880,14 +124985,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: _cache[19] || (_cache[19] = function ($event) {
       return $options.onToolbarFilterChange('year', $data.selectedYear);
     })
-  }, [_cache[92] || (_cache[92] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[95] || (_cache[95] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Years", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getYears, function (year) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: 'yr_' + year,
       value: year
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(year), 9 /* TEXT, PROPS */, _hoisted_30);
-  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedYear]]), _cache[93] || (_cache[93] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedYear]]), _cache[96] || (_cache[96] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-chevron"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dropdown: Statuses "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "toolbar-select",
@@ -124897,14 +125002,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: _cache[21] || (_cache[21] = function ($event) {
       return $options.onToolbarFilterChange('status', $data.selectedStatus);
     })
-  }, [_cache[94] || (_cache[94] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[97] || (_cache[97] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Statuses", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.getStatuses, function (status) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: 'st_' + status,
       value: status
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(status), 9 /* TEXT, PROPS */, _hoisted_32);
-  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedStatus]]), _cache[95] || (_cache[95] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.selectedStatus]]), _cache[98] || (_cache[98] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-chevron"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Clear Active Filters Pill "), $options.hasActiveFilters ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
@@ -124914,13 +125019,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[22] || (_cache[22] = function () {
       return $options.resetAllFilters && $options.resetAllFilters.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[96] || (_cache[96] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[99] || (_cache[99] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-refresh mr-25"
   }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Reset ", -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. MAIN WORKSPACE: TABLE + PREVIEW PANEL (Side-by-Side) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["inventory-main-layout", {
       'with-preview-open': $data.isPreviewOpen
     }])
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" LEFT: Table & Pagination Container "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loading Overlay when filtering, searching, or paging "), $data.isTableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_35, _toConsumableArray(_cache[97] || (_cache[97] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" LEFT: Table & Pagination Container "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loading Overlay when filtering, searching, or paging "), $data.isTableLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_35, _toConsumableArray(_cache[100] || (_cache[100] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "zd-loading-indicator-card"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-loader-alt bx-spin text-primary"
@@ -124936,63 +125041,78 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "true-value": '1',
     "false-value": '0'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.bulk_select]]), _cache[98] || (_cache[98] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.bulk_select]]), _cache[101] || (_cache[101] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "custom-chk-box"
-  }, null, -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 2. Photo Column "), _cache[107] || (_cache[107] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  }, null, -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 2. Photo Column "), _cache[113] || (_cache[113] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     "class": "th-photo"
   }, "Photo", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. Year Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     "class": "th-year th-sortable",
     onClick: _cache[24] || (_cache[24] = function ($event) {
       return $options.toggleSort('year');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_40, [_cache[99] || (_cache[99] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Year", -1 /* CACHED */)), $options.isSortAsc('year') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_41)) : $options.isSortDesc('year') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_42)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_43))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. Make / Model Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_40, [_cache[102] || (_cache[102] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Year", -1 /* CACHED */)), $options.isSortAsc('year') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_41)) : $options.isSortDesc('year') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_42)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_43))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. Make / Model Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     "class": "th-make-model th-sortable",
     onClick: _cache[25] || (_cache[25] = function ($event) {
       return $options.toggleSort('make');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_44, [_cache[100] || (_cache[100] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Make / Model", -1 /* CACHED */)), $options.isSortAsc('make') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_45)) : $options.isSortDesc('make') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_46)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_47))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. VIN Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-vin th-sortable",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_44, [_cache[103] || (_cache[103] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Make / Model", -1 /* CACHED */)), $options.isSortAsc('make') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_45)) : $options.isSortDesc('make') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_46)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_47))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. Body Type Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-body-type th-sortable",
     onClick: _cache[26] || (_cache[26] = function ($event) {
+      return $options.toggleSort('body_type');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_48, [_cache[104] || (_cache[104] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Body Type", -1 /* CACHED */)), $options.isSortAsc('body_type') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_49)) : $options.isSortDesc('body_type') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_50)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_51))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. VIN Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-vin th-sortable",
+    onClick: _cache[27] || (_cache[27] = function ($event) {
       return $options.toggleSort('vin');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_48, [_cache[101] || (_cache[101] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "VIN", -1 /* CACHED */)), $options.isSortAsc('vin') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_49)) : $options.isSortDesc('vin') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_50)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_51))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. Stock # Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_52, [_cache[105] || (_cache[105] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "VIN", -1 /* CACHED */)), $options.isSortAsc('vin') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_53)) : $options.isSortDesc('vin') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_54)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_55))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. Stock # Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     "class": "th-stock th-sortable",
-    onClick: _cache[27] || (_cache[27] = function ($event) {
+    onClick: _cache[28] || (_cache[28] = function ($event) {
       return $options.toggleSort('stock_no');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_52, [_cache[102] || (_cache[102] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Stock #", -1 /* CACHED */)), $options.isSortAsc('stock_no') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_53)) : $options.isSortDesc('stock_no') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_54)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_55))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. Status Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-status th-sortable",
-    onClick: _cache[28] || (_cache[28] = function ($event) {
-      return $options.toggleSort('status');
-    })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_56, [_cache[103] || (_cache[103] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Status", -1 /* CACHED */)), $options.isSortAsc('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_57)) : $options.isSortDesc('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_58)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_59))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. Price Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-price th-sortable",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_56, [_cache[106] || (_cache[106] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Stock #", -1 /* CACHED */)), $options.isSortAsc('stock_no') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_57)) : $options.isSortDesc('stock_no') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_58)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_59))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. DIS Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-dis th-sortable",
     onClick: _cache[29] || (_cache[29] = function ($event) {
+      return $options.toggleSort('days_in_stock');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_60, [_cache[107] || (_cache[107] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "DIS", -1 /* CACHED */)), $options.isSortAsc('days_in_stock') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_61)) : $options.isSortDesc('days_in_stock') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_62)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_63))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. Price Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-price th-sortable",
+    onClick: _cache[30] || (_cache[30] = function ($event) {
       return $options.toggleSort('price');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_60, [_cache[104] || (_cache[104] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Price", -1 /* CACHED */)), $options.isSortAsc('price') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_61)) : $options.isSortDesc('price') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_62)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_63))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. KMs Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-kms th-sortable",
-    onClick: _cache[30] || (_cache[30] = function ($event) {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_64, [_cache[108] || (_cache[108] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Price", -1 /* CACHED */)), $options.isSortAsc('price') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_65)) : $options.isSortDesc('price') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_66)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_67))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 10. Odometer Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-odometer th-sortable",
+    onClick: _cache[31] || (_cache[31] = function ($event) {
       return $options.toggleSort('odometer');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_64, [_cache[105] || (_cache[105] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "KMs", -1 /* CACHED */)), $options.isSortAsc('odometer') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_65)) : $options.isSortDesc('odometer') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_66)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_67))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 10. Last Sync Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-last-sync th-sortable",
-    onClick: _cache[31] || (_cache[31] = function ($event) {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_68, [_cache[109] || (_cache[109] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Odometer", -1 /* CACHED */)), $options.isSortAsc('odometer') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_69)) : $options.isSortDesc('odometer') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_70)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_71))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 11. Status Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-status th-sortable",
+    onClick: _cache[32] || (_cache[32] = function ($event) {
+      return $options.toggleSort('status');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_72, [_cache[110] || (_cache[110] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Status", -1 /* CACHED */)), $options.isSortAsc('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_73)) : $options.isSortDesc('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_74)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_75))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. Website / VDP Column "), _cache[114] || (_cache[114] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-action text-center"
+  }, "Website / VDP", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 13. CARFAX Column: Only visible if CARFAX data exists in backend and not in syndication view "), $options.hasCarfaxInListing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_76, "CARFAX")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 14. Repair Report Column "), _cache[115] || (_cache[115] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-action text-center"
+  }, "Repair Report", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 15. Created At Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-created-at th-sortable",
+    onClick: _cache[33] || (_cache[33] = function ($event) {
+      return $options.toggleSort('created_at');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_77, [_cache[111] || (_cache[111] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Created At", -1 /* CACHED */)), $options.isSortAsc('created_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_78)) : $options.isSortDesc('created_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_79)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_80))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 16. Modified At Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-modified-at th-sortable",
+    onClick: _cache[34] || (_cache[34] = function ($event) {
       return $options.toggleSort('updated_at');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_68, [_cache[106] || (_cache[106] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Last Sync", -1 /* CACHED */)), $options.isSortAsc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_69)) : $options.isSortDesc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_70)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_71))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 11. Website / VDP Column "), _cache[108] || (_cache[108] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-action text-center"
-  }, "Website / VDP", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. CARFAX Column: Only visible if CARFAX data exists in backend and not in syndication view "), $options.hasCarfaxInListing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", _hoisted_72, "CARFAX")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 13. Repair Report Column "), _cache[109] || (_cache[109] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-action text-center"
-  }, "Repair Report", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dynamic Syndication Headers "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_81, [_cache[112] || (_cache[112] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Modified At", -1 /* CACHED */)), $options.isSortAsc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_82)) : $options.isSortDesc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_83)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_84))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dynamic Syndication Headers "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.getActiveSyndicationList, function (active_syndication) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
       "class": "text-center th-syndication-header",
       key: "inventory_".concat(active_syndication.slug, "_header")
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(active_syndication.label), 1 /* TEXT */);
-  }), 128 /* KEYED_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table Body "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loading Indicator (Initial load or loading when empty) "), !_ctx.getLoadState || $data.isTableLoading && _ctx.getEntities.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_73, _toConsumableArray(_cache[110] || (_cache[110] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
-    colspan: "15",
+  }), 128 /* KEYED_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Table Body "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Loading Indicator (Initial load or loading when empty) "), !_ctx.getLoadState || $data.isTableLoading && _ctx.getEntities.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_85, _toConsumableArray(_cache[116] || (_cache[116] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    colspan: "20",
     "class": "text-center py-5 text-muted"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "d-flex flex-column align-items-center justify-content-center py-4"
@@ -125009,8 +125129,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }
   }, "Loading vehicles...")])], -1 /* CACHED */)])))) : _ctx.getEntities.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Empty State "), _cache[111] || (_cache[111] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
-    colspan: "15",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Empty State "), _cache[117] || (_cache[117] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    colspan: "20",
     "class": "text-center py-4 text-muted"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-search-alt mb-1",
@@ -125034,17 +125154,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       showCarfaxColumn: $options.hasCarfaxInListing,
       onSelectRow: $options.handleRowSelect
     }, null, 8 /* PROPS */, ["item", "time_zone", "childCheck", "placeholder_image", "app_metadata", "isSelected", "isCompact", "showCarfaxColumn", "onSelectRow"]);
-  }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */))])])], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. PAGINATION FOOTER: Docked & Always Visible "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_75, " Showing " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.paginationStart) + "–" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.paginationEnd) + " of " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalInventoryCount) + " vehicles ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Center/Right Pagination Buttons "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_76, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */))])])], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. PAGINATION FOOTER: Docked & Always Visible "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_87, " Showing " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.paginationStart) + "–" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.paginationEnd) + " of " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.totalInventoryCount) + " vehicles ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Center/Right Pagination Buttons "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_88, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "pagination-nav-btn",
     disabled: _ctx.getPager.previous == null,
-    onClick: _cache[32] || (_cache[32] = function ($event) {
+    onClick: _cache[35] || (_cache[35] = function ($event) {
       return $options.paginationWithUrl(_ctx.getPager.previous);
     }),
     title: "Previous Page"
-  }, _toConsumableArray(_cache[112] || (_cache[112] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[118] || (_cache[118] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-left"
-  }, null, -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_77), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Number Buttons "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.visiblePageNumbers, function (p) {
+  }, null, -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_89), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Number Buttons "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.visiblePageNumbers, function (p) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: 'page_' + p,
       type: "button",
@@ -125056,25 +125176,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return p !== '...' && $options.pagination(p);
       }
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(p), 11 /* TEXT, CLASS, PROPS */, _hoisted_78);
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(p), 11 /* TEXT, CLASS, PROPS */, _hoisted_90);
   }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "pagination-nav-btn",
     disabled: _ctx.getPager.next == null,
-    onClick: _cache[33] || (_cache[33] = function ($event) {
+    onClick: _cache[36] || (_cache[36] = function ($event) {
       return $options.paginationWithUrl(_ctx.getPager.next);
     }),
     title: "Next Page"
-  }, _toConsumableArray(_cache[113] || (_cache[113] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[119] || (_cache[119] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-right"
-  }, null, -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_79)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Size Selector "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [_cache[115] || (_cache[115] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_91)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Page Size Selector "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [_cache[121] || (_cache[121] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "mr-1 text-muted"
   }, "Rows per page", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "page-size-select",
-    "onUpdate:modelValue": _cache[34] || (_cache[34] = function ($event) {
+    "onUpdate:modelValue": _cache[37] || (_cache[37] = function ($event) {
       return $options.getNumberOfEntities = $event;
     })
-  }, _toConsumableArray(_cache[114] || (_cache[114] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"10\" data-v-0502e67e>10</option><option value=\"15\" data-v-0502e67e>15</option><option value=\"25\" data-v-0502e67e>25</option><option value=\"50\" data-v-0502e67e>50</option><option value=\"100\" data-v-0502e67e>100</option>", 5)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.getNumberOfEntities]])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" RIGHT: INVENTORY PREVIEW PANEL (Opened when a row is clicked) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
+  }, _toConsumableArray(_cache[120] || (_cache[120] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"10\" data-v-0502e67e>10</option><option value=\"15\" data-v-0502e67e>15</option><option value=\"25\" data-v-0502e67e>25</option><option value=\"50\" data-v-0502e67e>50</option><option value=\"100\" data-v-0502e67e>100</option>", 5)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.getNumberOfEntities]])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" RIGHT: INVENTORY PREVIEW PANEL (Opened when a row is clicked) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(vue__WEBPACK_IMPORTED_MODULE_0__.Transition, {
     name: "slide-panel"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -125089,7 +125209,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, ["item", "app_metadata", "time_zone", "placeholder_image", "onClose", "onOpenVdp"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
-  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. PRESERVED MODALS: Custom Columns Draggable List Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_83, [_cache[117] || (_cache[117] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. PRESERVED MODALS: Custom Columns Draggable List Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_cache[123] || (_cache[123] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header pl-1 pr-1"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "modal-title font-weight-bold",
@@ -125101,7 +125221,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-label": "Close"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
-  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_draggable, (0,vue__WEBPACK_IMPORTED_MODULE_0__.mergeProps)({
+  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_96, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_draggable, (0,vue__WEBPACK_IMPORTED_MODULE_0__.mergeProps)({
     tag: "transition-group",
     "component-data": {
       tag: 'ul',
@@ -125110,10 +125230,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     },
     list: _ctx.list
   }, $options.dragOptions, {
-    onStart: _cache[36] || (_cache[36] = function ($event) {
+    onStart: _cache[39] || (_cache[39] = function ($event) {
       return $data.isDragging = true;
     }),
-    onEnd: _cache[37] || (_cache[37] = function ($event) {
+    onEnd: _cache[40] || (_cache[40] = function ($event) {
       return $data.isDragging = false;
     }),
     "class": "list-group",
@@ -125124,14 +125244,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     item: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
       var element = _ref.element,
         index = _ref.index;
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_85, [_cache[116] || (_cache[116] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_97, [_cache[122] || (_cache[122] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         style: {
           "cursor": "pointer"
         },
         "class": "bx bx-grid-vertical pr-1 handle text-muted"
-      }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_86, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         type: "checkbox",
-        onChange: _cache[35] || (_cache[35] = function () {
+        onChange: _cache[38] || (_cache[38] = function () {
           return $options.unsavedView && $options.unsavedView.apply($options, arguments);
         }),
         "onUpdate:modelValue": function onUpdateModelValue($event) {
@@ -125141,13 +125261,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         id: 'dragging_' + index,
         "true-value": '1',
         "false-value": '0'
-      }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_87), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, element.visibility]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+      }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_99), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, element.visibility]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
         "for": 'dragging_' + index,
         "class": "mb-0 ml-1"
-      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(element.header), 9 /* TEXT, PROPS */, _hoisted_88)])])];
+      }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(element.header), 9 /* TEXT, PROPS */, _hoisted_100)])])];
     }),
     _: 1 /* STABLE */
-  }, 16 /* FULL_PROPS */, ["list", "onChange"])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. PRESERVED MODALS: Advanced Filters Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_89, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [_cache[123] || (_cache[123] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, 16 /* FULL_PROPS */, ["list", "onChange"])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. PRESERVED MODALS: Advanced Filters Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_102, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_103, [_cache[129] || (_cache[129] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header pl-1 pr-1"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "modal-title font-weight-bold",
@@ -125159,57 +125279,57 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-label": "Close"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
-  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_cache[118] || (_cache[118] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [_cache[124] || (_cache[124] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Year")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Year")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
     id: "filter-year",
     placeholder: "Year",
     modelValue: $options.yearFilter,
-    "onUpdate:modelValue": _cache[38] || (_cache[38] = function ($event) {
+    "onUpdate:modelValue": _cache[41] || (_cache[41] = function ($event) {
       return $options.yearFilter = $event;
     }),
     clearable: "",
     options: $options.getYears
-  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[119] || (_cache[119] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[125] || (_cache[125] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Make")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Make")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_107, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
     id: "filter-make",
     placeholder: "Make",
     modelValue: $options.makeFilter,
-    "onUpdate:modelValue": _cache[39] || (_cache[39] = function ($event) {
+    "onUpdate:modelValue": _cache[42] || (_cache[42] = function ($event) {
       return $options.makeFilter = $event;
     }),
     clearable: "",
     options: $options.getMakes
-  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[120] || (_cache[120] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[126] || (_cache[126] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Model")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_96, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Model")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
     id: "filter-model",
     placeholder: "Model",
     modelValue: $options.modelFilter,
-    "onUpdate:modelValue": _cache[40] || (_cache[40] = function ($event) {
+    "onUpdate:modelValue": _cache[43] || (_cache[43] = function ($event) {
       return $options.modelFilter = $event;
     }),
     clearable: "",
     options: $options.getModels
-  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[121] || (_cache[121] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[127] || (_cache[127] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_109, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
     id: "filter-status",
     placeholder: "Status",
     modelValue: $options.statusFilter,
-    "onUpdate:modelValue": _cache[41] || (_cache[41] = function ($event) {
+    "onUpdate:modelValue": _cache[44] || (_cache[44] = function ($event) {
       return $options.statusFilter = $event;
     }),
     clearable: "",
     options: _ctx.getStatuses
-  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[122] || (_cache[122] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["modelValue", "options"])]), _cache[128] || (_cache[128] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Visibility")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Visibility")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
     id: "filter-visibility",
     placeholder: "Visibility",
     modelValue: $options.visibilityFilter,
-    "onUpdate:modelValue": _cache[42] || (_cache[42] = function ($event) {
+    "onUpdate:modelValue": _cache[45] || (_cache[45] = function ($event) {
       return $options.visibilityFilter = $event;
     }),
     clearable: "",
@@ -125223,21 +125343,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       label: 'OFF',
       value: '0'
     }]
-  }, null, 8 /* PROPS */, ["modelValue", "reduce"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, ["modelValue", "reduce"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_111, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[43] || (_cache[43] = function () {
+    onClick: _cache[46] || (_cache[46] = function () {
       return $options.filterInventory && $options.filterInventory.apply($options, arguments);
     }),
     "class": "btn btn-primary mr-1",
     "data-dismiss": "modal"
   }, " Apply Filters "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[44] || (_cache[44] = function () {
+    onClick: _cache[47] || (_cache[47] = function () {
       return $options.resetFilters && $options.resetFilters.apply($options, arguments);
     }),
     "class": "btn btn-light-secondary",
     "data-dismiss": "modal"
-  }, " Reset ")])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. PRESERVED MODALS: Bulk Update Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_100, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_102, [_cache[134] || (_cache[134] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, " Reset ")])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. PRESERVED MODALS: Bulk Update Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [_cache[140] || (_cache[140] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header pl-1 pr-1"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "modal-title font-weight-bold",
@@ -125249,14 +125369,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-label": "Close"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
-  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_103, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [_cache[129] || (_cache[129] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_115, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_116, [_cache[135] || (_cache[135] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Featured Vehicle")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Featured Vehicle")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "custom-select form-control",
-    "onUpdate:modelValue": _cache[45] || (_cache[45] = function ($event) {
+    "onUpdate:modelValue": _cache[48] || (_cache[48] = function ($event) {
       return $data.form.feature_listing = $event;
     })
-  }, _toConsumableArray(_cache[124] || (_cache[124] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, _toConsumableArray(_cache[130] || (_cache[130] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: "",
     disabled: ""
@@ -125264,14 +125384,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: "1"
   }, "Featured", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0"
-  }, "Not Featured", -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.feature_listing]])]), _cache[130] || (_cache[130] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Not Featured", -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.feature_listing]])]), _cache[136] || (_cache[136] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_118, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "custom-select form-control",
-    "onUpdate:modelValue": _cache[46] || (_cache[46] = function ($event) {
+    "onUpdate:modelValue": _cache[49] || (_cache[49] = function ($event) {
       return $data.form.status = $event;
     })
-  }, [_cache[125] || (_cache[125] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[131] || (_cache[131] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: "",
     disabled: ""
@@ -125279,15 +125399,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       value: status,
       key: status
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(status), 9 /* TEXT, PROPS */, _hoisted_107);
-  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.status]])]), _cache[131] || (_cache[131] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(status), 9 /* TEXT, PROPS */, _hoisted_119);
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.status]])]), _cache[137] || (_cache[137] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Sub Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_108, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Sub Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "custom-select form-control",
-    "onUpdate:modelValue": _cache[47] || (_cache[47] = function ($event) {
+    "onUpdate:modelValue": _cache[50] || (_cache[50] = function ($event) {
       return $data.form.sub_status = $event;
     })
-  }, [_cache[126] || (_cache[126] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[132] || (_cache[132] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: "",
     disabled: ""
@@ -125295,15 +125415,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       value: status,
       key: status
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(status), 9 /* TEXT, PROPS */, _hoisted_109);
-  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.sub_status]])]), _cache[132] || (_cache[132] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(status), 9 /* TEXT, PROPS */, _hoisted_121);
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.sub_status]])]), _cache[138] || (_cache[138] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Vehicle Type")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_110, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Vehicle Type")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_122, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "custom-select form-control",
-    "onUpdate:modelValue": _cache[48] || (_cache[48] = function ($event) {
+    "onUpdate:modelValue": _cache[51] || (_cache[51] = function ($event) {
       return $data.form.vehicle_type = $event;
     })
-  }, [_cache[127] || (_cache[127] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[133] || (_cache[133] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: "",
     disabled: ""
@@ -125311,15 +125431,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       value: vt,
       key: vt
-    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(vt), 9 /* TEXT, PROPS */, _hoisted_111);
-  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.vehicle_type]])]), _cache[133] || (_cache[133] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(vt), 9 /* TEXT, PROPS */, _hoisted_123);
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.vehicle_type]])]), _cache[139] || (_cache[139] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Visibility")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_112, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Visibility")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "custom-select form-control",
-    "onUpdate:modelValue": _cache[49] || (_cache[49] = function ($event) {
+    "onUpdate:modelValue": _cache[52] || (_cache[52] = function ($event) {
       return $data.form.visibility = $event;
     })
-  }, _toConsumableArray(_cache[128] || (_cache[128] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, _toConsumableArray(_cache[134] || (_cache[134] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     selected: "",
     disabled: ""
@@ -125327,21 +125447,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     value: "1"
   }, "ON", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0"
-  }, "OFF", -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.visibility]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_113, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "OFF", -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.visibility]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[50] || (_cache[50] = function () {
+    onClick: _cache[53] || (_cache[53] = function () {
       return $options.applyBulkOptions && $options.applyBulkOptions.apply($options, arguments);
     }),
     "class": "btn btn-primary mr-1",
     "data-dismiss": "modal"
   }, " Update Fields "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[51] || (_cache[51] = function () {
+    onClick: _cache[54] || (_cache[54] = function () {
       return $options.resetBulkColumns && $options.resetBulkColumns.apply($options, arguments);
     }),
     "class": "btn btn-light-secondary",
     "data-dismiss": "modal"
-  }, " Cancel ")])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. PRESERVED MODALS: Bulk Syndication Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_114, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_115, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_116, [_cache[138] || (_cache[138] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, " Cancel ")])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. PRESERVED MODALS: Bulk Syndication Modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_127, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_128, [_cache[144] || (_cache[144] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header pl-1 pr-1"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "modal-title font-weight-bold",
@@ -125353,39 +125473,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-label": "Close"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
-  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_117, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_118, [_cache[136] || (_cache[136] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [_cache[142] || (_cache[142] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Action")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_119, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Action")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_131, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "custom-select form-control",
-    "onUpdate:modelValue": _cache[52] || (_cache[52] = function ($event) {
+    "onUpdate:modelValue": _cache[55] || (_cache[55] = function ($event) {
       return $data.syndication.action = $event;
     })
-  }, _toConsumableArray(_cache[135] || (_cache[135] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, _toConsumableArray(_cache[141] || (_cache[141] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "ADD"
   }, "ADD", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "REMOVE"
-  }, "REMOVE", -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.syndication.action]])]), _cache[137] || (_cache[137] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "REMOVE", -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.syndication.action]])]), _cache[143] || (_cache[143] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-5"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Syndication Partners")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Syndication Partners")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_132, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_select, {
     multiple: "",
     modelValue: $data.syndication.slugs,
-    "onUpdate:modelValue": _cache[53] || (_cache[53] = function ($event) {
+    "onUpdate:modelValue": _cache[56] || (_cache[56] = function ($event) {
       return $data.syndication.slugs = $event;
     }),
     reduce: function reduce(partner) {
       return partner.slug;
     },
     options: _ctx.getActiveSyndicationList
-  }, null, 8 /* PROPS */, ["modelValue", "reduce", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_121, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, ["modelValue", "reduce", "options"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_133, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[54] || (_cache[54] = function () {
+    onClick: _cache[57] || (_cache[57] = function () {
       return $options.confirmBulkSyndicationUpdate && $options.confirmBulkSyndicationUpdate.apply($options, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn mr-1", $options.getBulkSydnicationConfirmButtonClass]),
     "data-dismiss": "modal"
   }, " Confirm ", 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[55] || (_cache[55] = function () {
+    onClick: _cache[58] || (_cache[58] = function () {
       return $options.resetSyndicationColumns && $options.resetSyndicationColumns.apply($options, arguments);
     }),
     "class": "btn btn-light-secondary",
@@ -209253,7 +209373,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".inventory-table-row[data-v-190dd694] {\n  cursor: pointer;\n  transition: background-color 0.15s ease;\n  border-bottom: 1px solid #f3f4f6;\n}\n.inventory-table-row[data-v-190dd694]:hover {\n  background-color: #f9fafb;\n}\n.inventory-table-row.row-selected[data-v-190dd694] {\n  background-color: #eff6ff !important;\n}\n.inventory-table-row td[data-v-190dd694] {\n  padding: 0.45rem 0.75rem;\n  vertical-align: middle;\n  font-size: 0.9rem;\n  line-height: 1.3;\n  white-space: nowrap;\n  border-bottom: 1px solid #eef1f5;\n}\n\n/* Custom Checkbox */\n.col-checkbox[data-v-190dd694] {\n  width: 44px;\n  min-width: 44px;\n  max-width: 44px;\n  text-align: center;\n}\n.custom-chk-container[data-v-190dd694] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-190dd694] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694] {\n  position: relative;\n  display: inline-block;\n  height: 19px;\n  width: 19px;\n  background-color: #ffffff;\n  border: 1.5px solid #d1d5db;\n  border-radius: 4px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 6px;\n  top: 2px;\n  width: 5px;\n  height: 10px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-190dd694] {\n  border-color: #9ca3af;\n}\n\n/* Vehicle Thumbnail */\n.col-photo[data-v-190dd694] {\n  width: 58px;\n  min-width: 58px;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694] {\n  position: relative;\n  width: 48px;\n  height: 34px;\n  border-radius: 4px;\n  overflow: hidden;\n  background: #f3f4f6;\n  border: 1px solid #e5e7eb;\n}\n.vehicle-thumbnail[data-v-190dd694] {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  display: block;\n}\n.thumbnail-count-badge[data-v-190dd694] {\n  position: absolute;\n  bottom: 2px;\n  right: 2px;\n  background: rgba(17, 24, 39, 0.75);\n  color: #ffffff;\n  font-size: 9.5px;\n  padding: 1px 4px;\n  border-radius: 3px;\n  line-height: 1;\n}\n.thumbnail-count-badge i[data-v-190dd694] {\n  font-size: 8.5px;\n  vertical-align: middle;\n}\n.col-year[data-v-190dd694] {\n  width: 70px;\n  min-width: 70px;\n  font-size: 0.95rem;\n}\n.col-make-model[data-v-190dd694] {\n  min-width: 160px;\n  font-size: 0.95rem;\n  font-weight: 400;\n  color: #1f2937;\n  white-space: nowrap;\n}\n.col-vin[data-v-190dd694] {\n  width: 150px;\n  min-width: 150px;\n  font-size: 0.95rem;\n  cursor: pointer;\n}\n.col-vin .vin-display-text[data-v-190dd694] {\n  font-size: 0.95rem;\n  font-weight: 400;\n  color: #4b5563;\n}\n.col-vin .vin-display-text[data-v-190dd694]:hover {\n  color: #2563eb;\n  text-decoration: underline;\n}\n.col-stock[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  font-size: 0.95rem;\n  font-weight: 400;\n  color: #4b5563;\n}\n.col-status[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n}\n.col-price[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 0.95rem;\n}\n.col-kms[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n  font-size: 0.95rem;\n}\n.col-last-sync[data-v-190dd694] {\n  width: 125px;\n  min-width: 125px;\n  font-size: 0.85rem;\n}\n.col-action-btn[data-v-190dd694] {\n  width: 50px;\n  min-width: 50px;\n  text-align: center;\n}\n.col-syndication-item[data-v-190dd694] {\n  min-width: 110px;\n}\n\n/* Text styles */\n.text-muted-dark[data-v-190dd694] {\n  color: #374151;\n  font-weight: 500;\n}\n.text-muted-sm[data-v-190dd694] {\n  color: #6b7280;\n}\n\n/* Status Badges */\n.status-badge[data-v-190dd694] {\n  font-size: 11.5px;\n  font-weight: 600;\n  padding: 3px 9px;\n  border-radius: 6px;\n  display: inline-block;\n  white-space: nowrap;\n}\n.badge-price-change[data-v-190dd694] {\n  background: #fef3c7;\n  color: #92400e;\n  border: 1px solid #fde68a;\n}\n.badge-active[data-v-190dd694] {\n  background: #dcfce7;\n  color: #166534;\n  border: 1px solid #bbf7d0;\n}\n.badge-sold[data-v-190dd694] {\n  background: #fee2e2;\n  color: #991b1b;\n  border: 1px solid #fecaca;\n}\n.badge-pending[data-v-190dd694] {\n  background: #e0f2fe;\n  color: #0369a1;\n  border: 1px solid #bae6fd;\n}\n.badge-not-advertised[data-v-190dd694] {\n  background: #f1f5f9;\n  color: #475569;\n  border: 1px solid #e2e8f0;\n}\n\n/* Action Buttons */\n.table-icon-btn[data-v-190dd694] {\n  background: transparent;\n  border: none;\n  width: 32px;\n  height: 32px;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  padding: 0;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694] {\n  color: #2563eb;\n  font-size: 17px;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694]:hover {\n  background: #eff6ff;\n  color: #1d4ed8;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694] {\n  color: #ef4444;\n  font-size: 17px;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694]:hover {\n  background: #fee2e2;\n  color: #dc2626;\n}\n.table-icon-btn.btn-more[data-v-190dd694] {\n  color: #6b7280;\n  font-size: 19px;\n}\n.table-icon-btn.btn-more[data-v-190dd694]:hover {\n  background: #f3f4f6;\n  color: #111827;\n}\n.carfax-pill-badge[data-v-190dd694] {\n  background: #111827;\n  color: #ffffff;\n  border: none;\n  font-size: 10px;\n  font-weight: 800;\n  letter-spacing: 0.5px;\n  padding: 3px 8px;\n  border-radius: 4px;\n  cursor: pointer;\n  transition: opacity 0.15s ease;\n}\n.carfax-pill-badge[data-v-190dd694]:hover {\n  opacity: 0.85;\n}\n.dropdown-item[data-v-190dd694] {\n  font-size: 13px;\n  padding: 8px 14px;\n  color: #374151;\n}\n.dropdown-item[data-v-190dd694]:hover {\n  background-color: #f9fafb;\n  color: #111827;\n}\n\n/* Compact Row Density */\ntr.row-compact td[data-v-190dd694] {\n  padding: 4px 8px !important;\n  font-size: 12.5px !important;\n  line-height: 1.25 !important;\n}\ntr.row-compact .vehicle-thumbnail-wrapper[data-v-190dd694] {\n  width: 38px !important;\n  height: 26px !important;\n  border-radius: 4px !important;\n}\ntr.row-compact .thumbnail-count-badge[data-v-190dd694] {\n  font-size: 7.5px !important;\n  padding: 0 2px !important;\n}\ntr.row-compact .vehicle-make-title[data-v-190dd694] {\n  font-size: 12.5px !important;\n  line-height: 1.15 !important;\n}\ntr.row-compact .vehicle-model-sub[data-v-190dd694] {\n  font-size: 11.5px !important;\n  line-height: 1.15 !important;\n}\ntr.row-compact .col-vin .vin-display-text[data-v-190dd694] {\n  font-size: 11.5px !important;\n}\ntr.row-compact .status-badge[data-v-190dd694] {\n  font-size: 10px !important;\n  padding: 1px 6px !important;\n}\ntr.row-compact .col-price[data-v-190dd694] {\n  font-size: 12.5px !important;\n}\ntr.row-compact .col-kms[data-v-190dd694] {\n  font-size: 12px !important;\n}\ntr.row-compact .col-last-sync[data-v-190dd694] {\n  font-size: 11.5px !important;\n}\ntr.row-compact .table-icon-btn[data-v-190dd694] {\n  width: 25px !important;\n  height: 25px !important;\n  font-size: 14px !important;\n}\ntr.row-compact .carfax-pill-badge[data-v-190dd694] {\n  font-size: 8.5px !important;\n  padding: 1px 5px !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".inventory-table-row[data-v-190dd694] {\n  cursor: pointer;\n  transition: background-color 0.15s ease;\n  background-color: #ffffff;\n  border-bottom: 1px solid #f1f5f9;\n}\n.inventory-table-row[data-v-190dd694]:hover {\n  background-color: #f8fafc;\n}\n.inventory-table-row.row-selected[data-v-190dd694] {\n  background-color: #eff6ff !important;\n}\n.inventory-table-row td[data-v-190dd694] {\n  padding: 0.25rem 0.5rem;\n  vertical-align: middle;\n  font-size: 0.8125rem;\n  line-height: 1.3;\n  white-space: nowrap;\n  border-bottom: 1px solid #f1f5f9;\n}\n\n/* Custom Checkbox */\n.col-checkbox[data-v-190dd694] {\n  width: 36px;\n  min-width: 36px;\n  max-width: 36px;\n  text-align: center;\n}\n.custom-chk-container[data-v-190dd694] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-190dd694] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694] {\n  position: relative;\n  display: inline-block;\n  height: 15px;\n  width: 15px;\n  background-color: #ffffff;\n  border: 1.5px solid #cbd5e1;\n  border-radius: 3px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 4.5px;\n  top: 1.5px;\n  width: 4px;\n  height: 8px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-190dd694] {\n  border-color: #94a3b8;\n}\n\n/* Vehicle Thumbnail */\n.col-photo[data-v-190dd694] {\n  width: 50px;\n  min-width: 50px;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694] {\n  position: relative;\n  width: 40px;\n  height: 28px;\n  border-radius: 4px;\n  overflow: hidden;\n  background: #f1f5f9;\n  border: 1px solid #e2e8f0;\n}\n.vehicle-thumbnail[data-v-190dd694] {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  display: block;\n}\n.thumbnail-count-badge[data-v-190dd694] {\n  position: absolute;\n  bottom: 1px;\n  right: 1px;\n  background: rgba(15, 23, 42, 0.75);\n  color: #ffffff;\n  font-size: 8.5px;\n  padding: 0 3px;\n  border-radius: 2px;\n  line-height: 1;\n}\n.thumbnail-count-badge i[data-v-190dd694] {\n  font-size: 7.5px;\n  vertical-align: middle;\n}\n.col-year[data-v-190dd694] {\n  width: 60px;\n  min-width: 60px;\n  font-size: 0.8125rem;\n}\n.col-make-model[data-v-190dd694] {\n  min-width: 140px;\n  font-size: 0.8125rem;\n  font-weight: 500;\n  color: #1e293b;\n  white-space: nowrap;\n}\n.col-make-model .vehicle-title-text[data-v-190dd694] {\n  line-height: 1.25;\n}\n.col-make-model .vehicle-trim-subtext[data-v-190dd694] {\n  font-size: 0.725rem;\n  color: #64748b;\n  font-weight: 400;\n  line-height: 1.15;\n  margin-top: 1px;\n}\n.col-body-type[data-v-190dd694] {\n  width: 90px;\n  min-width: 90px;\n  font-size: 0.8125rem;\n  color: #475569;\n}\n.col-vin[data-v-190dd694] {\n  width: 135px;\n  min-width: 135px;\n  font-size: 0.8125rem;\n  cursor: pointer;\n}\n.col-vin .vin-display-text[data-v-190dd694] {\n  font-size: 0.8125rem;\n  font-weight: 400;\n  color: #475569;\n}\n.col-vin .vin-display-text[data-v-190dd694]:hover {\n  color: #2563eb;\n  text-decoration: underline;\n}\n.col-stock[data-v-190dd694] {\n  width: 80px;\n  min-width: 80px;\n  font-size: 0.8125rem;\n  font-weight: 400;\n  color: #475569;\n}\n.col-dis[data-v-190dd694] {\n  width: 60px;\n  min-width: 60px;\n  font-size: 0.8125rem;\n  font-weight: 500;\n  color: #475569;\n}\n.col-price[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  font-size: 0.8125rem;\n  font-weight: 600;\n  color: #0f172a;\n}\n.col-odometer[data-v-190dd694],\n.col-kms[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  font-size: 0.8125rem;\n  color: #475569;\n}\n.col-status[data-v-190dd694] {\n  width: 100px;\n  min-width: 100px;\n}\n.col-created-at[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  font-size: 0.775rem;\n}\n.col-modified-at[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  font-size: 0.775rem;\n}\n.col-last-sync[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n  font-size: 0.775rem;\n}\n.col-action-btn[data-v-190dd694] {\n  width: 44px;\n  min-width: 44px;\n  text-align: center;\n}\n.col-syndication-item[data-v-190dd694] {\n  min-width: 100px;\n}\n\n/* Text styles */\n.text-muted-dark[data-v-190dd694] {\n  color: #334155;\n  font-weight: 500;\n}\n.text-muted-sm[data-v-190dd694] {\n  color: #64748b;\n}\n\n/* Status Badges */\n.status-badge[data-v-190dd694] {\n  font-size: 11px;\n  font-weight: 600;\n  padding: 2px 7px;\n  border-radius: 5px;\n  display: inline-block;\n  white-space: nowrap;\n}\n.badge-price-change[data-v-190dd694] {\n  background: #fef3c7;\n  color: #92400e;\n  border: 1px solid #fde68a;\n}\n.badge-active[data-v-190dd694] {\n  background: #dcfce7;\n  color: #166534;\n  border: 1px solid #bbf7d0;\n}\n.badge-sold[data-v-190dd694] {\n  background: #fee2e2;\n  color: #991b1b;\n  border: 1px solid #fecaca;\n}\n.badge-pending[data-v-190dd694] {\n  background: #e0f2fe;\n  color: #0369a1;\n  border: 1px solid #bae6fd;\n}\n.badge-not-advertised[data-v-190dd694] {\n  background: #f1f5f9;\n  color: #475569;\n  border: 1px solid #e2e8f0;\n}\n\n/* Action Buttons */\n.table-icon-btn[data-v-190dd694] {\n  background: transparent;\n  border: none;\n  width: 28px;\n  height: 28px;\n  border-radius: 5px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  padding: 0;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694] {\n  color: #2563eb;\n  font-size: 15px;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694]:hover {\n  background: #eff6ff;\n  color: #1d4ed8;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694] {\n  color: #ef4444;\n  font-size: 15px;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694]:hover {\n  background: #fee2e2;\n  color: #dc2626;\n}\n.table-icon-btn.btn-more[data-v-190dd694] {\n  color: #64748b;\n  font-size: 17px;\n}\n.table-icon-btn.btn-more[data-v-190dd694]:hover {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.carfax-pill-badge[data-v-190dd694] {\n  background: #0f172a;\n  color: #ffffff;\n  border: none;\n  font-size: 9.5px;\n  font-weight: 800;\n  letter-spacing: 0.5px;\n  padding: 2px 7px;\n  border-radius: 4px;\n  cursor: pointer;\n  transition: opacity 0.15s ease;\n}\n.carfax-pill-badge[data-v-190dd694]:hover {\n  opacity: 0.85;\n}\n.dropdown-item[data-v-190dd694] {\n  font-size: 12.5px;\n  padding: 6px 12px;\n  color: #334155;\n}\n.dropdown-item[data-v-190dd694]:hover {\n  background-color: #f8fafc;\n  color: #0f172a;\n}\n\n/* Compact Row Density */\ntr.row-compact td[data-v-190dd694] {\n  padding: 0.15rem 0.4rem !important;\n  font-size: 0.775rem !important;\n  line-height: 1.2 !important;\n}\ntr.row-compact .vehicle-thumbnail-wrapper[data-v-190dd694] {\n  width: 34px !important;\n  height: 24px !important;\n  border-radius: 3px !important;\n}\ntr.row-compact .thumbnail-count-badge[data-v-190dd694] {\n  font-size: 7px !important;\n  padding: 0 2px !important;\n}\ntr.row-compact .col-make-model[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-make-model .vehicle-trim-subtext[data-v-190dd694] {\n  font-size: 0.675rem !important;\n}\ntr.row-compact .col-vin .vin-display-text[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .status-badge[data-v-190dd694] {\n  font-size: 9.5px !important;\n  padding: 1px 5px !important;\n}\ntr.row-compact .col-price[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-odometer[data-v-190dd694],\ntr.row-compact .col-kms[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-created-at[data-v-190dd694],\ntr.row-compact .col-modified-at[data-v-190dd694],\ntr.row-compact .col-last-sync[data-v-190dd694] {\n  font-size: 0.725rem !important;\n}\ntr.row-compact .table-icon-btn[data-v-190dd694] {\n  width: 24px !important;\n  height: 24px !important;\n  font-size: 13px !important;\n}\ntr.row-compact .carfax-pill-badge[data-v-190dd694] {\n  font-size: 8px !important;\n  padding: 1px 4px !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -209277,7 +209397,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "/* Page container inside CRM - matching Leads page spacing */\n.inventory-module-page[data-v-0502e67e] {\n  /* top padding clears the fixed theme navbar (~45px) */\n  /* bottom padding leaves room for the theme's fixed footer */\n  padding: calc(45px + 1.5rem) 1.75rem 2.75rem;\n  background-color: #f6f8fb;\n  font-family: inherit;\n  height: 100vh;\n  box-sizing: border-box;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* 1. Header Section */\n.inventory-header[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-end;\n  flex-wrap: wrap;\n  gap: 1rem;\n  margin-bottom: 1.25rem;\n  flex-shrink: 0;\n}\n.inventory-title-wrap[data-v-0502e67e] {\n  display: flex;\n  flex-direction: column;\n}\n.inventory-page-title[data-v-0502e67e] {\n  font-size: 2rem;\n  font-weight: 700;\n  color: #1f2937;\n  line-height: 1.15;\n  margin: 0;\n  letter-spacing: -0.02em;\n}\n.inventory-vehicle-count[data-v-0502e67e] {\n  font-size: 1rem;\n  color: #8a94a6;\n  font-weight: 400;\n  margin-top: 0.25rem;\n}\n\n/* Header Right: Split Add Inventory Button Group */\n.inventory-header-right[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n}\n.split-inventory-btn-group[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #2563eb;\n  color: #ffffff !important;\n  font-size: 14.5px;\n  font-weight: 600;\n  padding: 8px 16px;\n  border-top-left-radius: 8px;\n  border-bottom-left-radius: 8px;\n  border: none;\n  text-decoration: none;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e] {\n  background: #2563eb;\n  color: #ffffff;\n  border: none;\n  border-left: 1px solid rgba(255, 255, 255, 0.35);\n  padding: 8px 12px;\n  font-size: 14px;\n  border-top-right-radius: 8px;\n  border-bottom-right-radius: 8px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]::after {\n  display: none;\n  /* Hide default bootstrap caret, boxicons chevron is used */\n}\n.split-inventory-btn-group .dropdown-menu[data-v-0502e67e] {\n  position: absolute !important;\n  top: 100% !important;\n  right: 0 !important;\n  left: auto !important;\n  transform: none !important;\n  margin-top: 6px !important;\n  background: #ffffff !important;\n  border: 1px solid #e5e7eb !important;\n  border-radius: 8px !important;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;\n  min-width: 220px !important;\n  z-index: 1050 !important;\n  padding: 6px 0 !important;\n  display: none;\n}\n.split-inventory-btn-group .dropdown-menu.show[data-v-0502e67e] {\n  display: block !important;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e] {\n  padding: 9px 16px;\n  font-size: 13.5px;\n  color: #374151;\n  display: flex;\n  align-items: center;\n  transition: background-color 0.15s ease;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e]:hover {\n  background-color: #f3f4f6;\n  color: #111827;\n}\n\n/* 2. Subbar (Above Search Bar): Views Dropdown + Action Icons */\n.inventory-subbar[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 12px;\n  margin-bottom: 10px;\n}\n.btn-views-toggle[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  padding: 7px 14px;\n  border-radius: 8px;\n  font-size: 14px;\n  font-weight: 500;\n  color: #374151;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.btn-views-toggle[data-v-0502e67e]:hover {\n  border-color: #d1d5db;\n  background: #f9fafb;\n  color: #111827;\n}\n.custom-views-scrollable[data-v-0502e67e] {\n  max-height: 200px;\n  overflow-y: auto;\n}\n\n/* Action Icons Toolbar with Tooltips */\n.inventory-actions-toolbar[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n}\n\n/* Custom Tooltip Styling matching Screenshot */\n.custom-tooltip-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  width: 36px;\n  height: 36px;\n  border-radius: 8px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #4b5563;\n  font-size: 18px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  text-decoration: none;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e]:hover {\n  border-color: #d1d5db;\n  background: #f9fafb;\n  color: #111827;\n}\n.custom-tooltip-wrapper .btn-action-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e] {\n  visibility: hidden;\n  opacity: 0;\n  position: absolute;\n  top: calc(100% + 7px);\n  left: 50%;\n  transform: translateX(-50%);\n  background-color: #1e293b;\n  color: #ffffff;\n  font-size: 12px;\n  font-weight: 500;\n  white-space: nowrap;\n  padding: 5px 9px;\n  border-radius: 6px;\n  z-index: 100;\n  transition: opacity 0.15s ease, transform 0.15s ease;\n  pointer-events: none;\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e]::after {\n  content: \"\";\n  position: absolute;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -4px;\n  border-width: 4px;\n  border-style: solid;\n  border-color: transparent transparent #1e293b transparent;\n}\n.custom-tooltip-wrapper:hover .custom-tooltip-text[data-v-0502e67e] {\n  visibility: visible;\n  opacity: 1;\n}\n\n/* 3. Toolbar Card (Normal Filters vs Bulk Actions) */\n.inventory-toolbar-card[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 10px;\n  padding: 8px 14px;\n  margin-bottom: 12px;\n  transition: all 0.2s ease;\n}\n\n/* State A: Bulk Mode */\n.toolbar-bulk-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 12px;\n  width: 100%;\n}\n.bulk-mode-left[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n}\n.bulk-count-pill[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #4b5563;\n  font-size: 13.5px;\n  font-weight: 600;\n  padding: 6px 14px;\n  border-radius: 20px;\n  border: 1px solid #bfdbfe;\n  display: inline-flex;\n  align-items: center;\n}\n.btn-bulk-item[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  font-size: 13px;\n  font-weight: 500;\n  padding: 6px 12px;\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  border: 1px solid #e5e7eb;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #fca5a5;\n  color: #dc2626;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e]:hover {\n  background: #fee2e2;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #e5e7eb;\n  color: #4b5563;\n}\n.btn-bulk-item.btn-bulk-primary i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple i[data-v-0502e67e] {\n  color: #6b7280;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e]:hover, .btn-bulk-item.btn-bulk-purple[data-v-0502e67e]:hover {\n  background: #f3f4f6;\n  border-color: #d1d5db;\n  color: #111827;\n}\n.btn-bulk-item.btn-bulk-primary:hover i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple:hover i[data-v-0502e67e] {\n  color: #111827;\n}\n.btn-bulk-cancel[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  color: #4b5563;\n  font-size: 13px;\n  font-weight: 500;\n  padding: 6px 12px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-bulk-cancel i[data-v-0502e67e] {\n  color: #6b7280;\n}\n.btn-bulk-cancel[data-v-0502e67e]:hover {\n  background: #f3f4f6;\n  border-color: #d1d5db;\n  color: #111827;\n}\n.btn-bulk-cancel:hover i[data-v-0502e67e] {\n  color: #111827;\n}\n\n/* State B: Normal Filter Mode */\n.toolbar-filter-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 12px;\n  width: 100%;\n}\n.toolbar-search-wrapper[data-v-0502e67e] {\n  position: relative;\n  flex: 1;\n  min-width: 240px;\n  max-width: 400px;\n  display: flex;\n  align-items: center;\n}\n.search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 12px;\n  font-size: 18px;\n  color: #9ca3af;\n  pointer-events: none;\n}\n.toolbar-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 38px;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 0 32px 0 36px;\n  font-size: 13.5px;\n  color: #111827;\n  outline: none;\n  transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.toolbar-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #9ca3af;\n}\n.toolbar-search-input[data-v-0502e67e]::placeholder {\n  color: #9ca3af;\n}\n.toolbar-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 8px;\n  background: none;\n  border: none;\n  color: #9ca3af;\n  font-size: 18px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.clear-search-btn[data-v-0502e67e]:hover {\n  color: #374151;\n}\n.toolbar-filters-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n}\n.filter-dropdown-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n}\n.toolbar-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 8px;\n  padding: 0 28px 0 12px;\n  height: 38px;\n  line-height: 36px;\n  font-size: 13px;\n  font-weight: 500;\n  color: #374151;\n  cursor: pointer;\n  outline: none;\n  transition: border-color 0.15s ease;\n  min-width: 110px;\n}\n.toolbar-select[data-v-0502e67e]:hover {\n  border-color: #d1d5db;\n}\n.toolbar-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n.select-chevron[data-v-0502e67e] {\n  position: absolute;\n  right: 10px;\n  top: 50%;\n  transform: translateY(calc(-50% - 2px));\n  font-size: 14px;\n  line-height: 1;\n  color: #9ca3af;\n  pointer-events: none;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.btn-reset-filters[data-v-0502e67e] {\n  background: #f3f4f6;\n  border: 1px solid #e5e7eb;\n  color: #4b5563;\n  font-size: 12.5px;\n  font-weight: 600;\n  padding: 7px 12px;\n  border-radius: 8px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-reset-filters[data-v-0502e67e]:hover {\n  background: #e5e7eb;\n  color: #111827;\n}\n\n/* 4. Main Workspace: Table + Preview Panel */\n.inventory-main-layout[data-v-0502e67e] {\n  display: flex;\n  gap: 16px;\n  align-items: stretch;\n  width: 100%;\n  flex: 1 1 auto;\n  min-height: 0;\n  overflow: hidden;\n}\n.inventory-table-container[data-v-0502e67e] {\n  flex: 1;\n  min-width: 0;\n  width: 100%;\n  display: flex;\n  flex-direction: column;\n  min-height: 0;\n  height: 100%;\n}\n.inventory-table-card[data-v-0502e67e] {\n  position: relative;\n  background: #ffffff;\n  border: 1px solid #e6eaf0;\n  border-radius: 12px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  min-height: 0;\n  height: 100%;\n  margin-bottom: 0;\n}\n\n/* Loading Overlay for Inventory Table */\n.zd-inventory-loading-overlay[data-v-0502e67e] {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: rgba(255, 255, 255, 0.76);\n  backdrop-filter: blur(2px);\n  z-index: 50;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n  pointer-events: all;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.65rem;\n  padding: 0.85rem 1.6rem;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);\n  color: #374151;\n  font-size: 0.95rem;\n  font-weight: 600;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card i[data-v-0502e67e] {\n  font-size: 1.45rem;\n  color: #5a8dee;\n}\n.inventory-table-responsive[data-v-0502e67e] {\n  flex: 1 1 auto;\n  width: 100%;\n  overflow-x: auto;\n  overflow-y: auto;\n  min-height: 200px;\n  /* Custom slim scrollbar */\n}\n.inventory-table-responsive.compact .inventory-table-head-row th[data-v-0502e67e] {\n  padding: 0.35rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive.compact .inventory-table-row td[data-v-0502e67e] {\n  padding: 0.25rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-thumb {\n  background: #d1d5db;\n  border-radius: 3px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-track {\n  background: transparent;\n}\n.inventory-main-table[data-v-0502e67e] {\n  width: 100%;\n  min-width: 1150px;\n  border-collapse: separate;\n  border-spacing: 0;\n  margin: 0;\n  font-size: 0.9rem;\n  color: #1f2937;\n}\n.inventory-table-head-row[data-v-0502e67e] {\n  background: #f8fafc;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n.inventory-table-head-row th[data-v-0502e67e] {\n  padding: 0.5rem 0.75rem;\n  font-size: 0.875rem;\n  font-weight: 500;\n  color: #4b5563;\n  border-bottom: 1px solid #e6eaf0;\n  white-space: nowrap;\n  background: #f8fafc;\n}\n.inventory-table-head-row .th-checkbox[data-v-0502e67e] {\n  width: 44px;\n  min-width: 44px;\n  text-align: center;\n}\n.inventory-table-head-row .th-photo[data-v-0502e67e] {\n  width: 65px;\n  min-width: 65px;\n}\n.inventory-table-head-row .th-year[data-v-0502e67e] {\n  width: 70px;\n  min-width: 70px;\n}\n.inventory-table-head-row .th-make-model[data-v-0502e67e] {\n  min-width: 160px;\n}\n.inventory-table-head-row .th-vin[data-v-0502e67e] {\n  width: 150px;\n  min-width: 150px;\n}\n.inventory-table-head-row .th-stock[data-v-0502e67e] {\n  width: 95px;\n  min-width: 95px;\n}\n.inventory-table-head-row .th-status[data-v-0502e67e] {\n  width: 110px;\n  min-width: 110px;\n}\n.inventory-table-head-row .th-price[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n}\n.inventory-table-head-row .th-kms[data-v-0502e67e] {\n  width: 110px;\n  min-width: 110px;\n}\n.inventory-table-head-row .th-last-sync[data-v-0502e67e] {\n  width: 125px;\n  min-width: 125px;\n}\n.inventory-table-head-row .th-action[data-v-0502e67e] {\n  width: 50px;\n  min-width: 50px;\n}\n.inventory-table-head-row .th-syndication-header[data-v-0502e67e] {\n  min-width: 110px;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e] {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  transition: color 0.15s ease;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e]:hover {\n  color: #1f2937;\n}\n.inventory-table-head-row .lr-sort[data-v-0502e67e] {\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  gap: 0.35rem;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  font-weight: 500;\n  font-size: 0.9rem;\n  color: #4b5563;\n}\n.inventory-table-head-row .lr-sort > span[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.25rem;\n}\n.inventory-table-head-row .lr-sort i[data-v-0502e67e] {\n  font-size: 1rem;\n  color: #5a8dee;\n  line-height: 1;\n}\n.inventory-table-head-row .lr-sort .lr-sort-idle[data-v-0502e67e] {\n  color: #b4bccb;\n}\n.inventory-table-head-row .lr-sort:hover .lr-sort-idle[data-v-0502e67e] {\n  color: #1f2937;\n}\n\n/* Custom Checkbox */\n.custom-chk-container[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-0502e67e] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e] {\n  position: relative;\n  display: inline-block;\n  height: 19px;\n  width: 19px;\n  background-color: #ffffff;\n  border: 1.5px solid #d1d5db;\n  border-radius: 4px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 6px;\n  top: 2px;\n  width: 5px;\n  height: 10px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-0502e67e] {\n  border-color: #9ca3af;\n}\n\n/* 5. Pagination Footer */\n.inventory-pagination-footer[data-v-0502e67e] {\n  flex-shrink: 0;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n  padding: 0.4rem 1.25rem;\n  border-top: 1px solid #e6eaf0;\n  background: #ffffff;\n  z-index: 5;\n}\n.pagination-info[data-v-0502e67e] {\n  font-size: 0.875rem;\n  color: #4b5563;\n  font-weight: 500;\n}\n.pagination-controls[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 3px;\n}\n.pagination-nav-btn[data-v-0502e67e] {\n  width: 30px;\n  height: 30px;\n  border-radius: 6px;\n  background: #ffffff;\n  border: 1px solid #e6eaf0;\n  color: #4b5563;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 1rem;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.pagination-nav-btn[data-v-0502e67e]:hover:not(:disabled) {\n  background: #f1f4f8;\n  color: #1f2937;\n}\n.pagination-nav-btn[data-v-0502e67e]:disabled {\n  opacity: 0.4;\n  cursor: not-allowed;\n}\n.pagination-num-btn[data-v-0502e67e] {\n  min-width: 30px;\n  height: 30px;\n  padding: 0 6px;\n  border-radius: 6px;\n  background: #ffffff;\n  border: 1px solid #e6eaf0;\n  color: #4b5563;\n  font-size: 0.875rem;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.pagination-num-btn[data-v-0502e67e]:hover:not(:disabled):not(.active) {\n  background: #f1f4f8;\n  color: #1f2937;\n}\n.pagination-num-btn.active[data-v-0502e67e] {\n  background: #eef4ff;\n  border-color: #5a8dee;\n  color: #5a8dee;\n  font-weight: 600;\n}\n.pagination-num-btn.ellipsis[data-v-0502e67e] {\n  border: none;\n  background: transparent;\n  cursor: default;\n  color: #8a94a6;\n}\n.pagination-page-size[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  font-size: 0.875rem;\n  color: #4b5563;\n}\n.page-size-select[data-v-0502e67e] {\n  border: 1px solid #e6eaf0;\n  border-radius: 6px;\n  padding: 2px 6px;\n  font-size: 0.85rem;\n  color: #1f2937;\n  outline: none;\n  background: #ffffff;\n  cursor: pointer;\n}\n.page-size-select[data-v-0502e67e]:focus {\n  border-color: #5a8dee;\n}\n\n/* Transitions for Right Preview Panel */\n.slide-panel-enter-active[data-v-0502e67e],\n.slide-panel-leave-active[data-v-0502e67e] {\n  transition: all 0.2s ease-in-out;\n}\n.slide-panel-enter-from[data-v-0502e67e],\n.slide-panel-leave-to[data-v-0502e67e] {\n  opacity: 0;\n  transform: translateX(20px);\n}\n@media (max-width: 1200px) {\n.inventory-main-layout[data-v-0502e67e] {\n    flex-direction: column;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "/* Page container inside CRM - matching Leads page spacing */\n.inventory-module-page[data-v-0502e67e] {\n  /* top padding clears the fixed theme navbar (~45px) */\n  /* bottom padding leaves room for the theme's fixed footer */\n  padding: 4rem 1.75rem 2.75rem;\n  background-color: #ffffff;\n  font-family: inherit;\n  height: 100vh;\n  box-sizing: border-box;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* 1. Header Section */\n.inventory-header[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-end;\n  flex-wrap: wrap;\n  gap: 0.75rem;\n  margin-bottom: 0.75rem;\n  flex-shrink: 0;\n}\n.inventory-title-wrap[data-v-0502e67e] {\n  display: flex;\n  flex-direction: column;\n}\n.inventory-page-title[data-v-0502e67e] {\n  font-size: 1.75rem;\n  font-weight: 700;\n  color: #1f2937;\n  line-height: 1.15;\n  margin: 0;\n  letter-spacing: -0.02em;\n}\n.inventory-vehicle-count[data-v-0502e67e] {\n  font-size: 1rem;\n  color: #8a94a6;\n  font-weight: 400;\n  margin-top: 0.25rem;\n}\n\n/* Header Right: Split Add Inventory Button Group */\n.inventory-header-right[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n}\n.split-inventory-btn-group[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #2563eb;\n  color: #ffffff !important;\n  font-size: 14.5px;\n  font-weight: 600;\n  padding: 8px 16px;\n  border-top-left-radius: 8px;\n  border-bottom-left-radius: 8px;\n  border: none;\n  text-decoration: none;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e] {\n  background: #2563eb;\n  color: #ffffff;\n  border: none;\n  border-left: 1px solid rgba(255, 255, 255, 0.35);\n  padding: 8px 12px;\n  font-size: 14px;\n  border-top-right-radius: 8px;\n  border-bottom-right-radius: 8px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]::after {\n  display: none;\n  /* Hide default bootstrap caret, boxicons chevron is used */\n}\n.split-inventory-btn-group .dropdown-menu[data-v-0502e67e] {\n  position: absolute !important;\n  top: 100% !important;\n  right: 0 !important;\n  left: auto !important;\n  transform: none !important;\n  margin-top: 6px !important;\n  background: #ffffff !important;\n  border: 1px solid #e5e7eb !important;\n  border-radius: 8px !important;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;\n  min-width: 220px !important;\n  z-index: 1050 !important;\n  padding: 6px 0 !important;\n  display: none;\n}\n.split-inventory-btn-group .dropdown-menu.show[data-v-0502e67e] {\n  display: block !important;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e] {\n  padding: 9px 16px;\n  font-size: 13.5px;\n  color: #374151;\n  display: flex;\n  align-items: center;\n  transition: background-color 0.15s ease;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e]:hover {\n  background-color: #f3f4f6;\n  color: #111827;\n}\n\n/* 2. Subbar (Above Search Bar): Views Dropdown + Action Icons */\n.inventory-subbar[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin-bottom: 8px;\n}\n.btn-views-toggle[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  padding: 5px 12px;\n  height: 32px;\n  border-radius: 6px;\n  font-size: 13px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.btn-views-toggle[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n  background: #f8fafc;\n  color: #0f172a;\n}\n.custom-views-scrollable[data-v-0502e67e] {\n  max-height: 200px;\n  overflow-y: auto;\n}\n\n/* Action Icons Toolbar with Tooltips */\n.inventory-actions-toolbar[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n\n/* Custom Tooltip Styling matching Screenshot */\n.custom-tooltip-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  width: 32px;\n  height: 32px;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  text-decoration: none;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n  background: #f8fafc;\n  color: #0f172a;\n}\n.custom-tooltip-wrapper .btn-action-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e] {\n  visibility: hidden;\n  opacity: 0;\n  position: absolute;\n  top: calc(100% + 7px);\n  left: 50%;\n  transform: translateX(-50%);\n  background-color: #1e293b;\n  color: #ffffff;\n  font-size: 12px;\n  font-weight: 500;\n  white-space: nowrap;\n  padding: 5px 9px;\n  border-radius: 6px;\n  z-index: 100;\n  transition: opacity 0.15s ease, transform 0.15s ease;\n  pointer-events: none;\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e]::after {\n  content: \"\";\n  position: absolute;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -4px;\n  border-width: 4px;\n  border-style: solid;\n  border-color: transparent transparent #1e293b transparent;\n}\n.custom-tooltip-wrapper:hover .custom-tooltip-text[data-v-0502e67e] {\n  visibility: visible;\n  opacity: 1;\n}\n\n/* 3. Toolbar Card (Normal Filters vs Bulk Actions) */\n.inventory-toolbar-card[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  padding: 6px 10px;\n  margin-bottom: 8px;\n  transition: all 0.2s ease;\n}\n\n/* State A: Bulk Mode */\n.toolbar-bulk-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n}\n.bulk-mode-left[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.bulk-count-pill[data-v-0502e67e] {\n  background: #eff6ff;\n  font-size: 12.5px;\n  font-weight: 600;\n  padding: 4px 10px;\n  border-radius: 6px;\n  border: 1px solid #bfdbfe;\n  display: inline-flex;\n  align-items: center;\n}\n.btn-bulk-item[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  font-weight: 500;\n  padding: 4px 10px;\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  border: 1px solid #e2e8f0;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #fca5a5;\n  color: #dc2626;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e]:hover {\n  background: #fee2e2;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #e2e8f0;\n  color: #475569;\n}\n.btn-bulk-item.btn-bulk-primary i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple i[data-v-0502e67e] {\n  color: #64748b;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e]:hover, .btn-bulk-item.btn-bulk-purple[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-item.btn-bulk-primary:hover i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.btn-bulk-cancel[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 12px;\n  font-weight: 500;\n  padding: 4px 10px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-bulk-cancel i[data-v-0502e67e] {\n  color: #64748b;\n}\n.btn-bulk-cancel[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-cancel:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n\n/* State B: Normal Filter Mode */\n.toolbar-filter-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 8px;\n  width: 100%;\n}\n.toolbar-search-wrapper[data-v-0502e67e] {\n  position: relative;\n  flex: 1;\n  min-width: 220px;\n  max-width: 360px;\n  display: flex;\n  align-items: center;\n}\n.search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 9px;\n  font-size: 15px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.toolbar-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 30px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 26px 0 30px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.toolbar-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.toolbar-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.toolbar-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 6px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 15px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.toolbar-filters-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 6px;\n}\n.filter-dropdown-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n}\n.toolbar-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 22px 0 9px;\n  height: 30px;\n  line-height: 28px;\n  font-size: 12px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  outline: none;\n  transition: border-color 0.15s ease;\n  min-width: 95px;\n}\n.toolbar-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.toolbar-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n.select-chevron[data-v-0502e67e] {\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  transform: translateY(-50%);\n  font-size: 13px;\n  line-height: 1;\n  color: #94a3b8;\n  pointer-events: none;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.btn-reset-filters[data-v-0502e67e] {\n  background: #f1f5f9;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 11.5px;\n  font-weight: 600;\n  height: 30px;\n  padding: 4px 9px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-reset-filters[data-v-0502e67e]:hover {\n  background: #e2e8f0;\n  color: #0f172a;\n}\n\n/* 4. Main Workspace: Table + Preview Panel */\n.inventory-main-layout[data-v-0502e67e] {\n  display: flex;\n  gap: 16px;\n  align-items: stretch;\n  width: 100%;\n  flex: 1 1 auto;\n  min-height: 0;\n  overflow: hidden;\n}\n.inventory-table-container[data-v-0502e67e] {\n  flex: 1;\n  min-width: 0;\n  width: 100%;\n  display: flex;\n  flex-direction: column;\n  min-height: 0;\n  height: 100%;\n}\n.inventory-table-card[data-v-0502e67e] {\n  position: relative;\n  background: #ffffff;\n  border: 1px solid #e6eaf0;\n  border-radius: 12px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  min-height: 0;\n  height: 100%;\n  margin-bottom: 0;\n}\n\n/* Loading Overlay for Inventory Table */\n.zd-inventory-loading-overlay[data-v-0502e67e] {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: rgba(255, 255, 255, 0.76);\n  backdrop-filter: blur(2px);\n  z-index: 50;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n  pointer-events: all;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.65rem;\n  padding: 0.85rem 1.6rem;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);\n  color: #374151;\n  font-size: 0.95rem;\n  font-weight: 600;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card i[data-v-0502e67e] {\n  font-size: 1.45rem;\n  color: #5a8dee;\n}\n.inventory-table-responsive[data-v-0502e67e] {\n  flex: 1 1 auto;\n  width: 100%;\n  overflow-x: auto;\n  overflow-y: auto;\n  min-height: 200px;\n  /* Custom slim scrollbar */\n}\n.inventory-table-responsive.compact .inventory-table-head-row th[data-v-0502e67e] {\n  padding: 0.35rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive.compact .inventory-table-row td[data-v-0502e67e] {\n  padding: 0.15rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-thumb {\n  background: #d1d5db;\n  border-radius: 3px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-track {\n  background: transparent;\n}\n.inventory-main-table[data-v-0502e67e] {\n  width: 100%;\n  min-width: 1150px;\n  border-collapse: separate;\n  border-spacing: 0;\n  margin: 0;\n  font-size: 0.8125rem;\n  color: #1e293b;\n  background: #ffffff;\n}\n.inventory-table-head-row[data-v-0502e67e] {\n  background: #f1f5f9;\n  position: sticky;\n  top: 0;\n  z-index: 2;\n}\n.inventory-table-head-row th[data-v-0502e67e] {\n  padding: 0.35rem 0.55rem;\n  font-size: 0.8rem;\n  font-weight: 600;\n  color: #475569;\n  border-bottom: 1px solid #e2e8f0;\n  white-space: nowrap;\n  background: #f1f5f9;\n}\n.inventory-table-head-row .th-checkbox[data-v-0502e67e] {\n  width: 36px;\n  min-width: 36px;\n  text-align: center;\n}\n.inventory-table-head-row .th-photo[data-v-0502e67e] {\n  width: 50px;\n  min-width: 50px;\n}\n.inventory-table-head-row .th-year[data-v-0502e67e] {\n  width: 60px;\n  min-width: 60px;\n}\n.inventory-table-head-row .th-make-model[data-v-0502e67e] {\n  min-width: 140px;\n}\n.inventory-table-head-row .th-body-type[data-v-0502e67e] {\n  width: 90px;\n  min-width: 90px;\n}\n.inventory-table-head-row .th-vin[data-v-0502e67e] {\n  width: 135px;\n  min-width: 135px;\n}\n.inventory-table-head-row .th-stock[data-v-0502e67e] {\n  width: 80px;\n  min-width: 80px;\n}\n.inventory-table-head-row .th-dis[data-v-0502e67e] {\n  width: 60px;\n  min-width: 60px;\n}\n.inventory-table-head-row .th-price[data-v-0502e67e] {\n  width: 95px;\n  min-width: 95px;\n}\n.inventory-table-head-row .th-odometer[data-v-0502e67e] {\n  width: 95px;\n  min-width: 95px;\n}\n.inventory-table-head-row .th-status[data-v-0502e67e] {\n  width: 100px;\n  min-width: 100px;\n}\n.inventory-table-head-row .th-action[data-v-0502e67e] {\n  width: 44px;\n  min-width: 44px;\n}\n.inventory-table-head-row .th-created-at[data-v-0502e67e] {\n  width: 95px;\n  min-width: 95px;\n}\n.inventory-table-head-row .th-modified-at[data-v-0502e67e] {\n  width: 95px;\n  min-width: 95px;\n}\n.inventory-table-head-row .th-syndication-header[data-v-0502e67e] {\n  min-width: 100px;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e] {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  transition: color 0.15s ease;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e]:hover {\n  color: #0f172a;\n}\n.inventory-table-head-row .lr-sort[data-v-0502e67e] {\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  gap: 0.25rem;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  font-weight: 600;\n  font-size: 0.8rem;\n  color: #475569;\n}\n.inventory-table-head-row .lr-sort > span[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.2rem;\n}\n.inventory-table-head-row .lr-sort i[data-v-0502e67e] {\n  font-size: 0.9rem;\n  color: #2563eb;\n  line-height: 1;\n}\n.inventory-table-head-row .lr-sort .lr-sort-idle[data-v-0502e67e] {\n  color: #94a3b8;\n}\n.inventory-table-head-row .lr-sort:hover .lr-sort-idle[data-v-0502e67e] {\n  color: #0f172a;\n}\n\n/* Custom Checkbox */\n.custom-chk-container[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-0502e67e] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e] {\n  position: relative;\n  display: inline-block;\n  height: 15px;\n  width: 15px;\n  background-color: #ffffff;\n  border: 1.5px solid #cbd5e1;\n  border-radius: 3px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 4.5px;\n  top: 1.5px;\n  width: 4px;\n  height: 8px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-0502e67e] {\n  border-color: #94a3b8;\n}\n\n/* 5. Pagination Footer */\n.inventory-pagination-footer[data-v-0502e67e] {\n  flex-shrink: 0;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n  padding: 0.25rem 0.85rem;\n  border-top: 1px solid #e2e8f0;\n  background: #ffffff;\n  z-index: 5;\n}\n.pagination-info[data-v-0502e67e] {\n  font-size: 0.8rem;\n  color: #64748b;\n  font-weight: 500;\n}\n.pagination-controls[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 2px;\n}\n.pagination-nav-btn[data-v-0502e67e] {\n  width: 25px;\n  height: 25px;\n  border-radius: 4px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 0.85rem;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.pagination-nav-btn[data-v-0502e67e]:hover:not(:disabled) {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.pagination-nav-btn[data-v-0502e67e]:disabled {\n  opacity: 0.35;\n  cursor: not-allowed;\n}\n.pagination-num-btn[data-v-0502e67e] {\n  min-width: 25px;\n  height: 25px;\n  padding: 0 4px;\n  border-radius: 4px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 0.775rem;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.pagination-num-btn[data-v-0502e67e]:hover:not(:disabled):not(.active) {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.pagination-num-btn.active[data-v-0502e67e] {\n  background: #eff6ff;\n  border-color: #2563eb;\n  color: #2563eb;\n  font-weight: 600;\n}\n.pagination-num-btn.ellipsis[data-v-0502e67e] {\n  border: none;\n  background: transparent;\n  cursor: default;\n  color: #94a3b8;\n}\n.pagination-page-size[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  font-size: 0.8rem;\n  color: #64748b;\n}\n.page-size-select[data-v-0502e67e] {\n  border: 1px solid #e2e8f0;\n  border-radius: 4px;\n  padding: 1px 4px;\n  font-size: 0.775rem;\n  height: 25px;\n  color: #1e293b;\n  outline: none;\n  background: #ffffff;\n  cursor: pointer;\n}\n.page-size-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n\n/* Transitions for Right Preview Panel */\n.slide-panel-enter-active[data-v-0502e67e],\n.slide-panel-leave-active[data-v-0502e67e] {\n  transition: all 0.2s ease-in-out;\n}\n.slide-panel-enter-from[data-v-0502e67e],\n.slide-panel-leave-to[data-v-0502e67e] {\n  opacity: 0;\n  transform: translateX(20px);\n}\n@media (max-width: 1200px) {\n.inventory-main-layout[data-v-0502e67e] {\n    flex-direction: column;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

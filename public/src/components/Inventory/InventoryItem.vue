@@ -42,46 +42,52 @@
       {{ item.year || '—' }}
     </td>
 
-    <!-- 4. Make / Model (Show ONLY Make and Model in same line, normal font) -->
+    <!-- 4. Make / Model & Trim -->
     <td class="col-make-model text-muted-dark">
-      {{ makeModelDisplay }}
+      <div class="vehicle-title-text">{{ makeModelDisplay }}</div>
+      <div v-if="item.trim" class="vehicle-trim-subtext">{{ item.trim }}</div>
     </td>
 
-    <!-- 5. VIN (Same font as stock) -->
+    <!-- 5. Body Type -->
+    <td class="col-body-type text-muted-dark">
+      {{ item.body_type || '—' }}
+    </td>
+
+    <!-- 6. VIN (Same font as stock) -->
     <td class="col-vin text-muted-dark" @click.stop="copyVin">
       <span class="vin-display-text" :title="'Click to copy: ' + item.vin">
         {{ item.vin || '—' }}
       </span>
     </td>
 
-    <!-- 6. Stock # -->
+    <!-- 7. Stock # -->
     <td class="col-stock text-muted-dark">
       {{ item.stock_no || '—' }}
     </td>
 
-    <!-- 7. Status Badge -->
+    <!-- 8. DIS (Days in Stock, after stock column) -->
+    <td class="col-dis text-muted-dark">
+      {{ formattedDis }}
+    </td>
+
+    <!-- 9. Price -->
+    <td class="col-price font-weight-bold" @click.stop>
+      <span>{{ formattedPrice }}</span>
+    </td>
+
+    <!-- 10. Odometer -->
+    <td class="col-odometer text-muted-dark" @click.stop>
+      <span>{{ formattedOdometer }}</span>
+    </td>
+
+    <!-- 11. Status Badge -->
     <td class="col-status">
       <span :class="['status-badge', statusBadgeClass]">
         {{ statusBadgeText }}
       </span>
     </td>
 
-    <!-- 8. Price -->
-    <td class="col-price font-weight-bold" @click.stop>
-      <span>{{ formattedPrice }}</span>
-    </td>
-
-    <!-- 9. KMs (Odometer) -->
-    <td class="col-kms text-muted-dark" @click.stop>
-      <span>{{ formattedOdometer }}</span>
-    </td>
-
-    <!-- 10. Last Sync -->
-    <td class="col-last-sync text-muted-sm">
-      {{ formattedLastSync }}
-    </td>
-
-    <!-- 11. Website / VDP Link (Opens in new tab) -->
+    <!-- 12. Website / VDP Link (Opens in new tab) -->
     <td class="col-action-btn text-center" @click.stop>
       <button
         type="button"
@@ -93,7 +99,7 @@
       </button>
     </td>
 
-    <!-- 12. CARFAX Button: Only visible if CARFAX data exists in backend and not in syndication view -->
+    <!-- 13. CARFAX Button: Only visible if CARFAX data exists in backend and not in syndication view -->
     <td v-if="showCarfaxColumn" class="col-action-btn text-center" @click.stop>
       <button
         v-if="hasCarfaxReport"
@@ -107,7 +113,7 @@
       <span v-else class="text-muted font-small-2">—</span>
     </td>
 
-    <!-- 13. Repair Report Button -->
+    <!-- 14. Repair Report Button -->
     <td class="col-action-btn text-center" @click.stop>
       <button
         type="button"
@@ -117,6 +123,16 @@
       >
         <i class="bx bxs-file-pdf"></i>
       </button>
+    </td>
+
+    <!-- 15. Created At -->
+    <td class="col-created-at text-muted-sm" :title="item.created_at || ''">
+      {{ formattedCreatedAt }}
+    </td>
+
+    <!-- 16. Modified At -->
+    <td class="col-modified-at text-muted-sm" :title="item.updated_at || item.modified_at || ''">
+      {{ formattedModifiedAt }}
     </td>
 
     <!-- Dynamic Syndication Columns if Syndication View is Active -->
@@ -295,11 +311,44 @@ export default {
       if (text.includes("not advertised") || text.includes("archive") || text.includes("unpub")) return "badge-not-advertised";
       return "badge-active";
     },
+    formattedDis() {
+      if (this.item.days_in_stock !== null && this.item.days_in_stock !== undefined && this.item.days_in_stock !== "") {
+        return this.item.days_in_stock;
+      }
+      const baseDate = this.item.stock_date || this.item.created_at;
+      if (baseDate) {
+        try {
+          const diff = moment().diff(moment(baseDate), "days");
+          return !isNaN(diff) && diff >= 0 ? diff : "—";
+        } catch (e) {
+          return "—";
+        }
+      }
+      return "—";
+    },
+    formattedCreatedAt() {
+      const dt = this.item.created_at;
+      if (!dt) return "—";
+      try {
+        return moment(dt).format("MMM D, YYYY");
+      } catch (e) {
+        return dt;
+      }
+    },
+    formattedModifiedAt() {
+      const dt = this.item.updated_at || this.item.modified_at;
+      if (!dt) return "—";
+      try {
+        return moment(dt).format("MMM D, YYYY");
+      } catch (e) {
+        return dt;
+      }
+    },
     formattedLastSync() {
       const dt = this.item.updated_at || this.item.created_at;
       if (!dt) return "—";
       try {
-        return moment(dt).format("MMM D, h:mm A");
+        return moment(dt).format("MMM D, YYYY");
       } catch (e) {
         return dt;
       }
@@ -313,6 +362,10 @@ export default {
       "commitLoadState",
     ]),
     onRowClick() {
+      this.$router.push({
+        name: "inventory-update",
+        params: { id: this.item.inventory_id },
+      });
       this.$emit("select-row", this.item);
     },
     copyVin() {
@@ -463,10 +516,11 @@ export default {
 .inventory-table-row {
   cursor: pointer;
   transition: background-color 0.15s ease;
-  border-bottom: 1px solid #f3f4f6;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: #f8fafc;
   }
 
   &.row-selected {
@@ -474,20 +528,20 @@ export default {
   }
 
   td {
-    padding: 0.45rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     vertical-align: middle;
-    font-size: 0.9rem;
+    font-size: 0.8125rem;
     line-height: 1.3;
     white-space: nowrap;
-    border-bottom: 1px solid #eef1f5;
+    border-bottom: 1px solid #f1f5f9;
   }
 }
 
 /* Custom Checkbox */
 .col-checkbox {
-  width: 44px;
-  min-width: 44px;
-  max-width: 44px;
+  width: 36px;
+  min-width: 36px;
+  max-width: 36px;
   text-align: center;
 }
 
@@ -518,21 +572,21 @@ export default {
   .custom-chk-box {
     position: relative;
     display: inline-block;
-    height: 19px;
-    width: 19px;
+    height: 15px;
+    width: 15px;
     background-color: #ffffff;
-    border: 1.5px solid #d1d5db;
-    border-radius: 4px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 3px;
     transition: all 0.15s ease;
 
     &:after {
       content: "";
       position: absolute;
       display: none;
-      left: 6px;
-      top: 2px;
-      width: 5px;
-      height: 10px;
+      left: 4.5px;
+      top: 1.5px;
+      width: 4px;
+      height: 8px;
       border: solid white;
       border-width: 0 2px 2px 0;
       transform: rotate(45deg);
@@ -540,24 +594,24 @@ export default {
   }
 
   &:hover .custom-chk-box {
-    border-color: #9ca3af;
+    border-color: #94a3b8;
   }
 }
 
 /* Vehicle Thumbnail */
 .col-photo {
-  width: 58px;
-  min-width: 58px;
+  width: 50px;
+  min-width: 50px;
 }
 
 .vehicle-thumbnail-wrapper {
   position: relative;
-  width: 48px;
-  height: 34px;
+  width: 40px;
+  height: 28px;
   border-radius: 4px;
   overflow: hidden;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
 }
 
 .vehicle-thumbnail {
@@ -569,45 +623,64 @@ export default {
 
 .thumbnail-count-badge {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  background: rgba(17, 24, 39, 0.75);
+  bottom: 1px;
+  right: 1px;
+  background: rgba(15, 23, 42, 0.75);
   color: #ffffff;
-  font-size: 9.5px;
-  padding: 1px 4px;
-  border-radius: 3px;
+  font-size: 8.5px;
+  padding: 0 3px;
+  border-radius: 2px;
   line-height: 1;
 
   i {
-    font-size: 8.5px;
+    font-size: 7.5px;
     vertical-align: middle;
   }
 }
 
 .col-year {
-  width: 70px;
-  min-width: 70px;
-  font-size: 0.95rem;
+  width: 60px;
+  min-width: 60px;
+  font-size: 0.8125rem;
 }
 
 .col-make-model {
-  min-width: 160px;
-  font-size: 0.95rem;
-  font-weight: 400;
-  color: #1f2937;
+  min-width: 140px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #1e293b;
   white-space: nowrap;
+
+  .vehicle-title-text {
+    line-height: 1.25;
+  }
+
+  .vehicle-trim-subtext {
+    font-size: 0.725rem;
+    color: #64748b;
+    font-weight: 400;
+    line-height: 1.15;
+    margin-top: 1px;
+  }
+}
+
+.col-body-type {
+  width: 90px;
+  min-width: 90px;
+  font-size: 0.8125rem;
+  color: #475569;
 }
 
 .col-vin {
-  width: 150px;
-  min-width: 150px;
-  font-size: 0.95rem;
+  width: 135px;
+  min-width: 135px;
+  font-size: 0.8125rem;
   cursor: pointer;
 
   .vin-display-text {
-    font-size: 0.95rem;
+    font-size: 0.8125rem;
     font-weight: 400;
-    color: #4b5563;
+    color: #475569;
 
     &:hover {
       color: #2563eb;
@@ -617,62 +690,86 @@ export default {
 }
 
 .col-stock {
-  width: 95px;
-  min-width: 95px;
-  font-size: 0.95rem;
+  width: 80px;
+  min-width: 80px;
+  font-size: 0.8125rem;
   font-weight: 400;
-  color: #4b5563;
+  color: #475569;
 }
 
-.col-status {
-  width: 110px;
-  min-width: 110px;
+.col-dis {
+  width: 60px;
+  min-width: 60px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #475569;
 }
 
 .col-price {
-  width: 105px;
-  min-width: 105px;
-  font-size: 0.95rem;
+  width: 95px;
+  min-width: 95px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #0f172a;
 }
 
+.col-odometer,
 .col-kms {
-  width: 110px;
-  min-width: 110px;
-  font-size: 0.95rem;
+  width: 95px;
+  min-width: 95px;
+  font-size: 0.8125rem;
+  color: #475569;
+}
+
+.col-status {
+  width: 100px;
+  min-width: 100px;
+}
+
+.col-created-at {
+  width: 95px;
+  min-width: 95px;
+  font-size: 0.775rem;
+}
+
+.col-modified-at {
+  width: 95px;
+  min-width: 95px;
+  font-size: 0.775rem;
 }
 
 .col-last-sync {
-  width: 125px;
-  min-width: 125px;
-  font-size: 0.85rem;
+  width: 110px;
+  min-width: 110px;
+  font-size: 0.775rem;
 }
 
 .col-action-btn {
-  width: 50px;
-  min-width: 50px;
+  width: 44px;
+  min-width: 44px;
   text-align: center;
 }
 
 .col-syndication-item {
-  min-width: 110px;
+  min-width: 100px;
 }
 
 /* Text styles */
 .text-muted-dark {
-  color: #374151;
+  color: #334155;
   font-weight: 500;
 }
 
 .text-muted-sm {
-  color: #6b7280;
+  color: #64748b;
 }
 
 /* Status Badges */
 .status-badge {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 6px;
+  padding: 2px 7px;
+  border-radius: 5px;
   display: inline-block;
   white-space: nowrap;
 }
@@ -711,9 +808,9 @@ export default {
 .table-icon-btn {
   background: transparent;
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -723,7 +820,7 @@ export default {
 
   &.btn-vdp {
     color: #2563eb;
-    font-size: 17px;
+    font-size: 15px;
 
     &:hover {
       background: #eff6ff;
@@ -733,7 +830,7 @@ export default {
 
   &.btn-repair-report {
     color: #ef4444;
-    font-size: 17px;
+    font-size: 15px;
 
     &:hover {
       background: #fee2e2;
@@ -742,24 +839,24 @@ export default {
   }
 
   &.btn-more {
-    color: #6b7280;
-    font-size: 19px;
+    color: #64748b;
+    font-size: 17px;
 
     &:hover {
-      background: #f3f4f6;
-      color: #111827;
+      background: #f1f5f9;
+      color: #0f172a;
     }
   }
 }
 
 .carfax-pill-badge {
-  background: #111827;
+  background: #0f172a;
   color: #ffffff;
   border: none;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 4px;
   cursor: pointer;
   transition: opacity 0.15s ease;
@@ -770,75 +867,76 @@ export default {
 }
 
 .dropdown-item {
-  font-size: 13px;
-  padding: 8px 14px;
-  color: #374151;
+  font-size: 12.5px;
+  padding: 6px 12px;
+  color: #334155;
 
   &:hover {
-    background-color: #f9fafb;
-    color: #111827;
+    background-color: #f8fafc;
+    color: #0f172a;
   }
 }
 
 /* Compact Row Density */
 tr.row-compact {
   td {
-    padding: 4px 8px !important;
-    font-size: 12.5px !important;
-    line-height: 1.25 !important;
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.775rem !important;
+    line-height: 1.2 !important;
   }
 
   .vehicle-thumbnail-wrapper {
-    width: 38px !important;
-    height: 26px !important;
-    border-radius: 4px !important;
+    width: 34px !important;
+    height: 24px !important;
+    border-radius: 3px !important;
   }
 
   .thumbnail-count-badge {
-    font-size: 7.5px !important;
+    font-size: 7px !important;
     padding: 0 2px !important;
   }
 
-  .vehicle-make-title {
-    font-size: 12.5px !important;
-    line-height: 1.15 !important;
-  }
+  .col-make-model {
+    font-size: 0.775rem !important;
 
-  .vehicle-model-sub {
-    font-size: 11.5px !important;
-    line-height: 1.15 !important;
+    .vehicle-trim-subtext {
+      font-size: 0.675rem !important;
+    }
   }
 
   .col-vin .vin-display-text {
-    font-size: 11.5px !important;
+    font-size: 0.775rem !important;
   }
 
   .status-badge {
-    font-size: 10px !important;
-    padding: 1px 6px !important;
+    font-size: 9.5px !important;
+    padding: 1px 5px !important;
   }
 
   .col-price {
-    font-size: 12.5px !important;
+    font-size: 0.775rem !important;
   }
 
+  .col-odometer,
   .col-kms {
-    font-size: 12px !important;
+    font-size: 0.775rem !important;
   }
 
+  .col-created-at,
+  .col-modified-at,
   .col-last-sync {
-    font-size: 11.5px !important;
+    font-size: 0.725rem !important;
   }
 
   .table-icon-btn {
-    width: 25px !important;
-    height: 25px !important;
-    font-size: 14px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 13px !important;
   }
 
   .carfax-pill-badge {
-    font-size: 8.5px !important;
-    padding: 1px 5px !important;
+    font-size: 8px !important;
+    padding: 1px 4px !important;
   }
 }
 </style>
