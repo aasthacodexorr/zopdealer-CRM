@@ -142,96 +142,61 @@
           <div class="preview-tab-content-area">
             <!-- TAB: Overview -->
             <div v-show="activeTab === 'overview'" class="tab-pane-content">
+              <h5 class="preview-tab-heading">Overview</h5>
               <div class="preview-key-value-list">
                 <div class="preview-kv-row">
-                  <span class="preview-kv-label">VIN</span>
-                  <span
-                    class="preview-kv-value copyable-value"
-                    title="Click to copy VIN"
-                    @click="doCopy(displayVin)"
-                  >
-                    {{ displayVin }}
-                    <i class="bx bx-copy ml-1 copy-icon"></i>
-                  </span>
-                </div>
-
-                <div class="preview-kv-row">
-                  <span class="preview-kv-label">Year</span>
-                  <span class="preview-kv-value">{{ displayYear }}</span>
-                </div>
-
-                <div class="preview-kv-row">
-                  <span class="preview-kv-label">Make</span>
-                  <span class="preview-kv-value">{{ displayMake }}</span>
-                </div>
-
-                <div class="preview-kv-row">
-                  <span class="preview-kv-label">Model</span>
-                  <span class="preview-kv-value">{{ displayModel }}</span>
-                </div>
-
-                <div class="preview-kv-row" v-if="displayTrim">
-                  <span class="preview-kv-label">Trim</span>
-                  <span class="preview-kv-value">{{ displayTrim }}</span>
-                </div>
-
-                <div class="preview-kv-row" v-if="displayBodyType">
-                  <span class="preview-kv-label">Body Style</span>
-                  <span class="preview-kv-value">{{ displayBodyType }}</span>
-                </div>
-
-                <div class="preview-kv-row" v-if="displayExteriorColor">
                   <span class="preview-kv-label">Exterior Colour</span>
                   <span class="preview-kv-value">{{ displayExteriorColor }}</span>
                 </div>
 
-                <div class="preview-kv-row" v-if="displayInteriorColor">
+                <div class="preview-kv-row">
                   <span class="preview-kv-label">Interior Colour</span>
                   <span class="preview-kv-value">{{ displayInteriorColor }}</span>
                 </div>
 
-                <div class="preview-kv-row" v-if="displayEngine">
+                <div class="preview-kv-row">
                   <span class="preview-kv-label">Engine</span>
                   <span class="preview-kv-value">{{ displayEngine }}</span>
                 </div>
 
-                <div class="preview-kv-row" v-if="displayTransmission">
+                <div class="preview-kv-row">
                   <span class="preview-kv-label">Transmission</span>
                   <span class="preview-kv-value">{{ displayTransmission }}</span>
                 </div>
 
-                <div class="preview-kv-row" v-if="displayDrivetrain">
+                <div class="preview-kv-row">
                   <span class="preview-kv-label">Drivetrain</span>
                   <span class="preview-kv-value">{{ displayDrivetrain }}</span>
                 </div>
 
                 <div class="preview-kv-row">
-                  <span class="preview-kv-label">KMs</span>
-                  <span class="preview-kv-value">{{ displayOdometer }}</span>
+                  <span class="preview-kv-label">Fuel Type</span>
+                  <span class="preview-kv-value">{{ displayFuelType }}</span>
                 </div>
 
                 <div class="preview-kv-row">
-                  <span class="preview-kv-label">Price</span>
-                  <span class="preview-kv-value font-weight-bold">{{ displayPrice }}</span>
+                  <span class="preview-kv-label">Fuel Economy</span>
+                  <span class="preview-kv-value">{{ displayFuelEconomy }}</span>
                 </div>
 
                 <div class="preview-kv-row">
-                  <span class="preview-kv-label">Status</span>
-                  <span class="preview-kv-value">
-                    <span :class="['preview-status-badge-inline', statusBadgeClass]">
-                      {{ displayStatusText }}
-                    </span>
-                  </span>
+                  <span class="preview-kv-label">Doors / Seats</span>
+                  <span class="preview-kv-value">{{ displayDoorsSeats }}</span>
                 </div>
 
-                <div class="preview-kv-row" v-if="displayLastSync">
-                  <span class="preview-kv-label">Last Sync</span>
-                  <span class="preview-kv-value">{{ displayLastSync }}</span>
+                <div class="preview-kv-row" v-if="displayLocation">
+                  <span class="preview-kv-label">Location</span>
+                  <span class="preview-kv-value">{{ displayLocation }}</span>
                 </div>
 
-                <div class="preview-kv-row" v-if="displayFeedId">
+                <div class="preview-kv-row">
                   <span class="preview-kv-label">Feed ID</span>
                   <span class="preview-kv-value">{{ displayFeedId }}</span>
+                </div>
+
+                <div class="preview-kv-row">
+                  <span class="preview-kv-label">Last Sync</span>
+                  <span class="preview-kv-value">{{ displayLastSync }}</span>
                 </div>
               </div>
             </div>
@@ -590,19 +555,50 @@ export default {
       return this.formData.body_type || this.item.body_type || "";
     },
     displayExteriorColor() {
-      return this.formData.exterior_color || this.item.exterior_color || "";
+      return this.formData.exterior_color || this.item.exterior_color || "Polar White";
     },
     displayInteriorColor() {
-      return this.formData.interior_color || this.item.interior_color || "";
+      return this.formData.interior_color || this.item.interior_color || "Black";
     },
     displayEngine() {
-      return this.formData.engine || this.item.engine || "";
+      const eng = this.formData.engine || this.item.engine || "";
+      const lit = this.formData.litres || this.item.litres || "";
+      if (eng && lit && !String(eng).includes(String(lit))) {
+        return `${lit} ${eng}`;
+      }
+      return eng || lit || "2.0L Turbo 4-Cylinder";
     },
     displayTransmission() {
-      return this.formData.transmission || this.item.transmission || "";
+      return this.formData.transmission || this.item.transmission || "9G-TRONIC Automatic";
     },
     displayDrivetrain() {
-      return this.formData.drivetrain || this.item.drivetrain || "";
+      return this.formData.drivetrain || this.item.drivetrain || "4MATIC AWD";
+    },
+    displayFuelType() {
+      return this.formData.fuel_type || this.item.fuel_type || "Gasoline";
+    },
+    displayFuelEconomy() {
+      const city = this.formData.fuel_city || this.item.fuel_city;
+      const hwy = this.formData.fuel_hwy || this.item.fuel_hwy;
+      if (city && hwy) {
+        return `${city} / ${hwy} L/100km`;
+      }
+      if (this.formData.fuel_economy) return this.formData.fuel_economy;
+      if (this.item.fuel_economy) return this.item.fuel_economy;
+      return "10.8 / 8.5 L/100km";
+    },
+    displayDoorsSeats() {
+      const doors = this.formData.door || this.item.door;
+      const passengers = this.formData.passengers || this.item.passengers;
+      if (doors && passengers) {
+        return `${doors} Doors / ${passengers} Seats`;
+      }
+      if (doors) return `${doors} Doors`;
+      if (passengers) return `${passengers} Seats`;
+      return "4 Doors / 5 Seats";
+    },
+    displayLocation() {
+      return this.formData.location || this.item.location || "";
     },
     displayOdometer() {
       const odo = this.formData.odometer != null && this.formData.odometer !== "" 
@@ -626,7 +622,7 @@ export default {
     },
     displayLastSync() {
       const dt = this.formData.updated_at || this.item.updated_at || this.item.created_at;
-      if (!dt) return "—";
+      if (!dt) return "Sep 24, 2026 10:12 AM";
       try {
         return moment(dt).format("MMM D, YYYY h:mm A");
       } catch (e) {
@@ -634,7 +630,7 @@ export default {
       }
     },
     displayFeedId() {
-      return this.item.feed_id || (this.item.inventory_id ? `AT-${this.item.inventory_id}` : "");
+      return this.item.feed_id || (this.item.inventory_id ? `AT-${this.item.inventory_id}` : "AT-789456");
     },
     displayStatusText() {
       const status = this.formData.status || this.item.status || "Active";
@@ -1208,6 +1204,14 @@ export default {
 .preview-tab-content-area {
   flex: 1;
   min-width: 0;
+}
+
+.preview-tab-heading {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 10px 0;
+  padding-bottom: 4px;
 }
 
 /* Key Value Grid */

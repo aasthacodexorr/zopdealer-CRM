@@ -4,102 +4,121 @@
     <div class="content-overlay"></div>
     <div class="content-body" id="inventory-response-section">
       <div class="inventory-module-page">
-        <!-- 1. HEADER SECTION: Title & Split Add Inventory Dropdown -->
-        <header class="inventory-header">
-          <div class="inventory-title-wrap">
-            <h1 class="inventory-page-title">Inventory</h1>
-          </div>
+        <!-- TIER 1: Page Title & Add Inventory Split Button (matching Image 2 & 3) -->
+        <div class="inventory-tier1-row">
+          <h1 class="inventory-page-title">Inventory</h1>
 
-            <!-- Header Right: Unified Split Dropdown Button for Add Inventory -->
-            <div class="inventory-header-right">
-              <div class="btn-group split-inventory-btn-group dropdown" :class="{ show: isAddMenuOpen }">
-                <router-link
-                  :to="{ name: 'inventory-create' }"
-                  class="btn-split-main"
-                >
-                  <i class="bx bx-plus mr-50"></i> Add Inventory
-                </router-link>
-                <button
-                  type="button"
-                  class="btn-split-toggle dropdown-toggle dropdown-toggle-split"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  :aria-expanded="isAddMenuOpen ? 'true' : 'false'"
-                  title="Inventory Actions Menu"
-                  @click.stop="isAddMenuOpen = !isAddMenuOpen"
-                >
-                  <i class="bx bxs-down-arrow" style="font-size: 9px;"></i>
-                </button>
-                <div
-                  class="dropdown-menu dropdown-menu-right shadow-sm border-0"
-                  :class="{ show: isAddMenuOpen }"
-                  style="min-width: 210px; margin-top: 4px;"
-                >
-                  <router-link
-                    v-if="isAuthorized"
-                    :to="{ name: 'inventory-updates-pricing' }"
-                    class="dropdown-item d-flex align-items-center"
-                    @click="isAddMenuOpen = false"
-                  >
-                    <i class="bx bxs-dollar-circle mr-1 text-primary"></i> Bulk Price Updates
-                  </router-link>
-                  <router-link
-                    v-if="isAuthorized"
-                    :to="{ name: 'inventory-updates-description' }"
-                    class="dropdown-item d-flex align-items-center"
-                    @click="isAddMenuOpen = false"
-                  >
-                    <i class="bx bx-text mr-1 text-info"></i> Bulk Description Updates
-                  </router-link>
-                  <a
-                    v-if="isAuthorized"
-                    href="javascript:void(0)"
-                    class="dropdown-item d-flex align-items-center text-danger"
-                    @click="isAddMenuOpen = false; warningForPurgeDeletingInventories()"
-                  >
-                    <i class="bx bxs-eraser mr-1"></i> Empty Recycle Bin
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <router-link
-                    :to="{ name: 'third-party-inventory' }"
-                    class="dropdown-item d-flex align-items-center"
-                    @click="isAddMenuOpen = false"
-                  >
-                    <i class="bx bxs-file-import mr-1 text-secondary"></i> Bulk Import CSV
-                  </router-link>
-                  <router-link
-                    :to="{ name: 'inventory-import' }"
-                    class="dropdown-item d-flex align-items-center"
-                    @click="isAddMenuOpen = false"
-                  >
-                    <i class="bx bx-upload mr-1 text-success"></i> Quick Inventory Import
-                  </router-link>
-                </div>
-              </div>
-            </div>
-          </header>
-
-          <!-- 2. SUBBAR (Directly above search bar): Views Selector + Action Icons with Tooltips -->
-          <div class="inventory-subbar">
-            <!-- Left: Views Selector Dropdown -->
-            <div class="inventory-views-dropdown dropdown">
-              <button
-                class="btn-views-toggle dropdown-toggle"
-                type="button"
-                id="inventoryViewsMenu"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
+          <!-- Add Inventory Split Dropdown Button (matching Image 2 & 3) -->
+          <div class="btn-group split-inventory-btn-group dropdown" :class="{ show: isAddMenuOpen }">
+            <router-link
+              :to="{ name: 'inventory-create' }"
+              class="btn-split-main"
+            >
+              <i class="bx bx-plus mr-50"></i> Add Inventory
+            </router-link>
+            <button
+              type="button"
+              class="btn-split-toggle dropdown-toggle dropdown-toggle-split"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              :aria-expanded="isAddMenuOpen ? 'true' : 'false'"
+              title="Inventory Actions Menu"
+              @click.stop="isAddMenuOpen = !isAddMenuOpen"
+            >
+              <i class="bx bxs-down-arrow" style="font-size: 8px;"></i>
+            </button>
+            <div
+              class="dropdown-menu dropdown-menu-right shadow-sm border-0"
+              :class="{ show: isAddMenuOpen }"
+              style="min-width: 210px; margin-top: 4px;"
+            >
+              <router-link
+                v-if="isAuthorized"
+                :to="{ name: 'inventory-updates-pricing' }"
+                class="dropdown-item d-flex align-items-center"
+                @click="isAddMenuOpen = false"
               >
-                <i class="bx bx-list-ul mr-1 text-primary"></i>
-                <span>{{ selected_inventory }}</span>
-              </button>
-              <div class="dropdown-menu shadow-sm" aria-labelledby="inventoryViewsMenu">
-                <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
-                  Default Views
-                </h6>
+                <i class="bx bxs-dollar-circle mr-1 text-primary"></i> Bulk Price Updates
+              </router-link>
+              <router-link
+                v-if="isAuthorized"
+                :to="{ name: 'inventory-updates-description' }"
+                class="dropdown-item d-flex align-items-center"
+                @click="isAddMenuOpen = false"
+              >
+                <i class="bx bx-text mr-1 text-info"></i> Bulk Description Updates
+              </router-link>
+              <a
+                v-if="isAuthorized"
+                href="javascript:void(0)"
+                class="dropdown-item d-flex align-items-center text-danger"
+                @click="isAddMenuOpen = false; warningForPurgeDeletingInventories()"
+              >
+                <i class="bx bxs-eraser mr-1"></i> Empty Recycle Bin
+              </a>
+              <div class="dropdown-divider"></div>
+              <router-link
+                :to="{ name: 'third-party-inventory' }"
+                class="dropdown-item d-flex align-items-center"
+                @click="isAddMenuOpen = false"
+              >
+                <i class="bx bxs-file-import mr-1 text-secondary"></i> Bulk Import CSV
+              </router-link>
+              <router-link
+                :to="{ name: 'inventory-import' }"
+                class="dropdown-item d-flex align-items-center"
+                @click="isAddMenuOpen = false"
+              >
+                <i class="bx bx-upload mr-1 text-success"></i> Quick Inventory Import
+              </router-link>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIER 2: Views Selector Dropdown (Left) & 5 Action Icons (Right) -->
+        <div class="inventory-tier2-row">
+          <!-- Views Dropdown -->
+          <div class="inventory-views-dropdown dropdown">
+            <button
+              class="btn-views-toggle dropdown-toggle"
+              type="button"
+              id="inventoryViewsMenu"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title="Select View"
+            >
+              <i class="bx bx-list-ul mr-50 text-primary"></i>
+              <span>{{ selected_inventory }}</span>
+            </button>
+            <div class="dropdown-menu shadow-sm" aria-labelledby="inventoryViewsMenu">
+              <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
+                Default Views
+              </h6>
+              <a
+                v-for="inventory_view in getDefaultViews"
+                :key="inventory_view.id"
+                class="dropdown-item d-flex justify-content-between align-items-center"
+                href="javascript:void(0)"
+                @click="changeInventoryView(inventory_view.id)"
+              >
+                <span>{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
+                <router-link
+                  :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
+                  class="text-muted ml-2"
+                  @click.stop
+                >
+                  <i class="bx bx-edit-alt"></i>
+                </router-link>
+              </a>
+
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
+                Custom Views
+              </h6>
+              <div class="custom-views-scrollable">
                 <a
-                  v-for="inventory_view in getDefaultViews"
+                  v-for="inventory_view in getCustomViews"
                   :key="inventory_view.id"
                   class="dropdown-item d-flex justify-content-between align-items-center"
                   href="javascript:void(0)"
@@ -114,256 +133,206 @@
                     <i class="bx bx-edit-alt"></i>
                   </router-link>
                 </a>
-
-                <div class="dropdown-divider"></div>
-                <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
-                  Custom Views
-                </h6>
-                <div class="custom-views-scrollable">
-                  <a
-                    v-for="inventory_view in getCustomViews"
-                    :key="inventory_view.id"
-                    class="dropdown-item d-flex justify-content-between align-items-center"
-                    href="javascript:void(0)"
-                    @click="changeInventoryView(inventory_view.id)"
-                  >
-                    <span>{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
-                    <router-link
-                      :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
-                      class="text-muted ml-2"
-                      @click.stop
-                    >
-                      <i class="bx bx-edit-alt"></i>
-                    </router-link>
-                  </a>
-                </div>
-
-                <div class="dropdown-divider"></div>
-                <router-link
-                  :to="{ name: 'inventory-view-create' }"
-                  class="dropdown-item text-primary font-weight-bold d-flex align-items-center"
-                >
-                  <i class="bx bx-plus mr-1"></i> New Custom View
-                </router-link>
-              </div>
-            </div>
-
-            <!-- Right: Action Icons with Hover Tooltips (Above Search Bar) -->
-            <div class="inventory-actions-toolbar">
-              <!-- Filter Action -->
-              <div class="custom-tooltip-wrapper">
-                <button
-                  type="button"
-                  class="btn-action-icon"
-                  data-toggle="modal"
-                  data-target="#filters"
-                  :class="{ active: getFilterState }"
-                >
-                  <i class="bx bxs-filter-alt"></i>
-                </button>
-                <span class="custom-tooltip-text">Filters</span>
               </div>
 
-              <!-- Column Customize Action -->
-              <div class="custom-tooltip-wrapper">
-                <button
-                  type="button"
-                  class="btn-action-icon"
-                  data-toggle="modal"
-                  data-target="#grid-list"
-                >
-                  <i class="bx bxs-grid"></i>
-                </button>
-                <span class="custom-tooltip-text">Customize Columns</span>
-              </div>
-
-              <!-- Density Toggle Action -->
-              <div class="custom-tooltip-wrapper">
-                <button
-                  type="button"
-                  class="btn-action-icon"
-                  @click="changeCompact"
-                >
-                  <i class="bx" :class="getCompact ? 'bx-expand' : 'bx-collapse'"></i>
-                </button>
-                <span class="custom-tooltip-text">Compact View</span>
-              </div>
-
-              <!-- Syndication View Toggle Action -->
-              <div v-if="isAuthorized" class="custom-tooltip-wrapper">
-                <button
-                  type="button"
-                  class="btn-action-icon"
-                  :class="{ active: getCurrentSyndicationViewStatus }"
-                  @click="changeSyndicationViewStatus"
-                >
-                  <i class="bx bx-transfer"></i>
-                </button>
-                <span class="custom-tooltip-text">Bulk Syndication</span>
-              </div>
-
-              <!-- Settings Action -->
-              <div class="custom-tooltip-wrapper">
-                <router-link
-                  :to="{ name: 'inventory-settings' }"
-                  class="btn-action-icon"
-                >
-                  <i class="bx bxs-cog"></i>
-                </router-link>
-                <span class="custom-tooltip-text">Settings</span>
-              </div>
+              <div class="dropdown-divider"></div>
+              <router-link
+                :to="{ name: 'inventory-view-create' }"
+                class="dropdown-item text-primary font-weight-bold d-flex align-items-center"
+              >
+                <i class="bx bx-plus mr-1"></i> New Custom View
+              </router-link>
             </div>
           </div>
 
-          <!-- 3. TOOLBAR CARD: Transforms between Filters and Bulk Actions -->
-          <section class="inventory-toolbar-card shadow-sm">
-            <!-- STATE A: Bulk Actions Toolbar (Shown when items are selected) -->
-            <div v-if="getInventoryIds.length > 0" class="toolbar-bulk-mode">
-              <div class="bulk-mode-left">
-                <span class="bulk-count-pill">
-                  <i class="bx bx-check-circle mr-50"></i>
-                  <strong>{{ getInventoryIds.length }}</strong>&nbsp;selected
-                </span>
+          <!-- 5 Action Icons on Right: Filter, Grid, Expand, Syndication, Settings -->
+          <div class="inventory-tier2-actions">
+            <button
+              type="button"
+              class="btn-tier2-icon"
+              data-toggle="modal"
+              data-target="#filters"
+              :class="{ active: getFilterState }"
+              title="Filters"
+            >
+              <i class="bx bx-filter"></i>
+            </button>
 
-                <button
-                  type="button"
-                  class="btn-bulk-cancel"
-                  title="Deselect all rows"
-                  @click="clearBulkSelection"
-                >
-                  <i class="bx bx-x mr-25"></i> Cancel Selection
-                </button>
+            <button
+              type="button"
+              class="btn-tier2-icon"
+              data-toggle="modal"
+              data-target="#grid-list"
+              title="Customize Columns"
+            >
+              <i class="bx bx-grid-alt"></i>
+            </button>
 
-                <button
-                  type="button"
-                  class="btn-bulk-item btn-bulk-danger"
-                  @click="confirmDeleteAction"
-                >
-                  <i class="bx bx-trash mr-50"></i> Delete
-                </button>
+            <button
+              type="button"
+              class="btn-tier2-icon"
+              @click="changeCompact"
+              :title="getCompact ? 'Normal View' : 'Compact View'"
+            >
+              <i class="bx" :class="getCompact ? 'bx-collapse' : 'bx-expand'"></i>
+            </button>
 
-                <button
-                  type="button"
-                  class="btn-bulk-item btn-bulk-primary"
-                  data-toggle="modal"
-                  data-target="#bulk-list"
-                >
-                  <i class="bx bx-edit mr-50"></i> Bulk Update
-                </button>
+            <button
+              v-if="isAuthorized"
+              type="button"
+              class="btn-tier2-icon"
+              :class="{ active: getCurrentSyndicationViewStatus }"
+              @click="changeSyndicationViewStatus"
+              title="Bulk Syndication"
+            >
+              <i class="bx bx-transfer"></i>
+            </button>
 
-                <button
-                  type="button"
-                  class="btn-bulk-item btn-bulk-purple"
-                  data-toggle="modal"
-                  data-target="#bulk-syndication-update"
-                >
-                  <i class="bx bx-transfer mr-50"></i> Bulk Syndication
-                </button>
-              </div>
+            <button
+              type="button"
+              class="btn-tier2-icon"
+              data-toggle="modal"
+              data-target="#grid-list"
+              title="Settings"
+            >
+              <i class="bx bx-cog"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- TIER 3: Search Bar + 4 Dropdowns (Normal Mode, Image 2) OR Bulk Actions Bar (Selected Mode, Image 3) -->
+        <div class="inventory-tier3-card">
+          <!-- Normal Mode (Image 2): Search Input on Left, 4 Quick Dropdowns on Right -->
+          <div v-if="getInventoryIds.length === 0" class="tier3-normal-mode">
+            <div class="tier3-search-wrap" :class="{ 'is-loading': isTableLoading }">
+              <i
+                class="bx search-icon"
+                :class="isTableLoading ? 'bx-loader-alt bx-spin text-primary' : 'bx-search'"
+              ></i>
+              <input
+                type="text"
+                id="searchText"
+                class="tier3-search-input"
+                v-debounce:600ms="searchAction"
+                v-model="searchString"
+                placeholder="Search by make, model, year, stock # or VIN..."
+              />
+              <button
+                v-if="searchString"
+                type="button"
+                class="clear-search-btn"
+                title="Clear search"
+                @click="clearSearch"
+              >
+                <i class="bx bx-x"></i>
+              </button>
             </div>
 
-            <!-- STATE B: Search & Filters (Shown when NO items are selected) -->
-            <div v-else class="toolbar-filter-mode">
-              <div class="toolbar-search-wrapper" :class="{ 'is-loading': isTableLoading }">
-                <i
-                  class="bx search-icon"
-                  :class="isTableLoading ? 'bx-loader-alt bx-spin text-primary' : 'bx-search'"
-                ></i>
-                <input
-                  type="text"
-                  id="searchText"
-                  class="toolbar-search-input"
-                  v-debounce:600ms="searchAction"
-                  v-model="searchString"
-                  placeholder="Search by make, model, year, stock # or VIN..."
-                />
-                <button
-                  v-if="searchString"
-                  type="button"
-                  class="clear-search-btn"
-                  title="Clear search"
-                  @click="clearSearch"
+            <div class="tier3-filters-wrap">
+              <div class="tier3-select-box">
+                <select
+                  class="tier3-select"
+                  :value="makeFilter"
+                  @change="onToolbarFilterChange('make', $event.target.value)"
                 >
-                  <i class="bx bx-x"></i>
-                </button>
+                  <option value="">All Makes</option>
+                  <option v-for="make in getMakes" :key="make" :value="make">{{ make }}</option>
+                </select>
+                <i class="bx bx-chevron-down select-caret"></i>
               </div>
 
-              <div class="toolbar-filters-group">
-                <!-- Dropdown: Makes -->
-                <div class="filter-dropdown-wrapper">
-                  <select
-                    class="toolbar-select"
-                    v-model="selectedMake"
-                    @change="onToolbarFilterChange('make', selectedMake)"
-                  >
-                    <option value="">All Makes</option>
-                    <option v-for="make in getMakes" :key="'mk_' + make" :value="make">
-                      {{ make }}
-                    </option>
-                  </select>
-                  <i class="bx bx-chevron-down select-chevron"></i>
-                </div>
-
-                <!-- Dropdown: Models -->
-                <div class="filter-dropdown-wrapper">
-                  <select
-                    class="toolbar-select"
-                    v-model="selectedModel"
-                    @change="onToolbarFilterChange('model', selectedModel)"
-                  >
-                    <option value="">All Models</option>
-                    <option v-for="model in filteredModels" :key="'md_' + model" :value="model">
-                      {{ model }}
-                    </option>
-                  </select>
-                  <i class="bx bx-chevron-down select-chevron"></i>
-                </div>
-
-                <!-- Dropdown: Years -->
-                <div class="filter-dropdown-wrapper">
-                  <select
-                    class="toolbar-select"
-                    v-model="selectedYear"
-                    @change="onToolbarFilterChange('year', selectedYear)"
-                  >
-                    <option value="">All Years</option>
-                    <option v-for="year in getYears" :key="'yr_' + year" :value="year">
-                      {{ year }}
-                    </option>
-                  </select>
-                  <i class="bx bx-chevron-down select-chevron"></i>
-                </div>
-
-                <!-- Dropdown: Statuses -->
-                <div class="filter-dropdown-wrapper">
-                  <select
-                    class="toolbar-select"
-                    v-model="selectedStatus"
-                    @change="onToolbarFilterChange('status', selectedStatus)"
-                  >
-                    <option value="">All Statuses</option>
-                    <option v-for="status in getStatuses" :key="'st_' + status" :value="status">
-                      {{ status }}
-                    </option>
-                  </select>
-                  <i class="bx bx-chevron-down select-chevron"></i>
-                </div>
-
-                <!-- Clear Active Filters Pill -->
-                <button
-                  v-if="hasActiveFilters"
-                  type="button"
-                  class="btn-reset-filters"
-                  title="Reset all filters"
-                  @click="resetAllFilters"
+              <div class="tier3-select-box">
+                <select
+                  class="tier3-select"
+                  :value="modelFilter"
+                  @change="onToolbarFilterChange('model', $event.target.value)"
                 >
-                  <i class="bx bx-refresh mr-25"></i> Reset
-                </button>
+                  <option value="">All Models</option>
+                  <option v-for="model in getModels" :key="model" :value="model">{{ model }}</option>
+                </select>
+                <i class="bx bx-chevron-down select-caret"></i>
               </div>
+
+              <div class="tier3-select-box">
+                <select
+                  class="tier3-select"
+                  :value="yearFilter"
+                  @change="onToolbarFilterChange('year', $event.target.value)"
+                >
+                  <option value="">All Years</option>
+                  <option v-for="year in getYears" :key="year" :value="year">{{ year }}</option>
+                </select>
+                <i class="bx bx-chevron-down select-caret"></i>
+              </div>
+
+              <div class="tier3-select-box">
+                <select
+                  class="tier3-select"
+                  :value="statusFilter"
+                  @change="onToolbarFilterChange('status', $event.target.value)"
+                >
+                  <option value="">All Statuses</option>
+                  <option v-for="st in getStatuses" :key="st" :value="st">{{ st }}</option>
+                </select>
+                <i class="bx bx-chevron-down select-caret"></i>
+              </div>
+
+              <button
+                v-if="hasActiveFilters"
+                type="button"
+                class="btn-reset-filters"
+                title="Clear all applied filters"
+                @click="resetAllFilters"
+              >
+                <i class="bx bx-x mr-25"></i> Clear
+              </button>
             </div>
-          </section>
+          </div>
 
-          <!-- 4. MAIN WORKSPACE: TABLE + PREVIEW PANEL (Side-by-Side) -->
+          <!-- Bulk Selection Mode (Image 3): 1 Selected Pill, Cancel Selection, Delete, Bulk Update, Bulk Syndication -->
+          <div v-else class="tier3-bulk-mode">
+            <div class="bulk-pill-badge">
+              <i class="bx bx-check-circle"></i>
+              <span>{{ getInventoryIds.length }} selected</span>
+            </div>
+
+            <button
+              type="button"
+              class="btn-bulk-text btn-bulk-cancel"
+              @click="clearBulkSelection"
+            >
+              <i class="bx bx-x"></i> Cancel Selection
+            </button>
+
+            <button
+              type="button"
+              class="btn-bulk-text btn-bulk-delete"
+              @click="confirmDeleteAction"
+            >
+              <i class="bx bx-trash"></i> Delete
+            </button>
+
+            <button
+              type="button"
+              class="btn-bulk-text btn-bulk-update"
+              data-toggle="modal"
+              data-target="#bulk-list"
+            >
+              <i class="bx bx-edit"></i> Bulk Update
+            </button>
+
+            <button
+              type="button"
+              class="btn-bulk-text btn-bulk-syndication"
+              data-toggle="modal"
+              data-target="#bulk-syndication-update"
+            >
+              <i class="bx bx-transfer"></i> Bulk Syndication
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. MAIN WORKSPACE: TABLE + PREVIEW PANEL (Side-by-Side) -->
           <div class="inventory-main-layout" :class="{ 'with-preview-open': isPreviewOpen }">
             <!-- LEFT: Table & Pagination Container -->
             <div class="inventory-table-container">
@@ -397,174 +366,164 @@
                         <!-- 2. Photo Column -->
                         <th class="th-photo">Photo</th>
 
-                        <!-- 3. Year Column with Sort -->
-                        <th class="th-year th-sortable" @click="toggleSort('year')">
-                          <span class="lr-sort">
-                            <span>Year</span>
-                            <i v-if="isSortAsc('year')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('year')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
+                        <!-- 3. Combined Vehicle Identity Column with Sort -->
+                      <th class="th-vehicle th-sortable" @click="toggleSort('year')">
+                        <span class="lr-sort">
+                          <span>YEAR MAKE MODEL TRIM VIN STOCK #</span>
+                          <i v-if="isSortAsc('year')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('year')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 4. DIS Column with Sort -->
+                      <th class="th-dis th-sortable text-left" @click="toggleSort('days_in_stock')">
+                        <span class="lr-sort justify-content-start">
+                          <span>DIS</span>
+                          <i v-if="isSortAsc('days_in_stock')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('days_in_stock')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 5. Odometer Column with Sort -->
+                      <th class="th-odometer th-sortable text-left" @click="toggleSort('odometer')">
+                        <span class="lr-sort justify-content-start">
+                          <span>ODOMETER</span>
+                          <i v-if="isSortAsc('odometer')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('odometer')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 6. Special Price Column with Sort -->
+                      <th class="th-special-price th-sortable text-left" @click="toggleSort('special_price')">
+                        <span class="lr-sort justify-content-start">
+                          <span>SPECIAL PRICE</span>
+                          <i v-if="isSortAsc('special_price')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('special_price')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 7. Price Column with Sort -->
+                      <th class="th-price th-sortable text-left" @click="toggleSort('price')">
+                        <span class="lr-sort justify-content-start">
+                          <span>PRICE</span>
+                          <i v-if="isSortAsc('price')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('price')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 8. Status Column with Sort -->
+                      <th class="th-status th-sortable text-center" @click="toggleSort('status')">
+                        <span class="lr-sort justify-content-center">
+                          <span>STATUS</span>
+                          <i v-if="isSortAsc('status')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('status')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 9. Creation Date Column with Sort -->
+                      <th class="th-creation-date th-sortable" @click="toggleSort('created_at')">
+                        <span class="lr-sort">
+                          <span>CREATION DATE</span>
+                          <i v-if="isSortAsc('created_at')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('created_at')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 10. Body Type Column with Sort -->
+                      <th class="th-body-type th-sortable" @click="toggleSort('body_type')">
+                        <span class="lr-sort">
+                          <span>BODY TYPE</span>
+                          <i v-if="isSortAsc('body_type')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('body_type')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 11. Last Sync Column with Sort -->
+                      <th class="th-last-sync th-sortable" @click="toggleSort('updated_at')">
+                        <span class="lr-sort">
+                          <span>LAST SYNC</span>
+                          <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- 12. Website / VDP Column -->
+                      <th class="th-website-vdp text-center">WEBSITE/ VDP</th>
+
+
+                      <!-- 14. Repair Report Column -->
+                      <th class="th-repair-report text-center">REPAIR REPORT</th>
+
+                      <!-- 15. Modified At Column with Sort (Kept at last per instruction) -->
+                      <th class="th-modified-at th-sortable" @click="toggleSort('updated_at')">
+                        <span class="lr-sort">
+                          <span>MODIFIED AT</span>
+                          <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- Dynamic Syndication Headers -->
+                      <template v-if="getCurrentSyndicationViewStatus">
+                        <th
+                          class="text-center th-syndication-header"
+                          v-for="active_syndication in getActiveSyndicationList"
+                          :key="`inventory_${active_syndication.slug}_header`"
+                        >
+                          {{ active_syndication.label }}
                         </th>
-
-                        <!-- 4. Make / Model Column with Sort -->
-                        <th class="th-make-model th-sortable" @click="toggleSort('make')">
-                          <span class="lr-sort">
-                            <span>Make / Model</span>
-                            <i v-if="isSortAsc('make')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('make')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 5. Body Type Column with Sort -->
-                        <th class="th-body-type th-sortable" @click="toggleSort('body_type')">
-                          <span class="lr-sort">
-                            <span>Body Type</span>
-                            <i v-if="isSortAsc('body_type')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('body_type')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 6. VIN Column with Sort -->
-                        <th class="th-vin th-sortable" @click="toggleSort('vin')">
-                          <span class="lr-sort">
-                            <span>VIN</span>
-                            <i v-if="isSortAsc('vin')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('vin')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 7. Stock # Column with Sort -->
-                        <th class="th-stock th-sortable" @click="toggleSort('stock_no')">
-                          <span class="lr-sort">
-                            <span>Stock #</span>
-                            <i v-if="isSortAsc('stock_no')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('stock_no')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 8. DIS Column with Sort -->
-                        <th class="th-dis th-sortable" @click="toggleSort('days_in_stock')">
-                          <span class="lr-sort">
-                            <span>DIS</span>
-                            <i v-if="isSortAsc('days_in_stock')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('days_in_stock')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 9. Price Column with Sort -->
-                        <th class="th-price th-sortable" @click="toggleSort('price')">
-                          <span class="lr-sort">
-                            <span>Price</span>
-                            <i v-if="isSortAsc('price')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('price')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 10. Odometer Column with Sort -->
-                        <th class="th-odometer th-sortable" @click="toggleSort('odometer')">
-                          <span class="lr-sort">
-                            <span>Odometer</span>
-                            <i v-if="isSortAsc('odometer')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('odometer')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 11. Status Column with Sort -->
-                        <th class="th-status th-sortable" @click="toggleSort('status')">
-                          <span class="lr-sort">
-                            <span>Status</span>
-                            <i v-if="isSortAsc('status')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('status')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 12. Website / VDP Column -->
-                        <th class="th-action text-center">Website / VDP</th>
-
-                        <!-- 13. CARFAX Column: Only visible if CARFAX data exists in backend and not in syndication view -->
-                        <th v-if="hasCarfaxInListing" class="th-action text-center">CARFAX</th>
-
-                        <!-- 14. Repair Report Column -->
-                        <th class="th-action text-center">Repair Report</th>
-
-                        <!-- 15. Created At Column with Sort -->
-                        <th class="th-created-at th-sortable" @click="toggleSort('created_at')">
-                          <span class="lr-sort">
-                            <span>Created At</span>
-                            <i v-if="isSortAsc('created_at')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('created_at')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- 16. Modified At Column with Sort -->
-                        <th class="th-modified-at th-sortable" @click="toggleSort('updated_at')">
-                          <span class="lr-sort">
-                            <span>Modified At</span>
-                            <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt"></i>
-                            <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt"></i>
-                            <i v-else class="bx bx-sort lr-sort-idle"></i>
-                          </span>
-                        </th>
-
-                        <!-- Dynamic Syndication Headers -->
-                        <template v-if="getCurrentSyndicationViewStatus">
-                          <th
-                            class="text-center th-syndication-header"
-                            v-for="active_syndication in getActiveSyndicationList"
-                            :key="`inventory_${active_syndication.slug}_header`"
-                          >
-                            {{ active_syndication.label }}
-                          </th>
-                        </template>
-                      </tr>
-                    </thead>
-
-                    <!-- Table Body -->
-                    <tbody>
-                      <!-- Loading Indicator (Initial load or loading when empty) -->
-                      <tr v-if="!getLoadState || (isTableLoading && getEntities.length === 0)">
-                        <td colspan="20" class="text-center py-5 text-muted">
-                          <div class="d-flex flex-column align-items-center justify-content-center py-4">
-                            <i class="bx bx-loader-alt bx-spin text-primary mb-2" style="font-size: 32px;"></i>
-                            <span style="font-size: 14px; font-weight: 500; color: #4b5563;">Loading vehicles...</span>
-                          </div>
-                        </td>
-                      </tr>
-
-                      <!-- Empty State -->
-                      <tr v-else-if="getEntities.length === 0">
-                        <td colspan="20" class="text-center py-4 text-muted">
-                          <i class="bx bx-search-alt mb-1" style="font-size: 28px;"></i>
-                          <p class="mb-0">No vehicles found matching current criteria.</p>
-                        </td>
-                      </tr>
-
-                      <!-- Vehicle Rows -->
-                      <template v-else>
-                        <inventory-item
-                          v-for="item in getEntities"
-                          :key="item.inventory_id + '_item_listing_view'"
-                          :item="item"
-                          :time_zone="timeZoneName"
-                          :childCheck="bulk_select"
-                          :placeholder_image="placeholder_image"
-                          :app_metadata="app_metadata"
-                          :isSelected="selectedInventoryId === item.inventory_id"
-                          :isCompact="Boolean(getCompact)"
-                          :showCarfaxColumn="hasCarfaxInListing"
-                          @select-row="handleRowSelect"
-                        ></inventory-item>
                       </template>
+                    </tr>
+                  </thead>
+
+                  <!-- Table Body -->
+                  <tbody>
+                    <!-- Loading Indicator (Initial load or loading when empty) -->
+                    <tr v-if="!getLoadState || (isTableLoading && getEntities.length === 0)">
+                      <td colspan="20" class="text-center py-5 text-muted">
+                        <div class="d-flex flex-column align-items-center justify-content-center py-4">
+                          <i class="bx bx-loader-alt bx-spin text-primary mb-2" style="font-size: 32px;"></i>
+                          <span style="font-size: 14px; font-weight: 500; color: #4b5563;">Loading vehicles...</span>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr v-else-if="getEntities.length === 0">
+                      <td colspan="20" class="text-center py-4 text-muted">
+                        <i class="bx bx-search-alt mb-1" style="font-size: 28px;"></i>
+                        <p class="mb-0">No vehicles found matching current criteria.</p>
+                      </td>
+                    </tr>
+
+                    <!-- Vehicle Rows -->
+                    <template v-else>
+                      <inventory-item
+                        v-for="item in getEntities"
+                        :key="item.inventory_id + '_item_listing_view'"
+                        :item="item"
+                        :time_zone="timeZoneName"
+                        :childCheck="bulk_select"
+                        :placeholder_image="placeholder_image"
+                        :app_metadata="app_metadata"
+                        :isSelected="selectedInventoryId === item.inventory_id"
+                        :isCompact="Boolean(getCompact)"
+                        :showCarfaxColumn="hasCarfaxInListing"
+                        @select-row="handleOpenPreview"
+                        @open-preview="handleOpenPreview"
+                        @close-preview-if-selected="handleClosePreviewIfSelected"
+                      ></inventory-item>
+                    </template>
                     </tbody>
                   </table>
                 </div>
@@ -1226,6 +1185,13 @@ export default {
         }
       },
     },
+    bulk_select(newVal) {
+      if (newVal === "1" && this.getEntities && this.getEntities.length > 0) {
+        this.handleOpenPreview(this.getEntities[0]);
+      } else if (newVal === "0") {
+        this.closePreviewPanel();
+      }
+    },
   },
   methods: {
     ...mapActions("inventory", [
@@ -1253,10 +1219,27 @@ export default {
       "commitActiveSyndicationList",
     ]),
     handleRowSelect(item) {
-      this.$router.push({
-        name: "inventory-update",
-        params: { id: item.inventory_id },
-      });
+      this.handleOpenPreview(item);
+    },
+    handleOpenPreview(item) {
+      this.selectedInventoryId = item.inventory_id;
+      this.selectedVehicleItem = item;
+      this.isPreviewOpen = true;
+    },
+    handleClosePreviewIfSelected(inventoryId) {
+      if (this.selectedInventoryId === inventoryId) {
+        const remaining = this.getInventoryIds.filter((id) => id !== inventoryId);
+        if (remaining.length > 0) {
+          const nextId = remaining[remaining.length - 1];
+          const match = this.getEntities.find((e) => e.inventory_id === nextId);
+          if (match) {
+            this.selectedInventoryId = match.inventory_id;
+            this.selectedVehicleItem = match;
+            return;
+          }
+        }
+        this.closePreviewPanel();
+      }
     },
     closePreviewPanel() {
       this.isPreviewOpen = false;
@@ -1854,10 +1837,10 @@ export default {
 .inventory-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
   flex-shrink: 0;
 }
 
@@ -1867,25 +1850,152 @@ export default {
 }
 
 .inventory-page-title {
-  font-size: 1.75rem;
+  font-size: 1.65rem;
   font-weight: 700;
-  color: #1f2937;
-  line-height: 1.15;
+  color: #0f172a;
+  line-height: 1.2;
   margin: 0;
   letter-spacing: -0.02em;
 }
 
-.inventory-vehicle-count {
-  font-size: 1rem;
-  color: #8a94a6;
-  font-weight: 400;
-  margin-top: 0.25rem;
+.inventory-subtitle {
+  font-size: 13.5px;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 2px;
 }
 
-/* Header Right: Split Add Inventory Button Group */
+/* Header Right Controls */
 .inventory-header-right {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+  max-width: 380px;
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 16px;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  .header-search-input {
+    width: 100%;
+    height: 34px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0 28px 0 32px;
+    font-size: 12.5px;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.15s ease;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+  }
+
+  .clear-search-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: #475569;
+    }
+  }
+}
+
+.header-bulk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 3px 8px;
+
+  .bulk-count-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e40af;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .btn-bulk-icon {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: #f8fafc;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.header-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .btn-tool-icon {
+    width: 34px;
+    height: 34px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+
+    &.active {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #bfdbfe;
+    }
+  }
 }
 
 .split-inventory-btn-group {
@@ -2333,6 +2443,264 @@ export default {
   }
 }
 
+
+/* TIER 1: Header Row (Title & Add Inventory) */
+.inventory-tier1-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .inventory-page-title {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+}
+
+/* TIER 2: Controls Row (Views Dropdown & Action Icons) */
+.inventory-tier2-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inventory-tier2-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .btn-tier2-icon {
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+
+    &.active {
+      background: #eff6ff;
+      color: #2563eb;
+      border-color: #bfdbfe;
+    }
+  }
+}
+
+/* TIER 3: Card Box (Normal Filter Mode & Bulk Action Mode) */
+.inventory-tier3-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.tier3-normal-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.tier3-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+  max-width: 380px;
+  flex: 1;
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    font-size: 15px;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  .tier3-search-input {
+    width: 100%;
+    height: 32px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0 28px 0 32px;
+    font-size: 12.5px;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.15s ease;
+
+    &::placeholder {
+      color: #94a3b8;
+    }
+
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+  }
+
+  .clear-search-btn {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: #475569;
+    }
+  }
+}
+
+.tier3-filters-wrap {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tier3-select-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .tier3-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0 24px 0 10px;
+    height: 32px;
+    line-height: 30px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease;
+    min-width: 105px;
+
+    &:hover {
+      border-color: #cbd5e1;
+    }
+
+    &:focus {
+      border-color: #2563eb;
+    }
+  }
+
+  .select-caret {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #94a3b8;
+    pointer-events: none;
+  }
+}
+
+/* Bulk Selection Mode in Tier 3 */
+.tier3-bulk-mode {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.bulk-pill-badge {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    font-size: 15px;
+  }
+}
+
+.btn-bulk-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  transition: all 0.15s ease;
+
+  i {
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  &:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+
+    i {
+      color: #0f172a;
+    }
+  }
+
+  &.btn-bulk-delete {
+    background: #ffffff;
+    border: 1px solid #fecaca;
+    color: #ef4444;
+
+    i {
+      color: #ef4444;
+    }
+
+    &:hover {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+  }
+}
+
 /* 4. Main Workspace: Table + Preview Panel */
 .inventory-main-layout {
   display: flex;
@@ -2449,19 +2817,22 @@ export default {
 }
 
 .inventory-table-head-row {
-  background: #f1f5f9;
+  background: #f8fafc;
   position: sticky;
   top: 0;
   z-index: 2;
 
   th {
-    padding: 0.35rem 0.55rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 0.6rem 0.55rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     color: #475569;
+    border-top: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
-    background: #f1f5f9;
+    background: #f8fafc;
+    text-transform: uppercase;
   }
 
   .th-checkbox {
@@ -2471,67 +2842,72 @@ export default {
   }
 
   .th-photo {
-    width: 50px;
-    min-width: 50px;
+    width: 56px;
+    min-width: 56px;
+    text-align: center;
   }
 
-  .th-year {
-    width: 60px;
-    min-width: 60px;
-  }
-
-  .th-make-model {
-    min-width: 140px;
-  }
-
-  .th-body-type {
-    width: 90px;
-    min-width: 90px;
-  }
-
-  .th-vin {
-    width: 135px;
-    min-width: 135px;
-  }
-
-  .th-stock {
-    width: 80px;
-    min-width: 80px;
+  .th-vehicle {
+    min-width: 220px;
+    max-width: 320px;
   }
 
   .th-dis {
-    width: 60px;
-    min-width: 60px;
-  }
-
-  .th-price {
-    width: 95px;
-    min-width: 95px;
+    width: 55px;
+    min-width: 55px;
+    text-align: left;
   }
 
   .th-odometer {
-    width: 95px;
-    min-width: 95px;
+    width: 110px;
+    min-width: 110px;
+    text-align: left;
+  }
+
+  .th-special-price {
+    width: 105px;
+    min-width: 105px;
+    text-align: left;
+  }
+
+  .th-price {
+    width: 105px;
+    min-width: 105px;
+    text-align: left;
   }
 
   .th-status {
+    width: 110px;
+    min-width: 110px;
+    text-align: center;
+  }
+
+  .th-creation-date {
+    width: 105px;
+    min-width: 105px;
+  }
+
+  .th-body-type {
+    width: 85px;
+    min-width: 85px;
+  }
+
+  .th-last-sync {
     width: 100px;
     min-width: 100px;
   }
 
+  .th-website-vdp,
+  .th-repair-report,
   .th-action {
-    width: 44px;
-    min-width: 44px;
-  }
-
-  .th-created-at {
-    width: 95px;
-    min-width: 95px;
+    width: 65px;
+    min-width: 65px;
+    text-align: center;
   }
 
   .th-modified-at {
-    width: 95px;
-    min-width: 95px;
+    width: 105px;
+    min-width: 105px;
   }
 
   .th-syndication-header {
@@ -2554,24 +2930,26 @@ export default {
     align-items: center;
     gap: 0.25rem;
     user-select: none;
-    font-weight: 600;
-    font-size: 0.8rem;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
     color: #475569;
 
     > span {
       display: inline-flex;
       align-items: center;
-      gap: 0.2rem;
     }
-    i {
-      font-size: 0.9rem;
+    .sort-active {
+      font-size: 14px;
       color: #2563eb;
-      line-height: 1;
+      font-weight: 800;
     }
-    .lr-sort-idle {
+    .sort-idle {
       color: #94a3b8;
+      font-size: 12px;
+      margin-left: 2px;
     }
-    &:hover .lr-sort-idle {
+    &:hover .sort-idle {
       color: #0f172a;
     }
   }

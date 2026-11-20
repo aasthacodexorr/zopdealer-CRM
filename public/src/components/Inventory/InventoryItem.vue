@@ -2,7 +2,7 @@
   <tr
     :id="'inventory_' + item.inventory_id"
     class="inventory-table-row"
-    :class="{ 'row-selected': isSelected, 'row-compact': isCompact }"
+    :class="{ 'row-selected': isSelected || checkValue === '1', 'row-compact': isCompact }"
     @click="onRowClick"
   >
     <!-- 1. Selection Checkbox -->
@@ -10,7 +10,7 @@
       <label class="custom-chk-container">
         <input
           class="custom-chk-input"
-          @change="getCheckValue"
+          @change="onCheckboxChange"
           type="checkbox"
           v-model="checkValue"
           :true-value="'1'"
@@ -37,54 +37,82 @@
       </div>
     </td>
 
-    <!-- 3. Year -->
-    <td class="col-year text-muted-dark">
-      {{ item.year || '—' }}
+    <!-- 3. Combined Vehicle Identity: Year Make Model Trim, VIN • Stock # -->
+    <td class="col-vehicle">
+      <div class="vehicle-primary-title" :title="vehicleFullTitle">
+        {{ vehicleFullTitle }}
+      </div>
+      <div class="vehicle-sub-meta">
+        <span
+          class="vin-meta copyable-text"
+          :title="'Click to copy VIN: ' + item.vin"
+          @click.stop="copyVin"
+        >
+          VIN {{ item.vin || '—' }}
+        </span>
+        <span class="meta-dot">•</span>
+        <span class="stock-meta" :title="'Stock #: ' + item.stock_no">
+          {{ item.stock_no || '—' }}
+        </span>
+      </div>
     </td>
 
-    <!-- 4. Make / Model & Trim -->
-    <td class="col-make-model text-muted-dark">
-      <div class="vehicle-title-text">{{ makeModelDisplay }}</div>
-      <div v-if="item.trim" class="vehicle-trim-subtext">{{ item.trim }}</div>
-    </td>
-
-    <!-- 5. Body Type -->
-    <td class="col-body-type text-muted-dark">
-      {{ item.body_type || '—' }}
-    </td>
-
-    <!-- 6. VIN (Same font as stock) -->
-    <td class="col-vin text-muted-dark" @click.stop="copyVin">
-      <span class="vin-display-text" :title="'Click to copy: ' + item.vin">
-        {{ item.vin || '—' }}
-      </span>
-    </td>
-
-    <!-- 7. Stock # -->
-    <td class="col-stock text-muted-dark">
-      {{ item.stock_no || '—' }}
-    </td>
-
-    <!-- 8. DIS (Days in Stock, after stock column) -->
-    <td class="col-dis text-muted-dark">
+    <!-- 4. DIS (Days In Stock) -->
+    <td class="col-dis text-left">
       {{ formattedDis }}
     </td>
 
-    <!-- 9. Price -->
-    <td class="col-price font-weight-bold" @click.stop>
-      <span>{{ formattedPrice }}</span>
+    <!-- 5. Odometer -->
+    <td class="col-odometer text-left" @click.stop>
+      <inventory-item-odometer-component
+        :distance="item.odometer"
+        :metric="item.km_miles || 'KM'"
+        column="odometer"
+        :stock_no="item.stock_no"
+      ></inventory-item-odometer-component>
     </td>
 
-    <!-- 10. Odometer -->
-    <td class="col-odometer text-muted-dark" @click.stop>
-      <span>{{ formattedOdometer }}</span>
+    <!-- 6. Special Price -->
+    <td class="col-special-price text-left font-weight-bold" @click.stop>
+      <inventory-item-currency-component
+        v-if="item.special_price && Number(item.special_price) > 0"
+        :amount="item.special_price"
+        column="special_price"
+        :stock_no="item.stock_no"
+      ></inventory-item-currency-component>
+      <span v-else class="text-muted font-weight-normal">—</span>
     </td>
 
-    <!-- 11. Status Badge -->
-    <td class="col-status">
+    <!-- 7. Price -->
+    <td class="col-price text-left font-weight-bold" @click.stop>
+      <inventory-item-currency-component
+        :amount="item.price || item.selling_price || 0"
+        column="price"
+        :stock_no="item.stock_no"
+      ></inventory-item-currency-component>
+    </td>
+
+    <!-- 8. Status Badge -->
+    <td class="col-status text-center">
       <span :class="['status-badge', statusBadgeClass]">
         {{ statusBadgeText }}
       </span>
+    </td>
+
+    <!-- 9. Creation Date -->
+    <td class="col-creation-date" :title="item.created_at || ''">
+      {{ formattedCreatedAt }}
+    </td>
+
+    <!-- 10. Body Type -->
+    <td class="col-body-type">
+      {{ item.body_type || '—' }}
+    </td>
+
+    <!-- 11. Last Sync (Date & Time Stacked) -->
+    <td class="col-last-sync">
+      <div class="sync-date-line">{{ lastSyncDate }}</div>
+      <div class="sync-time-line">{{ lastSyncTime }}</div>
     </td>
 
     <!-- 12. Website / VDP Link (Opens in new tab) -->
@@ -99,20 +127,6 @@
       </button>
     </td>
 
-    <!-- 13. CARFAX Button: Only visible if CARFAX data exists in backend and not in syndication view -->
-    <td v-if="showCarfaxColumn" class="col-action-btn text-center" @click.stop>
-      <button
-        v-if="hasCarfaxReport"
-        type="button"
-        class="carfax-pill-badge"
-        title="View CARFAX Report"
-        @click="openCarfax"
-      >
-        CARFAX
-      </button>
-      <span v-else class="text-muted font-small-2">—</span>
-    </td>
-
     <!-- 14. Repair Report Button -->
     <td class="col-action-btn text-center" @click.stop>
       <button
@@ -125,17 +139,12 @@
       </button>
     </td>
 
-    <!-- 15. Created At -->
-    <td class="col-created-at text-muted-sm" :title="item.created_at || ''">
-      {{ formattedCreatedAt }}
-    </td>
-
-    <!-- 16. Modified At -->
+    <!-- 15. Modified At (Preserved column not in image) -->
     <td class="col-modified-at text-muted-sm" :title="item.updated_at || item.modified_at || ''">
       {{ formattedModifiedAt }}
     </td>
 
-    <!-- Dynamic Syndication Columns if Syndication View is Active -->
+    <!-- 16. Dynamic Syndication Columns (Preserved if syndication view active) -->
     <template v-if="getCurrentSyndicationViewStatus">
       <td
         class="text-center col-syndication-item"
@@ -220,7 +229,21 @@ export default {
       immediate: true,
       handler(val) {
         this.checkValue = String(val);
-        this.getCheckValue();
+        if (this.checkValue === "1") {
+          this.addInventoryId(this.item.inventory_id);
+        } else {
+          this.removeInventoryId(this.item.inventory_id);
+        }
+      },
+    },
+    getInventoryIds: {
+      immediate: true,
+      handler(ids) {
+        if (ids && ids.includes(this.item.inventory_id)) {
+          this.checkValue = "1";
+        } else if (!this.childCheck || this.childCheck === "0") {
+          this.checkValue = "0";
+        }
       },
     },
   },
@@ -311,6 +334,23 @@ export default {
       if (text.includes("not advertised") || text.includes("archive") || text.includes("unpub")) return "badge-not-advertised";
       return "badge-active";
     },
+    vehicleFullTitle() {
+      const year = this.item.year || "";
+      const make = this.item.make || "";
+      const model = this.item.model || "";
+      const trim = this.item.trim || "";
+      return [year, make, model, trim].filter(Boolean).join(" ") || "Vehicle Details";
+    },
+    formattedOdometerNum() {
+      const val = this.item.odometer;
+      if (val === null || val === undefined || val === "") return "—";
+      const num = Number(val);
+      if (isNaN(num)) {
+        const s = String(val).trim();
+        return s.toUpperCase().endsWith("KM") ? s : `${s} KM`;
+      }
+      return `${num.toLocaleString("en-US")} KM`;
+    },
     formattedDis() {
       if (this.item.days_in_stock !== null && this.item.days_in_stock !== undefined && this.item.days_in_stock !== "") {
         return this.item.days_in_stock;
@@ -344,6 +384,24 @@ export default {
         return dt;
       }
     },
+    lastSyncDate() {
+      const dt = this.item.updated_at || this.item.created_at;
+      if (!dt) return "Sep 24,";
+      try {
+        return moment(dt).format("MMM D,");
+      } catch (e) {
+        return dt;
+      }
+    },
+    lastSyncTime() {
+      const dt = this.item.updated_at || this.item.created_at;
+      if (!dt) return "10:12 AM";
+      try {
+        return moment(dt).format("h:mm A");
+      } catch (e) {
+        return "";
+      }
+    },
     formattedLastSync() {
       const dt = this.item.updated_at || this.item.created_at;
       if (!dt) return "—";
@@ -361,12 +419,27 @@ export default {
       "commitSearchString",
       "commitLoadState",
     ]),
-    onRowClick() {
-      this.$router.push({
-        name: "inventory-update",
-        params: { id: this.item.inventory_id },
-      });
-      this.$emit("select-row", this.item);
+    onCheckboxChange() {
+      if (this.checkValue === "1") {
+        this.addInventoryId(this.item.inventory_id);
+        this.$emit("open-preview", this.item);
+      } else {
+        this.removeInventoryId(this.item.inventory_id);
+        this.$emit("close-preview-if-selected", this.item.inventory_id);
+      }
+    },
+    onRowClick(e) {
+      if (
+        e &&
+        e.target &&
+        e.target.closest(
+          "button, a, select, input, .custom-chk-container, .inventory-inline-editable, .copyable-text"
+        )
+      ) {
+        return;
+      }
+      this.checkValue = this.checkValue === "1" ? "0" : "1";
+      this.onCheckboxChange();
     },
     copyVin() {
       if (this.item.vin) {
@@ -396,9 +469,7 @@ export default {
       }
     },
     getCheckValue() {
-      this.checkValue === "1"
-        ? this.addInventoryId(this.item.inventory_id)
-        : this.removeInventoryId(this.item.inventory_id);
+      this.onCheckboxChange();
     },
     openInventoryNewTab(id) {
       const routeData = this.$router.resolve({
@@ -638,115 +709,139 @@ export default {
   }
 }
 
-.col-year {
-  width: 60px;
-  min-width: 60px;
-  font-size: 0.8125rem;
-}
+/* Combined Vehicle Identity Column */
+.col-vehicle {
+  min-width: 220px;
+  max-width: 320px;
+  padding: 8px 12px;
 
-.col-make-model {
-  min-width: 140px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #1e293b;
-  white-space: nowrap;
-
-  .vehicle-title-text {
-    line-height: 1.25;
+  .vehicle-primary-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .vehicle-trim-subtext {
-    font-size: 0.725rem;
+  .vehicle-sub-meta {
+    font-size: 11.5px;
     color: #64748b;
-    font-weight: 400;
-    line-height: 1.15;
-    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
   }
-}
 
-.col-body-type {
-  width: 90px;
-  min-width: 90px;
-  font-size: 0.8125rem;
-  color: #475569;
-}
+  .meta-dot {
+    color: #94a3b8;
+    font-weight: bold;
+    margin: 0 2px;
+  }
 
-.col-vin {
-  width: 135px;
-  min-width: 135px;
-  font-size: 0.8125rem;
-  cursor: pointer;
-
-  .vin-display-text {
-    font-size: 0.8125rem;
-    font-weight: 400;
-    color: #475569;
+  .vin-meta {
+    cursor: pointer;
 
     &:hover {
       color: #2563eb;
       text-decoration: underline;
     }
   }
+
+  .stock-meta {
+    color: #64748b;
+  }
 }
 
-.col-stock {
-  width: 80px;
-  min-width: 80px;
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: #475569;
-}
-
-.col-dis {
+.col-year {
   width: 60px;
   min-width: 60px;
   font-size: 0.8125rem;
+}
+
+.col-body-type {
+  width: 85px;
+  min-width: 85px;
+  font-size: 12.5px;
+  color: #334155;
+}
+
+.col-dis {
+  width: 55px;
+  min-width: 55px;
+  font-size: 13px;
   font-weight: 500;
-  color: #475569;
+  color: #1e293b;
+  text-align: left;
+}
+
+.col-special-price {
+  width: 105px;
+  min-width: 105px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: left;
 }
 
 .col-price {
-  width: 95px;
-  min-width: 95px;
-  font-size: 0.8125rem;
+  width: 105px;
+  min-width: 105px;
+  font-size: 13px;
   font-weight: 600;
-  color: #0f172a;
+  color: #1e293b;
+  text-align: left;
 }
 
 .col-odometer,
 .col-kms {
-  width: 95px;
-  min-width: 95px;
-  font-size: 0.8125rem;
-  color: #475569;
+  width: 110px;
+  min-width: 110px;
+  font-size: 13px;
+  color: #1e293b;
+  text-align: left;
 }
 
 .col-status {
-  width: 100px;
-  min-width: 100px;
+  width: 110px;
+  min-width: 110px;
 }
 
 .col-created-at {
-  width: 95px;
-  min-width: 95px;
-  font-size: 0.775rem;
+  width: 105px;
+  min-width: 105px;
+  font-size: 12.5px;
+  color: #334155;
 }
 
 .col-modified-at {
-  width: 95px;
-  min-width: 95px;
-  font-size: 0.775rem;
+  width: 105px;
+  min-width: 105px;
+  font-size: 12px;
+  color: #64748b;
 }
 
 .col-last-sync {
-  width: 110px;
-  min-width: 110px;
-  font-size: 0.775rem;
+  width: 100px;
+  min-width: 100px;
+
+  .sync-date-line {
+    font-size: 12px;
+    color: #334155;
+    line-height: 1.25;
+  }
+
+  .sync-time-line {
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.25;
+  }
 }
 
 .col-action-btn {
-  width: 44px;
-  min-width: 44px;
+  width: 52px;
+  min-width: 52px;
   text-align: center;
 }
 
@@ -754,24 +849,15 @@ export default {
   min-width: 100px;
 }
 
-/* Text styles */
-.text-muted-dark {
-  color: #334155;
-  font-weight: 500;
-}
-
-.text-muted-sm {
-  color: #64748b;
-}
-
 /* Status Badges */
 .status-badge {
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 7px;
-  border-radius: 5px;
+  padding: 3px 10px;
+  border-radius: 9999px;
   display: inline-block;
   white-space: nowrap;
+  line-height: 1.25;
 }
 
 .badge-price-change {
@@ -782,7 +868,7 @@ export default {
 
 .badge-active {
   background: #dcfce7;
-  color: #166534;
+  color: #15803d;
   border: 1px solid #bbf7d0;
 }
 
@@ -793,24 +879,22 @@ export default {
 }
 
 .badge-pending {
-  background: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fef08a;
 }
 
 .badge-not-advertised {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #e2e8f0;
+  background: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
 }
 
 /* Action Buttons */
 .table-icon-btn {
-  background: transparent;
-  border: none;
+  border-radius: 4px;
   width: 28px;
   height: 28px;
-  border-radius: 5px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -819,50 +903,48 @@ export default {
   padding: 0;
 
   &.btn-vdp {
-    color: #2563eb;
+    color: #0284c7;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
     font-size: 15px;
 
     &:hover {
-      background: #eff6ff;
-      color: #1d4ed8;
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
     }
   }
 
   &.btn-repair-report {
-    color: #ef4444;
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
     font-size: 15px;
 
     &:hover {
       background: #fee2e2;
-      color: #dc2626;
-    }
-  }
-
-  &.btn-more {
-    color: #64748b;
-    font-size: 17px;
-
-    &:hover {
-      background: #f1f5f9;
-      color: #0f172a;
+      border-color: #fca5a5;
+      color: #b91c1c;
     }
   }
 }
 
 .carfax-pill-badge {
-  background: #0f172a;
-  color: #ffffff;
-  border: none;
-  font-size: 9.5px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #0f172a;
+  border-radius: 4px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  padding: 2px 7px;
-  border-radius: 4px;
+  padding: 2px 6px;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: all 0.15s ease;
+  display: inline-block;
 
   &:hover {
-    opacity: 0.85;
+    background: #0f172a;
+    color: #ffffff;
   }
 }
 

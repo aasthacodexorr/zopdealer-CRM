@@ -1237,11 +1237,11 @@ $(window).on("load", function () {
     },
   }
 
-  var primaryLineChart = new ApexCharts(
-    document.querySelector("#primary-line-chart"),
-    primaryLineChartOption
-  );
-  primaryLineChart.render();
+  var primaryLineChartEl = document.querySelector("#primary-line-chart");
+  if (primaryLineChartEl) {
+    var primaryLineChart = new ApexCharts(primaryLineChartEl, primaryLineChartOption);
+    primaryLineChart.render();
+  }
     
     // Growth Radial Chart
   // --------------------
@@ -1304,12 +1304,11 @@ $(window).on("load", function () {
     labels: ['Vehicle Health'],  
   }
 
-  var growthChart = new ApexCharts(
-    document.querySelector("#growth-Chart"),
-    growthChartOptions
-  );
-
-  growthChart.render();
+  var growthChartEl = document.querySelector("#growth-Chart");
+  if (growthChartEl) {
+    var growthChart = new ApexCharts(growthChartEl, growthChartOptions);
+    growthChart.render();
+  }
     
 // Warning Line Chart
   // -----------------------------
@@ -1370,11 +1369,11 @@ $(window).on("load", function () {
     },
   }
 
-  var warningLineChart = new ApexCharts(
-    document.querySelector("#warning-line-chart"),
-    warningLineChartOption
-  );
-  warningLineChart.render();
+  var warningLineChartEl = document.querySelector("#warning-line-chart");
+  if (warningLineChartEl) {
+    var warningLineChart = new ApexCharts(warningLineChartEl, warningLineChartOption);
+    warningLineChart.render();
+  }
     
     // danger Line Chart
   // -----------------------------
@@ -1435,11 +1434,11 @@ $(window).on("load", function () {
     },
   }
 
-  var dangerLineChart = new ApexCharts(
-    document.querySelector("#danger-line-chart"),
-    dangerLineChartOption
-  );
-  dangerLineChart.render();
+  var dangerLineChartEl = document.querySelector("#danger-line-chart");
+  if (dangerLineChartEl) {
+    var dangerLineChart = new ApexCharts(dangerLineChartEl, dangerLineChartOption);
+    dangerLineChart.render();
+  }
     
 });
 
