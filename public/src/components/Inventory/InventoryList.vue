@@ -369,7 +369,14 @@
                         <!-- 3. Combined Vehicle Identity Column with Sort -->
                       <th class="th-vehicle th-sortable" @click="toggleSort('year')">
                         <span class="lr-sort">
-                          <span>YEAR MAKE MODEL TRIM VIN STOCK #</span>
+                          <span class="vehicle-th-labels">
+                            <span>YEAR</span>
+                            <span>MAKE</span>
+                            <span>MODEL</span>
+                            <span>TRIM</span>
+                            <span>VIN</span>
+                            <span>STOCK #</span>
+                          </span>
                           <i v-if="isSortAsc('year')" class="bx bx-up-arrow-alt sort-active"></i>
                           <i v-else-if="isSortDesc('year')" class="bx bx-down-arrow-alt sort-active"></i>
                           <span v-else class="sort-idle">⇅</span>
@@ -587,19 +594,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- RIGHT: INVENTORY PREVIEW PANEL (Opened when a row is clicked) -->
-            <transition name="slide-panel">
-              <inventory-preview-panel
-                v-if="isPreviewOpen && selectedVehicleItem"
-                :item="selectedVehicleItem"
-                :app_metadata="app_metadata"
-                :time_zone="timeZoneName"
-                :placeholder_image="placeholder_image"
-                @close="closePreviewPanel"
-                @open-vdp="openInventoryNewTab"
-              ></inventory-preview-panel>
-            </transition>
           </div>
 
           <!-- 6. PRESERVED MODALS: Custom Columns Draggable List Modal -->
@@ -908,6 +902,19 @@
           </div>
         </div>
       </div>
+
+      <!-- RIGHT: INVENTORY PREVIEW PANEL (Opened when a row is clicked, sidebar to the whole page) -->
+      <transition name="slide-panel">
+        <inventory-preview-panel
+          v-if="isPreviewOpen && selectedVehicleItem"
+          :item="selectedVehicleItem"
+          :app_metadata="app_metadata"
+          :time_zone="timeZoneName"
+          :placeholder_image="placeholder_image"
+          @close="closePreviewPanel"
+          @open-vdp="openInventoryNewTab"
+        ></inventory-preview-panel>
+      </transition>
     </div>
   <!-- END: Content-->
 </template>
@@ -2848,8 +2855,8 @@ export default {
   }
 
   .th-vehicle {
-    min-width: 220px;
-    max-width: 320px;
+    min-width: 290px;
+    max-width: 360px;
   }
 
   .th-dis {
@@ -2938,6 +2945,11 @@ export default {
     > span {
       display: inline-flex;
       align-items: center;
+    }
+    .vehicle-th-labels {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
     }
     .sort-active {
       font-size: 14px;
@@ -3116,16 +3128,16 @@ export default {
   }
 }
 
-/* Transitions for Right Preview Panel */
+/* Transitions for Right Preview Panel (Sidebar to whole page) */
 .slide-panel-enter-active,
 .slide-panel-leave-active {
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
 }
 
 .slide-panel-enter-from,
 .slide-panel-leave-to {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(100%);
 }
 
 @media (max-width: 1200px) {

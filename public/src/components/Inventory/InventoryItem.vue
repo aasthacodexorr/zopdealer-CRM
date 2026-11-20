@@ -711,8 +711,8 @@ export default {
 
 /* Combined Vehicle Identity Column */
 .col-vehicle {
-  min-width: 220px;
-  max-width: 320px;
+  min-width: 290px;
+  max-width: 360px;
   padding: 8px 12px;
 
   .vehicle-primary-title {

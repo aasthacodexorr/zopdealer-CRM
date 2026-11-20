@@ -10,6 +10,16 @@
       @hide="lightboxVisible = false"
     ></vue-easy-lightbox>
 
+    <!-- Left Floating Toggle/Close Sidebar Handle (matches Image) -->
+    <a
+      class="preview-sidebar-toggle"
+      role="button"
+      title="Close Sidebar"
+      @click="$emit('close')"
+    >
+      <i class="bx bx-chevrons-right text-white"></i>
+    </a>
+
     <!-- Top Floating Close Button -->
     <button
       type="button"
@@ -912,23 +922,54 @@ export default {
 
 <style scoped lang="scss">
 .inventory-preview-panel {
-  position: relative;
-  width: 390px;
-  min-width: 370px;
-  max-width: 410px;
-  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 90vw;
+  height: 100vh;
+  max-height: 100vh;
+  z-index: 1051;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border: none;
+  border-left: 1px solid #e2e8f0;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  max-height: 100%;
-  position: relative;
-  top: 0;
-  overflow: hidden;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+  overflow: visible;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.12);
   font-family: inherit;
+}
+
+.preview-sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  left: -38px;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  background-color: #5a8dee;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  z-index: 10;
+  text-decoration: none;
+
+  i {
+    font-size: 24px;
+    line-height: 1;
+    color: #ffffff;
+  }
+
+  &:hover {
+    background-color: #4676d7;
+  }
 }
 
 .preview-close-btn {
@@ -1452,13 +1493,13 @@ export default {
 @media (max-width: 1024px) {
   .inventory-preview-panel {
     position: fixed;
-    top: 60px;
+    top: 0;
     right: 0;
     bottom: 0;
     width: 100%;
     max-width: 440px;
-    height: calc(100vh - 60px);
-    z-index: 1050;
+    height: 100vh;
+    z-index: 1051;
     border-radius: 0;
   }
 }
