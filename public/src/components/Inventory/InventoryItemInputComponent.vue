@@ -1,42 +1,52 @@
 <template>
   <span
+    class="inventory-inline-editable"
     @mouseover="show_edit_button = true"
     @mouseleave="show_edit_button = false"
   >
-    <span v-if="!edit_mode" style="cursor: pointer" @click="enableEditMode"
-      >{{ renderedValue }}<slot></slot>
+    <span
+      v-if="!edit_mode"
+      class="inline-display-value"
+      style="cursor: pointer"
+      @click.stop="enableEditMode"
+      title="Click to edit"
+    >
+      {{ renderedValue }}<slot></slot>
       <i
         v-show="show_edit_button"
-        style="font-size: 1.4em; vertical-align: bottom"
-        class="bx text-secondary bx bx-edit-alt"
-      ></i
-    ></span>
-    <div v-else>
+        class="bx bx-edit-alt inline-pencil-icon"
+      ></i>
+    </span>
+    <div v-else class="inline-edit-box" @click.stop>
       <input
         type="text"
-        class="form-control"
+        class="form-control form-control-sm inline-edit-input"
         :class="{
           'is-invalid': errors.hasOwnProperty(column),
         }"
+        @keyup.enter="partialUpdate"
+        @keyup.esc="resetEditMode"
         @keyup="delete errors[column]"
         :title="errors[column]"
         v-model="new_value"
+        ref="inlineInput"
       />
-      <span>
+      <span class="inline-edit-actions">
         <i
-          style="font-size: 1.4em; cursor: pointer"
-          class="bx text-success bx bx-save mt-50 mr-1"
-          @click="partialUpdate"
+          class="bx bx-check text-success inline-action-btn"
+          title="Save"
+          @click.stop="partialUpdate"
         ></i>
         <i
-          @click="resetEditMode"
-          style="font-size: 1.4em; cursor: pointer"
-          class="bx text-danger bx bx-x-circle mt-50"
+          @click.stop="resetEditMode"
+          class="bx bx-x text-danger inline-action-btn"
+          title="Cancel"
         ></i>
       </span>
     </div>
   </span>
 </template>
+
 <script>
 import Toast from "../../library/Toast";
 import { mapActions } from "vuex";
@@ -68,13 +78,21 @@ export default {
       show_edit_button: false,
     };
   },
+  watch: {
+    current_value(newVal) {
+      this.rendered_value = newVal;
+      this.new_value = newVal;
+    },
+  },
   computed: {
     renderedValue() {
-      return this.rendered_value == null || this.rendered_value == ""
-        ? ""
-        : new Intl.NumberFormat("en-US", this.$props.render_format).format(
-            this.rendered_value
-          );
+      if (this.rendered_value == null || this.rendered_value === "") return "—";
+      const num = Number(this.rendered_value);
+      if (isNaN(num)) return this.rendered_value;
+      if (this.$props.render_format && Object.keys(this.$props.render_format).length > 0) {
+        return new Intl.NumberFormat("en-US", this.$props.render_format).format(num);
+      }
+      return new Intl.NumberFormat("en-US").format(num);
     },
   },
   methods: {
@@ -87,6 +105,11 @@ export default {
     enableEditMode() {
       this.new_value = this.$props.current_value;
       this.edit_mode = true;
+      this.$nextTick(() => {
+        if (this.$refs.inlineInput) {
+          this.$refs.inlineInput.focus();
+        }
+      });
     },
     partialUpdate() {
       const vm = this;
@@ -118,7 +141,7 @@ export default {
         })
         .catch(function (error) {
           let error_message = `There was some error updating the inventory`;
-          vm.$data.errors = error.response.data;
+          vm.$data.errors = (error.response && error.response.data) || {};
           toast.fail(error_message);
           toast.close();
         });
@@ -129,3 +152,75 @@ export default {
   },
 };
 </script>
+
+<style scoped lang="scss">
+.inventory-inline-editable {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  max-width: 100%;
+}
+
+.inline-display-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: #2563eb;
+  }
+}
+
+.inline-pencil-icon {
+  font-size: 13px;
+  color: #64748b;
+  margin-left: 2px;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: #2563eb;
+  }
+}
+
+.inline-edit-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #ffffff;
+  z-index: 10;
+}
+
+.inline-edit-input {
+  height: 24px !important;
+  font-size: 0.8rem !important;
+  padding: 1px 5px !important;
+  width: 75px !important;
+  border-radius: 4px !important;
+  border: 1px solid #94a3b8 !important;
+  color: #0f172a !important;
+  background: #ffffff !important;
+
+  &:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2) !important;
+  }
+}
+
+.inline-edit-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.inline-action-btn {
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.1s ease;
+
+  &:hover {
+    transform: scale(1.15);
+  }
+}
+</style>

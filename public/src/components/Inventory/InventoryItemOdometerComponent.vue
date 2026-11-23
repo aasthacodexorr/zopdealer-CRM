@@ -4,9 +4,12 @@
     :stock_no="stock_no"
     :column="column"
   >
-    {{ metric }}
+    <span v-if="distance !== null && distance !== undefined && distance !== ''">
+      &nbsp;{{ metric }}
+    </span>
   </inventory-item-input-component>
 </template>
+
 <script>
 import InventoryItemInputComponent from "./InventoryItemInputComponent.vue";
 

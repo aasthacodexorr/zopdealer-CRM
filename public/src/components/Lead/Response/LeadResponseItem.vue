@@ -1,28 +1,42 @@
 <template>
-  <tr :id="'lead_response_' + item.id">
-    <td class="left-space-box" id="d-list">
+  <tr
+    :id="'lead_response_' + item.id"
+    :class="{ 'is-selected': checkValue == '1' }"
+  >
+    <td class="lr-col-check" id="d-list">
       <input
-        class="select_check"
+        class="select_check lr-checkbox"
         @change="getCheckValue"
         type="checkbox"
         v-model="checkValue"
         :true-value="'1'"
         :false-value="'0'"
         :data="item.id"
+        :aria-label="'Select lead ' + fullName"
       />
     </td>
-    <td
-      class="text-center"
-      title="View snapshot of details"
-      @click.prevent="showSnapshot()"
-      style="cursor: pointer"
-    >
-      <i class="bx bx-search-alt"></i>
+    <td class="lr-col-avatar">
+      <span class="lr-lead-cell">
+        <span
+          class="lr-avatar"
+          :style="avatarStyle(fullName)"
+          :title="fullName"
+          @click.prevent="openLeadResponse('avatar')"
+          >{{ initials(item.first_name, item.last_name) }}</span
+        >
+        <button
+          type="button"
+          class="lr-snapshot-btn"
+          title="View snapshot of details"
+          @click.prevent="showSnapshot()"
+        >
+          <i class="bx bx-search-alt"></i>
+        </button>
+      </span>
     </td>
     <template v-for="element in list">
       <td
         style="cursor: pointer"
-        class="text-center"
         exact
         :key="element.header"
         @click.prevent="openLeadResponse(element.column)"
@@ -39,6 +53,7 @@
           :lead_id="item.id"
           :current_value="item[element.column]"
           :options="getLeadStatusesMapper"
+          display="pill"
         />
         <lead-response-item-select-component
           v-else-if="element.column == 'assignee'"
@@ -46,20 +61,55 @@
           :lead_id="item.id"
           :current_value="item[element.column]"
           :options="getAllUsersMapper"
+          display="user"
         />
         <component
           v-else
-          v-bind="{ text: item[element.column] }"
+          v-bind="{ text: item[element.column], column: element.column }"
           v-bind:is="components[element.component].component"
         ></component>
       </td>
     </template>
+    <td class="lr-col-actions">
+      <div class="dropdown">
+        <button
+          type="button"
+          class="lr-row-menu-btn"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          title="More actions"
+        >
+          <i class="bx bx-dots-horizontal-rounded"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right lr-row-menu">
+          <a class="dropdown-item" @click.prevent="openLeadResponse('menu')"
+            ><i class="bx bx-show"></i> View lead</a
+          >
+          <a class="dropdown-item" @click.prevent="showSnapshot()"
+            ><i class="bx bx-search-alt"></i> Quick snapshot</a
+          >
+        </div>
+      </div>
+    </td>
   </tr>
 </template>
 <script>
 const moment = require("moment");
 import { mapGetters, mapActions } from "vuex";
 import LeadResponseItemSelectComponent from "./LeadResponseItemSelectComponent.vue";
+
+const AVATAR_COLORS = [
+  ["#e6efff", "#2f62d6"],
+  ["#e3f6e8", "#1e8a43"],
+  ["#fff3d1", "#a26a00"],
+  ["#efe8ff", "#6b46c1"],
+  ["#def6f3", "#11806f"],
+  ["#fde6ef", "#b83268"],
+];
+
+const pascal = (text) =>
+  text == null || text === "" ? "" : String(text)[0].toUpperCase() + String(text).substring(1);
 
 var components = {
   date: {
@@ -71,13 +121,21 @@ var components = {
         },
       },
       computed: {
+        isEmpty() {
+          return this.date == null || this.date == "";
+        },
         parseDate() {
-          return this.date == null || this.date == ""
-            ? ""
-            : moment(this.date).format("MMMM Do YYYY");
+          return this.isEmpty ? "" : moment(this.date).format("MMM D, YYYY");
+        },
+        parseTime() {
+          return this.isEmpty ? "" : moment(this.date).format("h:mm A");
+        },
+        fullDate() {
+          return this.isEmpty ? "" : moment(this.date).format("MMMM Do YYYY, h:mm A");
         },
       },
-      template: "<span>{{parseDate}}</span>",
+      template:
+        "<span v-if='isEmpty' class='lr-cell-muted'>—</span><span v-else class='lr-date' :title='fullDate'><span>{{parseDate}}</span><small>{{parseTime}}</small></span>",
     },
   },
   text: {
@@ -87,15 +145,23 @@ var components = {
         text: {
           required: false,
         },
+        column: {
+          required: false,
+          default: "",
+        },
       },
       computed: {
         pascalCase() {
-          return this.text == null || this.text == ""
-            ? ""
-            : this.text[0].toUpperCase() + this.text.substring(1);
+          return pascal(this.text);
+        },
+        cellClass() {
+          if (["first_name", "last_name"].includes(this.column)) return "lr-cell-strong";
+          if (["vin", "stock_no", "year"].includes(this.column)) return "lr-mono";
+          return "";
         },
       },
-      template: "<span>{{pascalCase}}</span>",
+      template:
+        "<span v-if='pascalCase === \"\"' class='lr-cell-muted'>—</span><span v-else :class='cellClass'>{{pascalCase}}</span>",
     },
   },
   phone: {
@@ -106,12 +172,15 @@ var components = {
           required: false,
           default: "",
         },
+        column: {
+          required: false,
+          default: "",
+        },
       },
       computed: {
         phoneFormat() {
-          x = this.text;
-          x = x == null ? "" : x;
-          var x = x.replace(/\D/g, "").match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+          var x = this.text == null ? "" : String(this.text);
+          x = x.replace(/\D/g, "").match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
 
           return !x[2]
             ? x[1]
@@ -119,7 +188,7 @@ var components = {
         },
       },
       template:
-        "<span><i class='bx bx-phone-call phone-icon'></i>{{phoneFormat}}</span>",
+        "<span v-if='phoneFormat === \"\"' class='lr-cell-muted'>—</span><span v-else class='lr-cell-icon'><i class='bx bx-phone-call lr-icon-phone'></i>{{phoneFormat}}</span>",
     },
   },
   email: {
@@ -129,19 +198,21 @@ var components = {
         text: {
           required: false,
         },
+        column: {
+          required: false,
+          default: "",
+        },
       },
       computed: {
         pascalCase() {
-          return this.text == null || this.text == ""
-            ? ""
-            : this.text[0].toUpperCase() + this.text.substring(1);
+          return pascal(this.text);
         },
         showTemplate() {
           return this.text == null || this.text == "" ? false : true;
         },
       },
       template:
-        "<span v-if='!showTemplate' ></span><span v-else><i class='bx bxs-inbox mail-icon'></i>{{pascalCase}}</span>",
+        "<span v-if='!showTemplate' class='lr-cell-muted'>—</span><span v-else class='lr-cell-icon'><i class='bx bx-envelope lr-icon-mail'></i>{{pascalCase}}</span>",
     },
   },
   user: {
@@ -151,12 +222,14 @@ var components = {
         text: {
           required: false,
         },
+        column: {
+          required: false,
+          default: "",
+        },
       },
       computed: {
         pascalCase() {
-          return this.text == null || this.text == ""
-            ? ""
-            : this.text[0].toUpperCase() + this.text.substring(1);
+          return pascal(this.text);
         },
       },
       template: "<span>{{pascalCase}}</span>",
@@ -169,9 +242,13 @@ var components = {
         text: {
           required: true,
         },
+        column: {
+          required: false,
+          default: "",
+        },
       },
       template:
-        "<span><span class='badge badge-light-success'>{{text}}</span></span>",
+        "<span><span class='lr-pill lr-pill--green'>{{text}}</span></span>",
     },
   },
 };
@@ -201,6 +278,11 @@ export default {
   },
   computed: {
     ...mapGetters("leadResponse", ["getLeadResponseIds", "getLeadStatuses"]),
+    fullName() {
+      return [this.item.first_name, this.item.last_name]
+        .filter((part) => part)
+        .join(" ");
+    },
     ...mapGetters("leadResponseView", ["list"]),
     assigneeName() {
       return this.$helpers.assigneeName(this.allUsers, this.item.assignee, "");
@@ -227,6 +309,21 @@ export default {
       "addLeadResponseId",
       "removeLeadResponseId",
     ]),
+    initials(first, last) {
+      const letters =
+        (first ? String(first).trim()[0] || "" : "") +
+        (last ? String(last).trim()[0] || "" : "");
+      return letters ? letters.toUpperCase() : "?";
+    },
+    avatarStyle(name) {
+      const value = String(name || "");
+      let hash = 0;
+      for (let i = 0; i < value.length; i++) {
+        hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+      }
+      const [background, color] = AVATAR_COLORS[hash % AVATAR_COLORS.length];
+      return { background, color };
+    },
     pascalCase(string) {
       return string == null || string == ""
         ? ""
@@ -266,18 +363,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.phone-icon {
-  color: #00c3ff;
-  float: left;
-  /* position: relative; */
-  /* top: 0.2em; */
-  /* padding-right: 1em; */
-}
-
-.mail-icon {
-  color: #1cd216;
-  float: left;
-}
-</style>

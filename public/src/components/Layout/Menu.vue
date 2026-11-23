@@ -1,10 +1,9 @@
 <template>
   <!-- BEGIN: Main Menu-->
   <div
-    class="main-menu menu-fixed menu-light menu-accordion menu-shadow"
+    class="main-menu menu-fixed menu-light menu-accordion menu-shadow zd-sidebar"
     data-scroll-to-active="true"
     id="main-menu"
-    style="overflow: auto;"
   >
     <div class="navbar-header">
       <ul class="nav navbar-nav flex-row">
@@ -756,7 +755,59 @@
           </a>
         </router-link>
         <!-- User Management : END -->
+
+        <!-- Support (moved from the top bar; opens the modals defined in Header.vue) : START -->
+        <li class="navigation-header">
+          <span>Support</span>
+        </li>
+        <li class="nav-item zd-menu-action">
+          <a
+            href="#"
+            data-toggle="modal"
+            data-target="#helpCenter"
+            @click.prevent
+          >
+            <i class="bx bx-support" data-icon="support"></i>
+            <span class="menu-title" data-i18n="Customer Support"
+              >Customer Support</span
+            >
+          </a>
+        </li>
+        <li class="nav-item zd-menu-action">
+          <a
+            href="#"
+            data-toggle="modal"
+            data-target="#referAndSave"
+            @click.prevent
+          >
+            <i class="bx bxs-gift" data-icon="refer"></i>
+            <span class="menu-title" data-i18n="Refer & Save"
+              >Refer &amp; Save</span
+            >
+          </a>
+        </li>
+        <!-- Support : END -->
       </ul>
+    </div>
+
+    <!-- User Profile Footer (Fixed at bottom of sidebar) -->
+    <div class="zd-sidebar-user-footer">
+      <div class="zd-sidebar-user-info">
+        <div class="zd-sidebar-user-avatar">
+          <img v-if="userPicture" :src="userPicture" alt="User Avatar" />
+          <span v-else class="zd-sidebar-user-initials">{{ userInitials }}</span>
+        </div>
+        <div class="zd-sidebar-user-details">
+          <span class="zd-sidebar-user-name" :title="userName">{{ userName }}</span>
+          <span class="zd-sidebar-user-role" :title="userRole">{{ userRole }}</span>
+        </div>
+      </div>
+
+      <a class="zd-sidebar-logout" href="api/admin/logout">
+        <i class="bx bx-log-out"></i>
+        <span>Log out</span>
+      </a>
+
     </div>
   </div>
   <!-- END: Main Menu-->
@@ -767,7 +818,7 @@ import { mapActions } from "vuex";
 
 export default {
   name: "Menu",
-  props: ["application", "app_metadata"],
+  props: ["application", "app_metadata", "user_metadata"],
   data() {
     return {
       selected: undefined,
@@ -823,6 +874,41 @@ export default {
       if (this.app_metadata.role == "Super Owner") {
         return true;
       } else false;
+    },
+    userName() {
+      if (this.user_metadata && this.user_metadata.name) {
+        return this.user_metadata.name;
+      }
+      let g = window.global || this.global;
+      if (g && g.user_metadata && g.user_metadata.name) {
+        return g.user_metadata.name;
+      }
+      return "Daniel Carter";
+    },
+    userRole() {
+      if (this.user_metadata && this.user_metadata.title) {
+        return this.user_metadata.title;
+      }
+      if (this.app_metadata && this.app_metadata.role) {
+        return this.app_metadata.role;
+      }
+      return "Sales Manager";
+    },
+    userPicture() {
+      if (this.user_metadata && (this.user_metadata.picture || this.user_metadata.avatar || this.user_metadata.image)) {
+        return this.user_metadata.picture || this.user_metadata.avatar || this.user_metadata.image;
+      }
+      let g = window.global || this.global;
+      if (g && g.user_metadata && (g.user_metadata.picture || g.user_metadata.avatar)) {
+        return g.user_metadata.picture || g.user_metadata.avatar;
+      }
+      return null;
+    },
+    userInitials() {
+      const name = this.userName || "";
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      const letters = (parts[0] || "").charAt(0) + (parts[1] || "").charAt(0);
+      return letters ? letters.toUpperCase() : "DC";
     },
   },
   methods: {
@@ -928,6 +1014,11 @@ export default {
         }
       },
     );
+
+    // Disable duplicate PerfectScrollbar on menu content so only 1 styled scrollbar is rendered
+    if (window.$ && window.$.app && window.$.app.menu && window.$.app.menu.manualScroller) {
+      window.$.app.menu.manualScroller.disable();
+    }
   },
 };
 </script>
@@ -941,5 +1032,415 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+</style>
+
+<style lang="scss">
+/* ==========================================================================
+   Sidebar — modern dark navigation. Scoped to #main-menu.zd-sidebar.
+   ========================================================================== */
+#main-menu.zd-sidebar {
+  --sb-bg: #161b26;
+  --sb-bg-2: #1c2230;
+  --sb-text: #c3cad6;
+  --sb-text-strong: #ffffff;
+  --sb-muted: #6b7486;
+  --sb-hover: rgba(255, 255, 255, 0.06);
+  --sb-active-bg: rgba(90, 141, 238, 0.16);
+  --sb-active: #8fb2ff;
+  --sb-accent: #5a8dee;
+
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+  background: var(--sb-bg) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: none;
+
+  /* Brand row */
+  /* Vertically centre the logo + pin toggle inside the brand row
+     (the theme's margins pushed the logo past the bottom border). */
+  .navbar-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    height: 68px !important;
+    padding: 0 1rem 0 1.25rem !important;
+    background: var(--sb-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    > ul.nav {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      margin: 0;
+      > li.nav-item {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin: 0 !important;
+      }
+      > li.nav-toggle {
+        margin-left: auto !important;
+      }
+    }
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      margin: 0 !important;
+      padding: 0 !important;
+      img {
+        position: static !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 112px !important;
+        height: auto;
+        display: block;
+      }
+    }
+    .modern-nav-toggle {
+      display: flex;
+      align-items: center;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  }
+  .shadow-bottom {
+    display: none !important;
+  }
+  .modern-nav-toggle i {
+    color: var(--sb-muted) !important;
+    transition: color 0.15s;
+  }
+  .modern-nav-toggle:hover i,
+  .modern-nav-toggle.active i {
+    color: var(--sb-text-strong) !important;
+  }
+
+  .main-menu-content {
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 1rem;
+
+    /* Hide PerfectScrollbar so there is never a duplicate scrollbar */
+    .ps__rail-y,
+    .ps__rail-x {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* Single clean modern scrollbar */
+    &::-webkit-scrollbar {
+      width: 5px !important;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16) !important;
+      border-radius: 5px !important;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+  }
+  .navigation {
+    background: transparent !important;
+    padding-top: 0.25rem;
+  }
+
+  /* Section headings */
+  .navigation > .navigation-header {
+    margin: 1.4rem 0 0.4rem 1.6rem !important;
+    padding: 0 !important;
+    background: transparent !important;
+    span {
+      color: var(--sb-muted) !important;
+      font-size: 0.68rem !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.09em !important;
+      text-transform: uppercase;
+    }
+  }
+
+  /* Items */
+  .navigation > li.nav-item {
+    margin: 1px 0.75rem !important;
+    border-radius: 10px;
+    background: transparent !important;
+    > a {
+      position: relative;
+      display: flex !important;
+      align-items: center;
+      gap: 0.15rem;
+      min-height: 40px;
+      padding: 0.55rem 0.8rem !important;
+      border-radius: 10px !important;
+      color: var(--sb-text) !important;
+      background: transparent !important;
+      font-size: 0.92rem;
+      font-weight: 500;
+      line-height: 1.2;
+      transition: background 0.15s, color 0.15s;
+      > i:first-child {
+        flex-shrink: 0;
+        width: 22px;
+        margin-right: 0.75rem !important;
+        font-size: 1.25rem !important;
+        line-height: 1;
+        color: var(--sb-muted) !important;
+        transition: color 0.15s;
+        /* keep icons still; the theme's bx-tada animation is distracting in a list */
+        animation: none !important;
+        transform: none !important;
+      }
+      .menu-title {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        flex: 1 1 auto;
+        min-width: 0;
+        color: inherit !important;
+      }
+      .bxs-lock {
+        font-size: 0.95rem !important;
+        color: var(--sb-muted) !important;
+        opacity: 0.8;
+      }
+    }
+    &:hover > a {
+      background: var(--sb-hover) !important;
+      color: var(--sb-text-strong) !important;
+      > i:first-child {
+        color: var(--sb-text-strong) !important;
+      }
+    }
+    /* Active route */
+    &.active > a,
+    &.router-link-exact-active > a {
+      background: var(--sb-active-bg) !important;
+      color: var(--sb-text-strong) !important;
+      box-shadow: none !important;
+      > i:first-child {
+        color: var(--sb-active) !important;
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        left: -0.75rem;
+        top: 8px;
+        bottom: 8px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: var(--sb-accent);
+      }
+    }
+    /* Locked / unavailable modules */
+    &[disabled="true"] > a,
+    &[style*="not-allowed"] > a {
+      color: var(--sb-muted) !important;
+      &:hover {
+        background: transparent !important;
+      }
+    }
+    /* Sub menus (Super / Import settings) */
+    > ul {
+      margin: 0.15rem 0 0.25rem;
+      padding: 0;
+      background: transparent !important;
+      li > a {
+        display: flex !important;
+        align-items: center;
+        padding: 0.45rem 0.8rem 0.45rem 2.4rem !important;
+        border-radius: 8px;
+        color: var(--sb-text) !important;
+        font-size: 0.87rem;
+        background: transparent !important;
+        i {
+          margin-right: 0.5rem;
+          color: var(--sb-muted) !important;
+        }
+        &:hover {
+          background: var(--sb-hover) !important;
+          color: var(--sb-text-strong) !important;
+        }
+      }
+      li.active > a,
+      li.router-link-exact-active > a {
+        color: var(--sb-active) !important;
+        background: transparent !important;
+      }
+    }
+  }
+
+  /* Support actions */
+  .zd-menu-action > a {
+    cursor: pointer;
+  }
+  .zd-menu-badge {
+    margin-left: auto;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(40, 199, 111, 0.16);
+    color: #5fd99a;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* User profile footer (fixed at bottom of sidebar) */
+  .zd-sidebar-user-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--sb-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+
+    .zd-sidebar-user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .zd-sidebar-user-avatar {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #5a8dee;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .zd-sidebar-user-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+
+      .zd-sidebar-user-name {
+        color: var(--sb-text-strong);
+        font-weight: 600;
+        font-size: 0.92rem;
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .zd-sidebar-user-role {
+        color: var(--sb-muted);
+        font-size: 0.78rem;
+        line-height: 1.2;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .zd-sidebar-logout {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: var(--sb-text);
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.15s;
+      width: fit-content;
+
+      i {
+        font-size: 1.2rem;
+        color: var(--sb-text);
+        transition: color 0.15s;
+      }
+
+      &:hover {
+        color: var(--sb-text-strong);
+        i {
+          color: var(--sb-text-strong);
+        }
+      }
+    }
+  }
+}
+
+/* Collapsed (icon-only) mode keeps the theme behaviour; just centre the icons */
+body.menu-collapsed #main-menu.zd-sidebar:not(:hover) {
+  .zd-sidebar-user-footer {
+    padding: 0.75rem 0.5rem;
+    align-items: center;
+
+    .zd-sidebar-user-details,
+    .zd-sidebar-logout span {
+      display: none !important;
+    }
+
+    .zd-sidebar-logout {
+      width: auto;
+      justify-content: center;
+    }
+  }
+  /* show only the logo mark, centred */
+  .navbar-header {
+    width: 100% !important;
+    padding: 0 !important;
+    justify-content: center;
+    > ul.nav {
+      justify-content: center;
+      flex: 0 0 auto;
+      > li.nav-toggle {
+        display: none !important;
+      }
+    }
+    .navbar-brand {
+      width: 46px;
+      overflow: hidden;
+    }
+  }
+  .navigation > .navigation-header {
+    margin-left: 0 !important;
+    text-align: center;
+  }
+  .navigation > li.nav-item {
+    margin: 1px 0.5rem !important;
+    > a {
+      justify-content: center;
+      > i:first-child {
+        margin-right: 0 !important;
+      }
+      .menu-title,
+      .zd-menu-badge {
+        display: none !important;
+      }
+      &::before {
+        left: -0.5rem;
+      }
+    }
+  }
 }
 </style>

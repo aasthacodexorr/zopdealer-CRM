@@ -17,128 +17,85 @@
       aria-labelledby="Accept Payment"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
         <div class="modal-content">
           <!-- Modal Header : START -->
-          <div class="modal-header">
-            <h5 class="modal-title" id="paymentHeader">Payment</h5>
-            <button
-              type="button"
-              id="paymentClose"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <!-- Modal Header : END -->
-          <!-- Modal Body : START -->
-          <div class="modal-body">
-            <form class="webapp-form">
-              <div class="form-row">
-                <h6
-                  class="form-group col-md-12 font-italic"
-                  v-if="form.type === 'Credit' && form.mode === 'Online'"
-                >
-                  Payment link will open in next tab. This link can be shared
-                  with the customer and valid for only 5 minutes.
-                </h6>
-                <h6 class="form-group col-md-12 font-italic">
+          <div class="ap-header">
+            <div class="ap-heading">
+              <span class="ap-header-icon"><i class="bx bx-credit-card"></i></span>
+              <div>
+                <h5 class="ap-title" id="paymentHeader">Payment</h5>
+                <p class="ap-subtitle">
                   You can log the payment that has been collected or refunded.
                   To accept payment online, select Type as Credit and Mode as
                   Online. If Online option is not available, please contact our
                   Support.
-                </h6>
-                <!-- Date : START -->
-                <div class="form-group col-md-6" v-show="!showStripeAction">
-                  <label for="payment_date">Date : </label>
-                  <fieldset
-                    class="has-icon-left"
-                    style="position: relative"
-                    id="payment_date"
-                  >
-                    <date-picker
-                      v-model="form.date"
-                      :format="'MM/DD/YYYY'"
-                      :value-type="'MM/DD/YYYY'"
-                      :class="{
-                        'is-invalid': errors.hasOwnProperty('date'),
-                      }"
-                      @change="delete errors.date"
-                      :title="errors.date"
-                      :clearable="false"
-                    ></date-picker>
-                  </fieldset>
-                </div>
-                <!-- Date : END -->
-                <!-- Name : START -->
-                <div class="form-group col-md-6">
-                  <label for="payment_name">Full Name: </label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('name'),
-                    }"
-                    @keyup="delete errors.name"
-                    :title="errors.name"
-                    v-model="form.name"
-                    id="payment_name"
-                    placeholder="Name"
-                  />
-                </div>
-                <!-- Name : END -->
-                <!-- Email : START -->
-                <div class="form-group col-md-6">
-                  <label for="payment_email">Email: </label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('email'),
-                    }"
-                    @keyup="delete errors.email"
-                    :title="errors.email"
-                    v-model="form.email"
-                    id="payment_email"
-                    placeholder="Email"
-                  />
-                </div>
-                <!-- Email : END -->
-                <!-- Phone : START -->
-                <div class="form-group col-md-6">
-                  <label for="payment_phone">Phone No (10 Digits): </label>
-                  <input
-                    type="tel"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('phone'),
-                    }"
-                    @keyup="delete errors.phone"
-                    :title="errors.phone"
-                    v-model="form.phone"
-                    id="payment_phone"
-                    placeholder="Phone"
-                  />
-                </div>
-                <!-- Phone : END -->
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              id="paymentClose"
+              class="ap-close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bx bx-x"></i>
+            </button>
+          </div>
+          <!-- Modal Header : END -->
+          <!-- Modal Body : START -->
+          <div class="modal-body ap-body">
+            <form class="webapp-form" @submit.prevent>
+              <div
+                class="ap-banner"
+                v-if="form.type === 'Credit' && form.mode === 'Online'"
+              >
+                <i class="bx bx-link"></i>
+                <span
+                  >Payment link will open in next tab. This link can be shared
+                  with the customer and valid for only 5 minutes.</span
+                >
+              </div>
+
+              <!-- Section: Payment : START -->
+              <div class="ap-section">
+                <p class="ap-section-title">Payment</p>
+
                 <!-- Type : START -->
-                <div class="form-group col-md-6">
-                  <label for="payment_type">Type: </label>
+                <div class="ap-field">
+                  <label class="ap-label" for="payment_type">Type</label>
+                  <div class="ap-chips" role="radiogroup" aria-label="Payment type">
+                    <button
+                      type="button"
+                      class="ap-chip"
+                      v-for="payment_type in getTypes"
+                      :key="'chip_' + payment_type"
+                      :class="{ active: form.type === payment_type }"
+                      role="radio"
+                      :aria-checked="form.type === payment_type"
+                      @click="
+                        form.type = payment_type;
+                        delete errors.type;
+                      "
+                    >
+                      <i class="bx" :class="typeIcon(payment_type)"></i>
+                      {{ payment_type }}
+                    </button>
+                  </div>
                   <select
-                    class="custom-select form-control"
+                    class="d-none"
                     v-model="form.type"
                     id="payment_type"
                     name="payment_type"
+                    tabindex="-1"
+                    aria-hidden="true"
                     :class="{
                       'is-invalid': errors.hasOwnProperty('type'),
                     }"
                     @change="delete errors.type"
                   >
-                    <option value="" selected="" disabled="">
-                      - Payment Types -
-                    </option>
+                    <option value="" disabled="">- Payment Types -</option>
                     <option
                       :value="payment_type"
                       v-for="payment_type in getTypes"
@@ -147,172 +104,374 @@
                       {{ payment_type }}
                     </option>
                   </select>
+                  <small class="ap-error" v-if="errors.type">{{ errors.type }}</small>
                 </div>
                 <!-- Type : END -->
-                <!-- Mode : START -->
-                <div class="form-group col-md-6" v-show="form.type !== 'Cash'">
-                  <label for="payment_mode">Mode: </label>
-                  <select
-                    class="custom-select form-control"
-                    v-model="form.mode"
-                    id="payment_mode"
-                    name="payment_mode"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('mode'),
-                    }"
-                    @change="delete errors.mode"
-                  >
-                    <option value="" selected="" disabled="">
-                      - Payment Modes -
-                    </option>
-                    <option
-                      :value="payment_mode"
-                      v-for="payment_mode in getModes"
-                      :disabled="
-                        payment_mode === `Online` &&
-                        !isOnlinePaymentModuleAvailable
-                      "
-                      :key="payment_mode"
-                    >
-                      {{ payment_mode }}
-                    </option>
-                  </select>
-                </div>
-                <!-- Mode : END -->
-                <!-- Transaction ID : START -->
-                <div
-                  class="form-group col-md-6"
-                  v-show="!showStripeAction && form.type !== 'Cash'"
-                >
-                  <label for="payment_transaction_id">Transaction #: </label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('transaction_id'),
-                    }"
-                    @keyup="delete errors.transaction_id"
-                    :title="errors.transaction_id"
-                    v-model="form.transaction_id"
-                    id="payment_transaction_id"
-                    placeholder="Transaction #"
-                  />
-                </div>
-                <!-- Transaction ID : END -->
-                <!-- Receipt Number : START -->
-                <div class="form-group col-md-6" v-show="!showStripeAction">
-                  <label for="payment_receipt_number">Receipt #: </label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('receipt_number'),
-                    }"
-                    @keyup="delete errors.receipt_number"
-                    :title="errors.receipt_number"
-                    v-model="form.receipt_number"
-                    id="payment_receipt_number"
-                    placeholder="Receipt #"
-                  />
-                  <small class="form-text"
-                    >Will be autogenerated if left blank.</small
-                  >
-                </div>
-                <!-- Receipt Number : END -->
 
-                <!-- Reason : START -->
-                <div class="form-group col-md-6">
-                  <label for="reason">Reason</label>
-                  <v-select
-                    id="payment_reason"
-                    placeholder="Reason"
-                    taggable
-                    v-model="form.reason"
-                    clearable
-                    :options="getReasons"
-                  >
-                  </v-select>
-                  <small
-                    id="reason-error"
-                    class="form-text invalid-feedback"
-                  ></small>
+                <div class="ap-grid">
+                  <!-- Mode : START -->
+                  <div class="ap-field" v-show="form.type !== 'Cash'">
+                    <label class="ap-label" for="payment_mode">Mode</label>
+                    <div class="ap-segmented" role="radiogroup" aria-label="Payment mode">
+                      <button
+                        type="button"
+                        class="ap-segment"
+                        v-for="payment_mode in getModes"
+                        :key="'mode_' + payment_mode"
+                        :class="{ active: form.mode === payment_mode }"
+                        :disabled="
+                          payment_mode === `Online` &&
+                          !isOnlinePaymentModuleAvailable
+                        "
+                        :title="
+                          payment_mode === `Online` &&
+                          !isOnlinePaymentModuleAvailable
+                            ? 'Online payments are not enabled for this account'
+                            : ''
+                        "
+                        role="radio"
+                        :aria-checked="form.mode === payment_mode"
+                        @click="
+                          form.mode = payment_mode;
+                          delete errors.mode;
+                        "
+                      >
+                        <i
+                          class="bx"
+                          :class="payment_mode === 'Online' ? 'bx-globe' : 'bx-store'"
+                        ></i>
+                        {{ payment_mode }}
+                      </button>
+                    </div>
+                    <select
+                      class="d-none"
+                      v-model="form.mode"
+                      id="payment_mode"
+                      name="payment_mode"
+                      tabindex="-1"
+                      aria-hidden="true"
+                      :class="{
+                        'is-invalid': errors.hasOwnProperty('mode'),
+                      }"
+                      @change="delete errors.mode"
+                    >
+                      <option value="" disabled="">- Payment Modes -</option>
+                      <option
+                        :value="payment_mode"
+                        v-for="payment_mode in getModes"
+                        :disabled="
+                          payment_mode === `Online` &&
+                          !isOnlinePaymentModuleAvailable
+                        "
+                        :key="payment_mode"
+                      >
+                        {{ payment_mode }}
+                      </option>
+                    </select>
+                    <small class="ap-error" v-if="errors.mode">{{ errors.mode }}</small>
+                  </div>
+                  <!-- Mode : END -->
+
+                  <!-- Status : START -->
+                  <div class="ap-field" v-show="!showStripeAction">
+                    <label class="ap-label" for="payment_status">Status</label>
+                    <div class="ap-segmented" role="radiogroup" aria-label="Payment status">
+                      <button
+                        type="button"
+                        class="ap-segment"
+                        v-for="payment_status in getPaymentStatuses"
+                        :key="'status_' + payment_status"
+                        :class="[
+                          { active: form.status === payment_status },
+                          payment_status === 'Refund' ? 'is-refund' : '',
+                        ]"
+                        role="radio"
+                        :aria-checked="form.status === payment_status"
+                        @click="
+                          form.status = payment_status;
+                          delete errors.status;
+                        "
+                      >
+                        <i
+                          class="bx"
+                          :class="payment_status === 'Refund' ? 'bx-undo' : 'bx-down-arrow-alt'"
+                        ></i>
+                        {{ payment_status }}
+                      </button>
+                    </div>
+                    <select
+                      class="d-none"
+                      v-model="form.status"
+                      id="payment_status"
+                      name="payment_status"
+                      tabindex="-1"
+                      aria-hidden="true"
+                      :class="{
+                        'is-invalid': errors.hasOwnProperty('status'),
+                      }"
+                      @change="delete errors.status"
+                    >
+                      <option value="" disabled="">- Payment Status -</option>
+                      <option
+                        :value="payment_status"
+                        v-for="payment_status in getPaymentStatuses"
+                        :key="payment_status"
+                      >
+                        {{ payment_status }}
+                      </option>
+                    </select>
+                    <small class="ap-error" v-if="errors.status">{{ errors.status }}</small>
+                  </div>
+                  <!-- Status : END -->
                 </div>
-                <!-- Reason : END -->
 
                 <!-- Amount : START -->
-                <div class="form-group col-md-6">
-                  <label for="payment_amount">Amount: </label>
-                  <input
-                    type="tel"
-                    class="form-control"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('amount'),
-                    }"
-                    @keyup="delete errors.amount"
-                    :title="errors.amount"
-                    v-model="form.amount"
-                    id="payment_amount"
-                    placeholder="Amount"
-                  />
+                <div class="ap-field mb-0">
+                  <label class="ap-label" for="payment_amount">Amount</label>
+                  <div
+                    class="ap-amount"
+                    :class="{ 'is-invalid': errors.hasOwnProperty('amount') }"
+                  >
+                    <span class="ap-amount-prefix">$</span>
+                    <input
+                      type="tel"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': errors.hasOwnProperty('amount'),
+                      }"
+                      @keyup="delete errors.amount"
+                      :title="errors.amount"
+                      v-model="form.amount"
+                      id="payment_amount"
+                      placeholder="0.00"
+                      inputmode="decimal"
+                    />
+                  </div>
+                  <small class="ap-error" v-if="errors.amount">{{ errors.amount }}</small>
                 </div>
                 <!-- Amount : END -->
-                <!-- Status : START -->
-                <div class="form-group col-md-6" v-show="!showStripeAction">
-                  <label for="payment_status">Status: </label>
-                  <select
-                    class="custom-select form-control"
-                    v-model="form.status"
-                    id="payment_status"
-                    name="payment_status"
-                    :class="{
-                      'is-invalid': errors.hasOwnProperty('status'),
-                    }"
-                    @change="delete errors.status"
-                  >
-                    <option value="" selected="" disabled="">
-                      - Payment Status -
-                    </option>
-                    <option
-                      :value="payment_status"
-                      v-for="payment_status in getPaymentStatuses"
-                      :key="payment_status"
-                    >
-                      {{ payment_status }}
-                    </option>
-                  </select>
-                </div>
-                <!-- Status : END -->
               </div>
+              <!-- Section: Payment : END -->
+
+              <!-- Section: Customer : START -->
+              <div class="ap-section">
+                <p class="ap-section-title">Customer</p>
+                <div class="ap-grid">
+                  <!-- Name : START -->
+                  <div class="ap-field ap-span-2">
+                    <label class="ap-label" for="payment_name"
+                      >Full Name <span class="ap-required">*</span></label
+                    >
+                    <div class="ap-input-icon">
+                      <i class="bx bx-user"></i>
+                      <input
+                        type="text"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': errors.hasOwnProperty('name'),
+                        }"
+                        @keyup="delete errors.name"
+                        :title="errors.name"
+                        v-model="form.name"
+                        id="payment_name"
+                        placeholder="Name"
+                      />
+                    </div>
+                    <small class="ap-error" v-if="errors.name">{{ errors.name }}</small>
+                  </div>
+                  <!-- Name : END -->
+                  <!-- Email : START -->
+                  <div class="ap-field">
+                    <label class="ap-label" for="payment_email">Email</label>
+                    <div class="ap-input-icon">
+                      <i class="bx bx-envelope"></i>
+                      <input
+                        type="email"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': errors.hasOwnProperty('email'),
+                        }"
+                        @keyup="delete errors.email"
+                        :title="errors.email"
+                        v-model="form.email"
+                        id="payment_email"
+                        placeholder="Email"
+                      />
+                    </div>
+                    <small class="ap-error" v-if="errors.email">{{ errors.email }}</small>
+                  </div>
+                  <!-- Email : END -->
+                  <!-- Phone : START -->
+                  <div class="ap-field">
+                    <label class="ap-label" for="payment_phone"
+                      >Phone <span class="ap-hint">(10 digits)</span></label
+                    >
+                    <div class="ap-input-icon">
+                      <i class="bx bx-phone"></i>
+                      <input
+                        type="tel"
+                        class="form-control"
+                        :class="{
+                          'is-invalid': errors.hasOwnProperty('phone'),
+                        }"
+                        @keyup="delete errors.phone"
+                        :title="errors.phone"
+                        v-model="form.phone"
+                        id="payment_phone"
+                        placeholder="Phone"
+                      />
+                    </div>
+                    <small class="ap-error" v-if="errors.phone">{{ errors.phone }}</small>
+                  </div>
+                  <!-- Phone : END -->
+                </div>
+              </div>
+              <!-- Section: Customer : END -->
+
+              <!-- Section: Details : START -->
+              <div class="ap-section">
+                <p class="ap-section-title">Details</p>
+                <div class="ap-grid">
+                  <!-- Date : START -->
+                  <div class="ap-field" v-show="!showStripeAction">
+                    <label class="ap-label" for="payment_date">Date</label>
+                    <fieldset
+                      class="ap-date"
+                      style="position: relative"
+                      id="payment_date"
+                    >
+                      <date-picker
+                        v-model="form.date"
+                        :format="'MM/DD/YYYY'"
+                        :value-type="'MM/DD/YYYY'"
+                        :class="{
+                          'is-invalid': errors.hasOwnProperty('date'),
+                        }"
+                        @change="delete errors.date"
+                        :title="errors.date"
+                        :clearable="false"
+                      ></date-picker>
+                    </fieldset>
+                    <small class="ap-error" v-if="errors.date">{{ errors.date }}</small>
+                  </div>
+                  <!-- Date : END -->
+
+                  <!-- Reason : START -->
+                  <div class="ap-field">
+                    <label class="ap-label" for="reason">Reason</label>
+                    <v-select
+                      id="payment_reason"
+                      placeholder="Select or type a reason"
+                      taggable
+                      v-model="form.reason"
+                      clearable
+                      :options="getReasons"
+                    >
+                    </v-select>
+                    <small
+                      id="reason-error"
+                      class="form-text invalid-feedback"
+                    ></small>
+                  </div>
+                  <!-- Reason : END -->
+
+                  <!-- Transaction ID : START -->
+                  <div
+                    class="ap-field"
+                    v-show="!showStripeAction && form.type !== 'Cash'"
+                  >
+                    <label class="ap-label" for="payment_transaction_id"
+                      >Transaction #</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': errors.hasOwnProperty('transaction_id'),
+                      }"
+                      @keyup="delete errors.transaction_id"
+                      :title="errors.transaction_id"
+                      v-model="form.transaction_id"
+                      id="payment_transaction_id"
+                      placeholder="Transaction #"
+                    />
+                    <small class="ap-error" v-if="errors.transaction_id">{{
+                      errors.transaction_id
+                    }}</small>
+                  </div>
+                  <!-- Transaction ID : END -->
+
+                  <!-- Receipt Number : START -->
+                  <div class="ap-field" v-show="!showStripeAction">
+                    <label class="ap-label" for="payment_receipt_number"
+                      >Receipt #</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      :class="{
+                        'is-invalid': errors.hasOwnProperty('receipt_number'),
+                      }"
+                      @keyup="delete errors.receipt_number"
+                      :title="errors.receipt_number"
+                      v-model="form.receipt_number"
+                      id="payment_receipt_number"
+                      placeholder="Receipt #"
+                    />
+                    <small class="ap-help">Will be autogenerated if left blank.</small>
+                    <small class="ap-error" v-if="errors.receipt_number">{{
+                      errors.receipt_number
+                    }}</small>
+                  </div>
+                  <!-- Receipt Number : END -->
+                </div>
+              </div>
+              <!-- Section: Details : END -->
             </form>
           </div>
           <!-- Modal Body : END -->
           <!-- Modal Footer : START -->
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              v-if="showStripeAction"
-              @click.prevent="paymentOnlineForm"
-              :disabled="form.name == '' || form.amount < 1"
-            >
-              Payment Link
-            </button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              v-else
-              @click.prevent="savePayment"
-              :disabled="form.name == '' || form.amount < 1"
-            >
-              Add Log
-            </button>
+          <div class="ap-footer">
+            <div class="ap-summary">
+              <span class="ap-summary-label">{{
+                showStripeAction ? "Payment link for" : form.status === "Refund" ? "Refund" : "Charge"
+              }}</span>
+              <span
+                class="ap-summary-amount"
+                :class="{ 'is-refund': form.status === 'Refund' && !showStripeAction }"
+                >{{ formattedAmount }}</span
+              >
+              <span class="ap-summary-meta"
+                >{{ form.type }}<template v-if="form.type !== 'Cash'"> · {{ form.mode }}</template></span
+              >
+            </div>
+            <div class="ap-footer-actions">
+              <button
+                type="button"
+                class="btn ap-ghost-btn"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary ap-primary-btn"
+                v-if="showStripeAction"
+                @click.prevent="paymentOnlineForm"
+                :disabled="form.name == '' || form.amount < 1"
+              >
+                <i class="bx bx-link-external"></i> Payment Link
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary ap-primary-btn"
+                v-else
+                @click.prevent="savePayment"
+                :disabled="form.name == '' || form.amount < 1"
+              >
+                <i class="bx bx-check"></i> Add Log
+              </button>
+            </div>
           </div>
           <!-- Modal Footer : END -->
         </div>
@@ -426,10 +585,34 @@ export default {
     isOnlinePaymentModuleAvailable() {
       return this.global.stripe_account.length > 1;
     },
+    formattedAmount() {
+      const value = parseFloat(this.form.amount);
+      return this.$helpers.moneyFormatter(isNaN(value) ? 0 : value);
+    },
   },
   methods: {
     ...mapActions("payment", ["getPaymentConfigurations"]),
     ...mapActions("paymentView", ["commitOnlyEntities"]),
+    typeIcon(type) {
+      switch (type) {
+        case "Cash":
+          return "bx-money";
+        case "Credit":
+          return "bx-credit-card";
+        case "Bank Transfer":
+        case "ACH":
+        case "Draft":
+          return "bxs-bank";
+        case "Cheque":
+          return "bx-receipt";
+        case "Email Transfer":
+          return "bx-envelope";
+        case "Store Credit":
+          return "bx-store";
+        default:
+          return "bx-wallet";
+      }
+    },
     async getGlobalConfiguration() {
       let request_url =
         window.location.origin + "/api/business/configurations/global";
@@ -592,36 +775,454 @@ select {
 }
 </style>
 <style lang="scss">
-#paymentModal .webapp-form .form-group input {
-  height: calc(1.4em + 0.94rem + 3.7px);
-  margin-top: 0;
-}
+/* ==========================================================================
+   Payment modal (AcceptPayment). Scoped to #paymentModal.
+   ========================================================================== */
+#paymentModal {
+  --ap-border: #e6eaf0;
+  --ap-surface: #ffffff;
+  --ap-bg: #f6f8fb;
+  --ap-text: #1f2937;
+  --ap-text-2: #4b5563;
+  --ap-muted: #8a94a6;
+  --ap-primary: #5a8dee;
+  --ap-primary-soft: #eef4ff;
 
-#paymentModal .webapp-form .form-group .vs__dropdown-toggle {
-  padding: 0px;
-}
+  .modal-dialog {
+    max-width: 760px;
+  }
+  .modal-content {
+    border: 1px solid var(--ap-border);
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    overflow: hidden;
+  }
 
-#paymentModal .vdpComponent {
-  width: 100%;
-}
-#paymentModal .vdpComponent input {
-  display: block;
-  width: 100%;
-  height: calc(1.4em + 0.94rem + 3.7px);
-  padding: 0.47rem 0.8rem;
-  padding-right: 0.8rem;
-  padding-left: 2.2em !important;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.4;
-  color: #475f7b;
-  background-color: #ffffff;
-  background-clip: padding-box;
-  border: 1px solid #dfe3e7;
-  border-radius: 0.267rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-#paymentModal .vdpComponent.is-invalid input {
-  border-color: #ff5b5c;
+  /* Header */
+  .ap-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.2rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--ap-border);
+  }
+  .ap-heading {
+    display: flex;
+    gap: 0.85rem;
+  }
+  .ap-header-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    background: #e3f6e8;
+    color: #1e8a43;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+  }
+  .ap-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ap-text);
+  }
+  .ap-subtitle {
+    margin: 0.2rem 0 0;
+    max-width: 560px;
+    font-size: 0.83rem;
+    line-height: 1.45;
+    color: var(--ap-muted);
+  }
+  .ap-close {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--ap-muted);
+    font-size: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    &:hover {
+      background: #f1f4f8;
+      color: var(--ap-text);
+    }
+  }
+
+  /* Body */
+  .ap-body {
+    padding: 0;
+  }
+  .ap-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 1rem 1.5rem 0;
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
+    background: var(--ap-primary-soft);
+    color: #2f62d6;
+    font-size: 0.85rem;
+    i {
+      font-size: 1.15rem;
+      margin-top: 0.05rem;
+    }
+  }
+  .ap-section {
+    padding: 1.1rem 1.5rem 1.2rem;
+    border-bottom: 1px solid var(--ap-border);
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+  .ap-section-title {
+    margin: 0 0 0.85rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ap-muted);
+  }
+  .ap-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 1rem;
+  }
+  .ap-span-2 {
+    grid-column: 1 / -1;
+  }
+  .ap-field {
+    margin-bottom: 1rem;
+  }
+  .ap-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ap-text-2);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .ap-hint {
+    color: var(--ap-muted);
+    font-weight: 400;
+  }
+  .ap-required {
+    color: #c23434;
+  }
+  .ap-help {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--ap-muted);
+  }
+  .ap-error {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    color: #c23434;
+  }
+
+  /* Inputs */
+  .webapp-form .form-control,
+  .webapp-form input.form-control {
+    height: 44px;
+    margin-top: 0;
+    border: 1px solid var(--ap-border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--ap-text);
+    box-shadow: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    &:hover {
+      border-color: #d6dce5;
+    }
+    &:focus {
+      border-color: var(--ap-primary);
+      box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.15);
+    }
+    &.is-invalid {
+      border-color: #e05252;
+      background-image: none;
+    }
+  }
+  .ap-input-icon {
+    position: relative;
+    > i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ap-muted);
+      font-size: 1.1rem;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .form-control {
+      padding-left: 2.4rem;
+    }
+  }
+
+  /* Type chips */
+  .ap-chips {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  .ap-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    height: 40px;
+    padding: 0 0.5rem;
+    border: 1px solid var(--ap-border);
+    border-radius: 10px;
+    background: var(--ap-surface);
+    color: var(--ap-text-2);
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    i {
+      font-size: 1.05rem;
+      color: var(--ap-muted);
+    }
+    &:hover {
+      border-color: #d6dce5;
+      color: var(--ap-text);
+    }
+    &.active {
+      border-color: var(--ap-primary);
+      background: var(--ap-primary-soft);
+      color: var(--ap-primary);
+      box-shadow: 0 0 0 1px var(--ap-primary) inset;
+      i {
+        color: var(--ap-primary);
+      }
+    }
+  }
+
+  /* Segmented (mode / status) */
+  .ap-segmented {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 12px;
+    background: #f1f4f8;
+  }
+  .ap-segment {
+    flex: 1 1 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    height: 36px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--ap-text-2);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    i {
+      font-size: 1.05rem;
+    }
+    &:hover:not(:disabled) {
+      color: var(--ap-text);
+    }
+    &.active {
+      background: var(--ap-surface);
+      color: var(--ap-primary);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+    }
+    &.active.is-refund {
+      color: #c23434;
+    }
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  /* Amount */
+  .ap-amount {
+    position: relative;
+    max-width: 320px;
+    .ap-amount-prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--ap-muted);
+      pointer-events: none;
+      z-index: 1;
+    }
+    input.form-control {
+      height: 52px;
+      padding-left: 2.1rem;
+      font-size: 1.4rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  /* Date picker */
+  .ap-date {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    .mx-datepicker {
+      width: 100%;
+    }
+    .mx-input {
+      height: 44px;
+      padding: 0 2.2rem 0 0.9rem;
+      border: 1px solid var(--ap-border);
+      border-radius: 10px;
+      box-shadow: none;
+      font-size: 0.95rem;
+      color: var(--ap-text);
+      &:hover {
+        border-color: #d6dce5;
+      }
+      &:focus {
+        border-color: var(--ap-primary);
+        box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.15);
+      }
+    }
+    .is-invalid .mx-input {
+      border-color: #e05252;
+    }
+  }
+
+  /* Reason (v-select) */
+  .v-select {
+    .vs__dropdown-toggle {
+      min-height: 44px;
+      padding: 0 0.4rem;
+      border: 1px solid var(--ap-border);
+      border-radius: 10px;
+      background: var(--ap-surface);
+    }
+    &.vs--open .vs__dropdown-toggle {
+      border-color: var(--ap-primary);
+      box-shadow: 0 0 0 3px rgba(90, 141, 238, 0.15);
+    }
+    .vs__search,
+    .vs__selected {
+      font-size: 0.95rem;
+      color: var(--ap-text);
+    }
+    .vs__search::placeholder {
+      color: var(--ap-muted);
+    }
+    .vs__dropdown-menu {
+      border: 1px solid var(--ap-border);
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+      margin-top: 4px;
+    }
+    .vs__dropdown-option--highlight {
+      background: var(--ap-primary-soft);
+      color: var(--ap-primary);
+    }
+  }
+
+  /* Footer */
+  .ap-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.9rem 1.5rem;
+    border-top: 1px solid var(--ap-border);
+    background: var(--ap-bg);
+    border-radius: 0 0 16px 16px;
+  }
+  .ap-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .ap-summary-label {
+    font-size: 0.85rem;
+    color: var(--ap-muted);
+  }
+  .ap-summary-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ap-text);
+    font-variant-numeric: tabular-nums;
+    &.is-refund {
+      color: #c23434;
+    }
+  }
+  .ap-summary-meta {
+    font-size: 0.85rem;
+    color: var(--ap-text-2);
+  }
+  .ap-footer-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+  .ap-primary-btn {
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 1.15rem;
+    border-radius: 10px;
+    font-weight: 500;
+    line-height: 1;
+    i {
+      position: static;
+      top: 0;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  .ap-ghost-btn {
+    height: 40px;
+    padding: 0 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--ap-border);
+    background: var(--ap-surface);
+    color: var(--ap-text-2);
+    font-weight: 500;
+    &:hover {
+      background: #fff;
+      color: var(--ap-text);
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .ap-chips {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .ap-grid {
+      grid-template-columns: 1fr;
+    }
+    .ap-amount {
+      max-width: none;
+    }
+  }
 }
 </style>

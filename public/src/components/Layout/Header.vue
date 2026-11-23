@@ -1,7 +1,7 @@
 <template>
   <article>
     <nav
-      class="header-navbar main-header-navbar navbar-expand-lg navbar navbar-with-menu fixed-top"
+      class="header-navbar main-header-navbar zd-topbar navbar-expand-lg navbar navbar-with-menu fixed-top"
     >
       <div class="navbar-wrapper">
         <div class="navbar-container content">
@@ -24,18 +24,16 @@
                 <router-link
                   tag="li"
                   :to="{ name: 'calendar' }"
-                  class="nav-item d-none d-lg-block mr-1"
+                  class="nav-item zd-icon-item d-none d-lg-block"
                   data-toggle="tooltip"
-                  data-placement="top"
+                  data-placement="bottom"
                   title="Calendar"
-                  style="position: relative"
                   exact
                 >
                   <i class="ficon bx bx-calendar-alt"></i>
                   <span
                     v-if="getTodayCount != 0"
-                    class="badge badge-pill badge-danger badge-up"
-                    style="top: -5px; right: -7px"
+                    class="badge badge-pill badge-danger badge-up zd-count"
                     >{{ getTodayCount }}</span
                   >
                 </router-link>
@@ -43,27 +41,29 @@
                 <router-link
                   tag="li"
                   :to="{ name: 'sms' }"
-                  class="nav-item d-none d-lg-block"
+                  class="nav-item zd-icon-item d-none d-lg-block"
                   data-toggle="tooltip"
-                  data-placement="top"
+                  data-placement="bottom"
                   title="SMS"
-                  style="position: relative; cursor: pointer"
                   exact
                 >
                   <i class="ficon bx bxs-message"></i>
                   <span
                     v-if="unReadSMS != 0"
-                    class="badge badge-pill badge-danger badge-up"
-                    style="top: -5px; right: -7px"
+                    class="badge badge-pill badge-danger badge-up zd-count"
                     >{{ unReadSMS }}</span
                   >
                 </router-link>
 
-                <li class="nav-item d-none d-lg-block ml-1">
+                <li
+                  class="nav-item zd-icon-item d-none d-lg-block"
+                  title="Calculator"
+                >
                   <a
                     type="button"
                     data-toggle="modal"
                     data-target="#universalCalculator"
+                    aria-label="Calculator"
                   >
                     <i class="ficon bx bxs-calculator"></i>
                   </a>
@@ -72,14 +72,15 @@
                 <router-link
                   tag="li"
                   :to="{ name: 'voucher-list' }"
-                  class="nav-item d-none d-lg-block ml-1"
+                  class="nav-item zd-icon-item d-none d-lg-block"
+                  title="Vouchers"
                   exact
                 >
                   <i class="ficon bx bxs-coupon"></i>
                 </router-link>
               </ul>
             </div>
-            <ul class="nav navbar-nav float-right">
+            <ul class="nav navbar-nav float-right zd-actions">
               <li
                 class="nav-item d-none d-md-inline-block d-lg-inline-block"
                 v-if="
@@ -90,7 +91,7 @@
                 "
               >
                 <a
-                  class="dropdown-item text-danger"
+                  class="dropdown-item zd-action zd-action--danger"
                   type="button"
                   data-toggle="modal"
                   data-target="#overDueInvoiceModal"
@@ -98,88 +99,36 @@
                     class="bx bxs-credit-card mr-50"
                     style="vertical-align: middle"
                   ></i>
-                  <span class="">OVERDUE INVOICE(S)</span>
+                  <span>Overdue Invoice(s)</span>
                 </a>
               </li>
-              <li class="nav-item d-none d-md-inline-block d-lg-inline-block">
-                <router-link
-                    tag="a"
-                    class="dropdown-item btn-success"
-                    type="button"
-                    :to="{ name: 'download-center' }"
-                    exact
-                ><i
-                    class="bx bxs-download mr-50"
-                    style="vertical-align: middle"
-                ></i>
-                  <span class="">DOWNLOADS</span>
-                </router-link>
-              </li>
-              <li class="nav-item d-none d-md-inline-block d-lg-inline-block">
-                <a
-                  class="dropdown-item"
-                  type="button"
-                  data-toggle="modal"
-                  data-target="#helpCenter"
-                  href="https://help.zopmedia.com/portal/en/home"
-                  ><i
-                    class="bx bx-support mr-50"
-                    style="vertical-align: middle"
-                  ></i>
-                  <span class="">CUSTOMER SUPPORT</span>
+              <!-- Call Icon Button Only -->
+              <li
+                v-if="sms.sms_phone_number != null"
+                class="nav-item zd-call-item"
+                :title="`Call: ${formatNumber}`"
+                @click="copyPhoneNumber"
+              >
+                <a class="nav-link p-0" type="button" aria-label="Call">
+                  <i class="ficon bx bxs-phone"></i>
                 </a>
-              </li>
-              <li class="nav-item d-none d-md-inline-block d-lg-inline-block">
-                <a
-                  class="dropdown-item"
-                  type="button"
-                  data-toggle="modal"
-                  data-target="#referAndSave"
-                  ><i
-                    class="bx bxs-gift mr-50"
-                    style="vertical-align: middle"
-                  ></i>
-                  <span class="">REFER & SAVE</span>
-                </a>
-              </li>
-              <li class="nav-item d-none">
-                <a class="dropdown-item"
-                  ><i class="bx bxs-data" style="vertical-align: middle"></i>
-                  <span class=""> {{ getAvailableSMSCredits }} </span></a
-                >
               </li>
 
-              <li class="nav-item d-none d-md-inline-block d-lg-inline-block">
+              <li class="dropdown nav-item zd-user-item">
                 <a
-                  class="dropdown-item"
-                  :href="form.business_website"
-                  target="_blank"
-                  ><i
-                    class="bx bx-link-external mr-50"
-                    style="vertical-align: middle"
-                  ></i>
-                  <span class="">VISIT WEBSITE </span></a
-                >
-              </li>
-
-              <li class="dropdown nav-item">
-                <a
-                  class="dropdown-toggle nav-link"
+                  class="dropdown-toggle nav-link zd-user"
                   id="dropdown-user"
                   href="#"
                   data-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
-                  style="padding: 0.8rem 1.6rem"
                 >
-                  <i
-                    class="bx bxs-user-rectangle mr-50"
-                    style="vertical-align: middle"
-                  ></i
-                  >{{ global.user_metadata.name.toLocaleUpperCase() }}
+                  <span class="zd-user-avatar">{{ userInitials }}</span>
+                  <span class="zd-user-name">{{ global.user_metadata.name }}</span>
+                  <i class="bx bx-chevron-down zd-user-chevron"></i>
                 </a>
                 <div
-                  class="mt-0 dropdown-menu dropdown-menu-right pb-0"
+                  class="mt-0 dropdown-menu dropdown-menu-right pb-0 zd-user-menu"
                   aria-labelledby="dropdown-user"
                 >
                   <a class="dropdown-item" @click="doCopy(rooftop_id)"
@@ -189,16 +138,31 @@
                     ></i>
                     {{ rooftop_id }}</a
                   >
-                  <a
-                    v-show="sms.sms_phone_number != null"
+
+                  <router-link
+                    tag="a"
+                    :to="{ name: 'download-center' }"
                     class="dropdown-item"
-                    @click="copyPhoneNumber"
-                    ><i
-                      class="bx bxs-phone mr-50"
+                    exact
+                  >
+                    <i
+                      class="bx bxs-download mr-50"
                       style="vertical-align: middle"
                     ></i>
-                    {{ formatNumber }}</a
+                    Downloads
+                  </router-link>
+
+                  <a
+                    class="dropdown-item"
+                    :href="form.business_website"
+                    target="_blank"
                   >
+                    <i
+                      class="bx bx-link-external mr-50"
+                      style="vertical-align: middle"
+                    ></i>
+                    Visit Website
+                  </a>
 
                   <router-link
                     tag="a"
@@ -1616,6 +1580,15 @@ export default {
     ...mapGetters("configuration", ["businessTaxSettings"]),
     ...mapGetters("calendarView", ["getTodayCount"]),
     ...mapGetters("leadResponseView", ["getLoadState"]),
+    userInitials() {
+      const name =
+        this.global && this.global.user_metadata && this.global.user_metadata.name
+          ? String(this.global.user_metadata.name).trim()
+          : "";
+      const parts = name.split(/\s+/).filter((part) => part);
+      const letters = (parts[0] || "").charAt(0) + (parts[1] || "").charAt(0);
+      return letters ? letters.toUpperCase() : "?";
+    },
     getAvailableSMSCredits() {
       return this.form.enable_sms_package == "1" &&
         this.sms.sms_phone_number !== null
@@ -2199,6 +2172,275 @@ export default {
 </script>
 
 <style>
+/* ==========================================================================
+   Top bar — modern styling. Scoped to .zd-topbar; height kept at 45px so
+   page offsets across the app are unchanged.
+   ========================================================================== */
+.zd-topbar.header-navbar {
+  background: #ffffff !important;
+  /* inset line instead of a border so the bar stays exactly 45px tall */
+  box-shadow: inset 0 -1px 0 #e6eaf0, 0 1px 2px rgba(15, 23, 42, 0.04);
+  min-height: 45px;
+}
+.zd-topbar .navbar-container {
+  background: transparent !important;
+  height: 45px;
+  display: flex;
+  align-items: center;
+}
+.zd-topbar .navbar-collapse {
+  height: 100%;
+  align-items: center;
+}
+.zd-topbar .bookmark-wrapper,
+.zd-topbar .bookmark-icons,
+.zd-topbar .zd-actions {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Left: quick-access icons */
+.zd-topbar .bookmark-icons {
+  gap: 0.25rem;
+  margin-left: 0.25rem;
+}
+.zd-topbar .zd-icon-item {
+  position: relative;
+  margin: 0 !important;
+}
+.zd-topbar .zd-icon-item > a,
+.zd-topbar a.zd-icon-item,
+.zd-topbar .zd-icon-item {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.zd-topbar .zd-icon-item:hover,
+.zd-topbar .zd-icon-item.active {
+  background: #eef4ff;
+  color: #5a8dee;
+}
+.zd-topbar .zd-icon-item .ficon {
+  font-size: 1.3rem;
+  color: inherit;
+  margin: 0;
+  position: static;
+  top: 0;
+}
+.zd-topbar .zd-icon-item > a {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+}
+.zd-topbar .zd-count {
+  top: -5px !important;
+  right: -6px !important;
+  /* flex-centre the number; theme .badge padding/line-height pushed it down and clipped it */
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px !important;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1 !important;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+}
+
+/* Right: text actions */
+.zd-topbar .zd-actions {
+  gap: 0.25rem;
+}
+.zd-topbar .zd-actions > .nav-item {
+  display: inline-flex;
+  align-items: center;
+}
+.zd-topbar .zd-action.dropdown-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 34px;
+  padding: 0 0.8rem;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  background: transparent;
+  transition: background 0.15s, color 0.15s;
+}
+.zd-topbar .zd-action.dropdown-item i {
+  margin: 0 !important;
+  font-size: 1.15rem;
+  color: #8a94a6;
+  vertical-align: middle;
+  position: static;
+  top: 0;
+  transition: color 0.15s;
+}
+.zd-topbar .zd-action.dropdown-item:hover,
+.zd-topbar .zd-action.dropdown-item:focus {
+  background: #f1f4f8;
+  color: #1f2937;
+}
+.zd-topbar .zd-action.dropdown-item:hover i {
+  color: #5a8dee;
+}
+.zd-topbar .zd-action--primary.dropdown-item {
+  background: #e3f6e8;
+  color: #1e8a43;
+}
+.zd-topbar .zd-action--primary.dropdown-item i {
+  color: #1e8a43;
+}
+.zd-topbar .zd-action--primary.dropdown-item:hover,
+.zd-topbar .zd-action--primary.dropdown-item:focus {
+  background: #cdeed7;
+  color: #176b34;
+}
+.zd-topbar .zd-action--primary.dropdown-item:hover i {
+  color: #176b34;
+}
+.zd-topbar .zd-action--danger.dropdown-item {
+  background: #fde6e6;
+  color: #c23434;
+}
+.zd-topbar .zd-action--danger.dropdown-item i {
+  color: #c23434;
+}
+.zd-topbar .zd-action--danger.dropdown-item:hover {
+  background: #fbd3d3;
+  color: #a12626;
+}
+
+/* Call button */
+.zd-topbar .zd-call-item {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: #4b5563;
+  cursor: pointer;
+  margin-right: 0.25rem;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: #eef4ff;
+    color: #5a8dee;
+  }
+
+  i.ficon,
+  i {
+    font-size: 1.3rem;
+    color: inherit;
+    line-height: 1;
+    position: static;
+    top: 0;
+  }
+}
+
+/* User chip */
+.zd-topbar .zd-user-item {
+  margin-left: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid #e6eaf0;
+  height: 28px;
+}
+.zd-topbar .zd-user.nav-link {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  height: 36px;
+  padding: 0 0.6rem 0 0.25rem !important;
+  border-radius: 999px;
+  color: #1f2937 !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: none;
+  transition: background 0.15s;
+}
+.zd-topbar .zd-user.nav-link:hover {
+  background: #f1f4f8;
+}
+.zd-topbar .zd-user.dropdown-toggle::after {
+  display: none;
+}
+.zd-topbar .zd-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #eef4ff;
+  color: #2f62d6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.zd-topbar .zd-user-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.zd-topbar .zd-user-chevron {
+  font-size: 1.1rem;
+  color: #8a94a6;
+}
+.zd-topbar .zd-user-menu {
+  min-width: 220px;
+  margin-top: 8px !important;
+  border: 1px solid #e6eaf0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  padding-top: 0.35rem;
+  overflow: hidden;
+}
+.zd-topbar .zd-user-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+.zd-topbar .zd-user-menu .dropdown-item i {
+  font-size: 1.1rem;
+  color: #8a94a6;
+}
+.zd-topbar .zd-user-menu .dropdown-item:hover {
+  background: #f6f8fb;
+  color: #1f2937;
+}
+.zd-topbar .zd-user-menu .dropdown-item:last-child {
+  border-top: 1px solid #eef1f5;
+  color: #c23434;
+}
+.zd-topbar .zd-user-menu .dropdown-item:last-child i {
+  color: #c23434;
+}
+
+@media (max-width: 1199.98px) {
+  .zd-topbar .zd-action.dropdown-item {
+    padding: 0 0.55rem;
+    font-size: 0.85rem;
+  }
+}
+
 .integration-connector {
   display: flex;
   align-items: center;
