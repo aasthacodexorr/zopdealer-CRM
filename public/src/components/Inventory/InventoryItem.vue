@@ -21,9 +21,13 @@
       </label>
     </td>
 
-    <!-- 2. Vehicle Photo Thumbnail -->
+    <!-- 2. Vehicle Photo Thumbnail with Eye-Catching Magnifier Quick-View Icon -->
     <td class="col-photo">
-      <div class="vehicle-thumbnail-wrapper">
+      <div
+        class="vehicle-thumbnail-wrapper"
+        @click.stop="openInventoryNewTab(item.inventory_id)"
+        title="Click to open vehicle details"
+      >
         <img
           :src="thumbnailUrl"
           :alt="vehicleTitle"
@@ -34,12 +38,23 @@
         <span v-if="item.image_count > 1" class="thumbnail-count-badge">
           <i class="bx bxs-camera"></i> {{ item.image_count }}
         </span>
+        <div
+          class="thumbnail-magnifier-btn"
+          @click.stop="openPreview"
+          title="Quick Snapshot"
+        >
+          <i class="bx bx-search-alt"></i>
+        </div>
       </div>
     </td>
 
     <!-- 3. Combined Vehicle Identity: Year Make Model Trim, VIN • Stock # -->
     <td class="col-vehicle">
-      <div class="vehicle-primary-title" :title="vehicleFullTitle">
+      <div
+        class="vehicle-primary-title"
+        :title="'Click to open vehicle details: ' + vehicleFullTitle"
+        @click.stop="openInventoryNewTab(item.inventory_id)"
+      >
         {{ vehicleFullTitle }}
       </div>
       <div class="vehicle-sub-meta">
@@ -426,18 +441,23 @@ export default {
         this.removeInventoryId(this.item.inventory_id);
       }
     },
+    openPreview(e) {
+      if (e) {
+        e.stopPropagation();
+      }
+      this.$emit("open-preview", this.item);
+    },
     onRowClick(e) {
       if (
         e &&
         e.target &&
         e.target.closest(
-          "button, a, select, input, .custom-chk-container, .inventory-inline-editable, .copyable-text"
+          "button, a, select, input, .custom-chk-container, .inventory-inline-editable, .copyable-text, .thumbnail-magnifier-btn"
         )
       ) {
         return;
       }
-      // Row tap opens the vehicle detail page.
-      this.$router.push({ name: "inventory-update", params: { id: this.item.inventory_id } });
+      this.openInventoryNewTab(this.item.inventory_id);
     },
     copyVin() {
       if (this.item.vin) {
@@ -669,18 +689,35 @@ export default {
 
 /* Vehicle Thumbnail */
 .col-photo {
-  width: 50px;
-  min-width: 50px;
+  width: 52px;
+  min-width: 52px;
 }
 
 .vehicle-thumbnail-wrapper {
   position: relative;
-  width: 40px;
-  height: 28px;
-  border-radius: 4px;
+  width: 44px;
+  height: 30px;
+  border-radius: 6px;
   overflow: hidden;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.12);
+    transition: background 0.2s ease;
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    background: rgba(15, 23, 42, 0.28);
+  }
 }
 
 .vehicle-thumbnail {
@@ -694,16 +731,53 @@ export default {
   position: absolute;
   bottom: 1px;
   right: 1px;
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(15, 23, 42, 0.8);
   color: #ffffff;
-  font-size: 8.5px;
-  padding: 0 3px;
-  border-radius: 2px;
+  font-size: 8px;
+  padding: 1px 3px;
+  border-radius: 3px;
   line-height: 1;
+  z-index: 3;
 
   i {
     font-size: 7.5px;
     vertical-align: middle;
+  }
+}
+
+.thumbnail-magnifier-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  left: auto;
+  transform: none;
+  transform-origin: center center;
+  width: 17.5px;
+  height: 17.5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border: 1.2px solid #ffffff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.5), 0 1px 2px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+
+  i {
+    font-size: 9.5px;
+    line-height: 1;
+    color: #ffffff !important;
+    position: static !important;
+    top: 0 !important;
+  }
+
+  &:hover {
+    transform: scale(1.18);
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -721,6 +795,12 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: #2563eb;
+    }
   }
 
   .vehicle-sub-meta {
@@ -968,7 +1048,18 @@ tr.row-compact {
   .vehicle-thumbnail-wrapper {
     width: 34px !important;
     height: 24px !important;
-    border-radius: 3px !important;
+    border-radius: 4px !important;
+  }
+
+  .thumbnail-magnifier-btn {
+    width: 14px !important;
+    height: 14px !important;
+    top: 1.5px !important;
+    right: 1.5px !important;
+
+    i {
+      font-size: 8px !important;
+    }
   }
 
   .thumbnail-count-badge {
