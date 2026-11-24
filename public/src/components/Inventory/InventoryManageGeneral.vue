@@ -19,7 +19,7 @@
                         <div class="m-width-s">
                           <div class="row">
                             <div class="col-md-4">
-                              <label style="color: red">Vin Number *</label>
+                              <label style="color: red">Vin Number</label>
                             </div>
                             <div class="col-md-8 form-group">
                               <fieldset>
@@ -177,7 +177,7 @@
                                       {{ sub_status }}
                                     </option>
                                   </select>
-                                  <div class="checkbox" style="margin-top: 6px">
+                                  <div class="checkbox">
                                     <input
                                       type="checkbox"
                                       class="checkbox-input"
@@ -233,10 +233,7 @@
                                 <label
                                   class="custom-control-label"
                                   for="customSwitch0"
-                                >
-                                  <span class="switch-icon-left"> ON</span>
-                                  <span class="switch-icon-right">OFF</span>
-                                </label>
+                                ></label>
                               </div>
                             </div>
                             <div class="col-md-4">
@@ -272,7 +269,7 @@
                               </text-editor>
                             </div>
                             <div class="col-md-4">
-                              <label style="color: red">Vehicle *</label>
+                              <label style="color: red">Vehicle</label>
                             </div>
                             <div class="col-md-8 form-group">
                               <fieldset>
@@ -933,7 +930,6 @@
                                   />
                                   <div
                                     class="checkbox pr-1"
-                                    style="margin-top: 5px; margin-left: 20px"
                                   >
                                     <input
                                       type="checkbox"
@@ -966,10 +962,7 @@
                                   class="custom-control-label"
                                   for="customSwitch13"
                                   id="on-price-ss"
-                                >
-                                  <span class="switch-icon-left">ON</span>
-                                  <span class="switch-icon-right">OFF</span>
-                                </label>
+                                ></label>
                               </div>
                             </div>
                             <div
@@ -1111,10 +1104,7 @@
                                 <label
                                   class="custom-control-label"
                                   for="customSwitch10"
-                                >
-                                  <span class="switch-icon-left"> ON</span>
-                                  <span class="switch-icon-right">OFF</span>
-                                </label>
+                                ></label>
                               </div>
                             </div>
                             <div class="col-md-4">
@@ -1134,10 +1124,7 @@
                                 <label
                                   class="custom-control-label"
                                   for="customSwitch11"
-                                >
-                                  <span class="switch-icon-left">ON</span>
-                                  <span class="switch-icon-right">OFF</span>
-                                </label>
+                                ></label>
                               </div>
                             </div>
                             <div
@@ -1930,7 +1917,7 @@
                         <label>Kijiji Category</label>
                       </div>
                       <div
-                        class="col-md-2 form-group"
+                        class="col-md-4 form-group"
                         v-show="showKijijiCategory"
                       >
                         <select
@@ -1958,7 +1945,7 @@
                         <label>Kijiji Commercial Category</label>
                       </div>
                       <div
-                        class="col-md-2 form-group"
+                        class="col-md-4 form-group"
                         v-show="showKijijiNpvCategory"
                       >
                         <select
@@ -1986,7 +1973,7 @@
                         <label>Autotrader Category</label>
                       </div>
                       <div
-                        class="col-md-2 form-group"
+                        class="col-md-4 form-group"
                         v-show="showAutoTraderCategory"
                       >
                         <select
@@ -2014,7 +2001,7 @@
                         <label>Facebook Category</label>
                       </div>
                       <div
-                        class="col-md-2 form-group"
+                        class="col-md-4 form-group"
                         v-show="showFacebookCategory"
                       >
                         <select
@@ -3022,7 +3009,8 @@ export default {
   height: 2em;
 }
 #general-block-list .vs__deselect {
-  fill: white;
+  fill: #000000 !important;
+  color: #000000 !important;
 }
 #general-block-list .vs__dropdown-option--selected {
   color: #727e8c;

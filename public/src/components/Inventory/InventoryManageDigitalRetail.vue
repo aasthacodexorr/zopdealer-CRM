@@ -6,217 +6,145 @@
     role="tabpanel"
   >
     <!-- form layout section start -->
-    <section id="inventory-digital-retail-initial-section">
-      <div class="row match-height">
-        <div class="col-md-12 col-12">
-          <div class="card shadow-none mb-0">
-            <div class="card-content">
-              <div class="card-body pt-0">
-                <form class="form form-horizontal webapp-form">
-                  <div class="form-body">
-                    <div class="row">
-                      <div class="col-md-12 col-12">
-                        <div class="m-width-s">
-                          <div class="row">
-                            <div class="col-md-4">
-                              <label>Override Default Finance Terms</label>
-                            </div>
-                            <div class="col-md-8 form-group">
-                              <div class="custom-control custom-switch">
-                                <input
-                                  type="checkbox"
-                                  class="custom-control-input"
-                                  id="override_default_finance_terms"
-                                  name="Visibility"
-                                  v-model="form.override_default_finance_terms"
-                                  :true-value="'1'"
-                                  :false-value="'0'"
-                                  checked
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  for="override_default_finance_terms"
-                                >
-                                  <span class="switch-icon-left"> ON</span>
-                                  <span class="switch-icon-right">OFF</span>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="m-width-s" v-show="showCustomFinanceTerms">
-                          <!-- Repeater : START -->
-                          <div class="list-image-content">
-                            <div class="row contact-repeater">
-                              <div class="col-md-3">
-                                <button
-                                  class="btn btn-icon btn-primary"
-                                  type="button"
-                                  @click.prevent="addFinanceTerms"
-                                >
-                                  <i class="bx bx-plus"></i>Add Another Term
-                                </button>
-                              </div>
-
-                              <div
-                                class="col-md-9 form-group"
-                                data-repeater-list="contact"
-                              >
-                                <!-- start Loop for vehicle tags -->
-                                <div
-                                  class="row"
-                                  v-for="n in getFinanceTermsCount"
-                                  :key="n"
-                                >
-                                  <div class="col-md-4 col-12 form-group">
-                                    <input
-                                      type="text"
-                                      class="form-control"
-                                      placeholder="Downpayment"
-                                      :class="{
-                                        'is-invalid': checkIsInvalid(
-                                          n - 1,
-                                          'downpayment'
-                                        ),
-                                      }"
-                                      @keyup="
-                                        deleteErrorAttribute(
-                                          n - 1,
-                                          'downpayment'
-                                        )
-                                      "
-                                      :title="
-                                        titleForErrorAttribute(
-                                          n - 1,
-                                          'downpayment'
-                                        )
-                                      "
-                                      v-model="
-                                        form.finance_terms[n - 1].downpayment
-                                      "
-                                    />
-                                  </div>
-                                  <div class="col-md-4 col-12 form-group">
-                                    <input
-                                      type="number"
-                                      class="form-control"
-                                      placeholder="Interest Rate %"
-                                      :class="{
-                                        'is-invalid': checkIsInvalid(
-                                          n - 1,
-                                          'interest_rate'
-                                        ),
-                                      }"
-                                      @keyup="
-                                        deleteErrorAttribute(
-                                          n - 1,
-                                          'interest_rate'
-                                        )
-                                      "
-                                      :title="
-                                        titleForErrorAttribute(
-                                          n - 1,
-                                          'interest_rate'
-                                        )
-                                      "
-                                      v-model="
-                                        form.finance_terms[n - 1].interest_rate
-                                      "
-                                    />
-                                  </div>
-                                  <div class="col-md-4 col-12 form-group">
-                                    <input
-                                      type="number"
-                                      class="form-control"
-                                      placeholder="Months"
-                                      :class="{
-                                        'is-invalid': checkIsInvalid(
-                                          n - 1,
-                                          'term'
-                                        ),
-                                      }"
-                                      @keyup="
-                                        deleteErrorAttribute(n - 1, 'term')
-                                      "
-                                      :title="
-                                        titleForErrorAttribute(n - 1, 'term')
-                                      "
-                                      v-model="form.finance_terms[n - 1].term"
-                                    />
-                                  </div>
-                                  <div class="col-md-3 col-12 form-group">
-                                    <select
-                                      class="custom-select form-control"
-                                      name="Payment Frequency"
-                                      v-model="
-                                        form.finance_terms[n - 1].frequency
-                                      "
-                                    >
-                                      <option value="" selected disabled>
-                                        Select Payment
-                                      </option>
-                                      <option value="Weekly">Weekly</option>
-                                      <option value="Bi-Weekly"
-                                        >Bi-Weekly</option
-                                      >
-                                      <option value="Monthly">Monthly</option>
-                                    </select>
-                                  </div>
-                                  <div class="col-md-3 col-12 form-group">
-                                    <select
-                                      class="custom-select form-control"
-                                      name="Credit Score Band"
-                                      v-model="
-                                        form.finance_terms[n - 1]
-                                          .credit_score_band
-                                      "
-                                    >
-                                      <option value="" selected disabled>
-                                        Select Payment
-                                      </option>
-                                      <option value="Excellent"
-                                        >Excellent</option
-                                      >
-                                      <option value="Great">Great</option>
-                                      <option value="Very Good"
-                                        >Very Good</option
-                                      >
-                                      <option value="Good">Good</option>
-                                      <option value="Fair">Fair</option>
-                                      <option value="Challenged"
-                                        >Challenged</option
-                                      >
-                                    </select>
-                                  </div>
-                                  <div class="col-md-2 col-12 form-group pl-0">
-                                    <button
-                                      class="btn btn-danger text-nowrap px-1"
-                                      type="button"
-                                      @click.prevent="
-                                        form.finance_terms.splice(n - 1, 1);
-                                        errors = [];
-                                      "
-                                    >
-                                      <i class="bx bx-x"></i>
-                                    </button>
-                                  </div>
-                                </div>
-                                <!-- end Loop for vehicle tags -->
-                              </div>
-                            </div>
-                          </div>
-                          <!-- Repeater : END-->
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              </div>
+    <section id="inventory-digital-retail-initial-section" class="eq-page">
+      <form class="form form-horizontal webapp-form">
+        <div class="m-width-s eq-card eq-toggle-card">
+          <div class="eq-toggle-row">
+            <span class="eq-icon"><i class="bx bx-calculator"></i></span>
+            <label class="eq-toggle-label">Override Default Finance Terms</label>
+            <div class="custom-control custom-switch">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                id="override_default_finance_terms"
+                name="Visibility"
+                v-model="form.override_default_finance_terms"
+                :true-value="'1'"
+                :false-value="'0'"
+                checked
+              />
+              <label
+                class="custom-control-label"
+                for="override_default_finance_terms"
+              >
+                <span class="switch-icon-left"> ON</span>
+                <span class="switch-icon-right">OFF</span>
+              </label>
             </div>
           </div>
         </div>
-      </div>
+
+        <div class="m-width-s eq-card" v-show="showCustomFinanceTerms">
+          <!-- Repeater : START -->
+          <div class="list-image-content">
+            <div class="contact-repeater">
+              <div class="eq-terms-head">
+                <button
+                  class="btn btn-icon btn-primary eq-add-btn"
+                  type="button"
+                  @click.prevent="addFinanceTerms"
+                >
+                  <i class="bx bx-plus"></i>Add Another Term
+                </button>
+              </div>
+
+              <div class="eq-terms" data-repeater-list="contact">
+                <!-- start Loop for vehicle tags -->
+                <div
+                  class="eq-term"
+                  v-for="n in getFinanceTermsCount"
+                  :key="n"
+                >
+                  <div class="eq-field eq-field--money">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Downpayment"
+                      :class="{
+                        'is-invalid': checkIsInvalid(n - 1, 'downpayment'),
+                      }"
+                      @keyup="deleteErrorAttribute(n - 1, 'downpayment')"
+                      :title="titleForErrorAttribute(n - 1, 'downpayment')"
+                      v-model="form.finance_terms[n - 1].downpayment"
+                    />
+                  </div>
+                  <div class="eq-field eq-field--pct">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Interest Rate %"
+                      :class="{
+                        'is-invalid': checkIsInvalid(n - 1, 'interest_rate'),
+                      }"
+                      @keyup="deleteErrorAttribute(n - 1, 'interest_rate')"
+                      :title="titleForErrorAttribute(n - 1, 'interest_rate')"
+                      v-model="form.finance_terms[n - 1].interest_rate"
+                    />
+                  </div>
+                  <div class="eq-field eq-field--months">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="Months"
+                      :class="{
+                        'is-invalid': checkIsInvalid(n - 1, 'term'),
+                      }"
+                      @keyup="deleteErrorAttribute(n - 1, 'term')"
+                      :title="titleForErrorAttribute(n - 1, 'term')"
+                      v-model="form.finance_terms[n - 1].term"
+                    />
+                  </div>
+                  <div class="eq-field">
+                    <select
+                      class="custom-select form-control"
+                      name="Payment Frequency"
+                      v-model="form.finance_terms[n - 1].frequency"
+                    >
+                      <option value="" selected disabled>
+                        Select Payment
+                      </option>
+                      <option value="Weekly">Weekly</option>
+                      <option value="Bi-Weekly">Bi-Weekly</option>
+                      <option value="Monthly">Monthly</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <select
+                      class="custom-select form-control"
+                      name="Credit Score Band"
+                      v-model="form.finance_terms[n - 1].credit_score_band"
+                    >
+                      <option value="" selected disabled>
+                        Select Payment
+                      </option>
+                      <option value="Excellent">Excellent</option>
+                      <option value="Great">Great</option>
+                      <option value="Very Good">Very Good</option>
+                      <option value="Good">Good</option>
+                      <option value="Fair">Fair</option>
+                      <option value="Challenged">Challenged</option>
+                    </select>
+                  </div>
+                  <div class="eq-remove">
+                    <button
+                      class="btn btn-danger text-nowrap eq-remove-btn"
+                      type="button"
+                      @click.prevent="
+                        form.finance_terms.splice(n - 1, 1);
+                        errors = [];
+                      "
+                    >
+                      <i class="bx bx-x"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- end Loop for vehicle tags -->
+              </div>
+            </div>
+          </div>
+          <!-- Repeater : END-->
+        </div>
+      </form>
     </section>
   </div>
 </template>
@@ -415,3 +343,118 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+/* Inventory — E-Quote (digital retailing) tab (look only). */
+#inventory-digital-retail-panel .eq-page {
+  padding: 8px 20px 96px;
+  color: #0f172a;
+
+  .eq-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    max-width: none;
+  }
+  .eq-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    .custom-switch { margin-left: auto; min-height: 30px; display: flex; align-items: center; }
+  }
+  .eq-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .eq-toggle-label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .eq-terms-head {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+  .eq-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    box-shadow: none !important;
+    i { position: static; top: 0; font-size: 16px; }
+  }
+  .eq-terms {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .eq-term {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) repeat(2, minmax(0, 1.1fr)) 38px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+  }
+  .eq-field { position: relative; min-width: 0; }
+  .form-control,
+  .custom-select {
+    height: 38px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #0f172a;
+    background-color: #ffffff;
+    box-shadow: none;
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    &.is-invalid { border-color: #ef4444; }
+  }
+  .eq-remove-btn {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: #ffffff !important;
+    border: 1px solid #fecaca !important;
+    color: #dc2626 !important;
+    box-shadow: none !important;
+    i { position: static; top: 0; }
+    &:hover { background: #fef2f2 !important; }
+  }
+
+  @media (max-width: 991px) {
+    .eq-term { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .eq-remove { grid-column: 2; justify-self: end; }
+  }
+}
+</style>
+

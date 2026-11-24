@@ -6,181 +6,148 @@
     role="tabpanel"
   >
     <!-- photo  form layout section start -->
-    <section id="dropzone-examples">
-      <div class="row">
-        <vue-easy-lightbox
-          escDisabled
-          moveDisabled
-          :visible="visible"
-          :imgs="galleryLinks"
-          @hide="handleHide"
-        ></vue-easy-lightbox>
-        <div class="col-12">
-          <div class="card shadow-none mb-0">
-            <div class="card-content">
-              <div class="card-body pt-0">
-                <!-- image component using dropzone -->
-                <div class="row p-1">
-                  <div
-                    role="alert"
-                    class="alert alert-light-warning mb-0 fade show"
-                  >
-                    NOTE: HEIC/HEIF and WebP Images will be automatically
-                    converted to JPG to provide broader support for third-party
-                    syndication. Maximum Image Size acceptable is 30MB.
-                  </div>
-                </div>
-                <div class="row p-1">
-                  <div class="col-xs-6 col-md-4">
-                    <input
-                      ref="fileInput"
-                      type="file"
-                      style="display: none"
-                      multiple
-                      @change="onFileChanged"
-                    />
-                    <button
-                      style="font-weight: 800"
-                      type="button"
-                      class="btn btn-primary"
-                      @click="$refs.fileInput.click()"
-                    >
-                      <i
-                        style="font-size: 1.4em; padding-right: 0.5em"
-                        class="bx bxs-cloud-upload"
-                      ></i>
-                      Upload
-                    </button>
-                  </div>
-                  <div
-                    class="col-xs-6 col-md-2 text-right"
-                    style="padding: 0.5em"
-                  >
-                    <span v-if="!checkedCount" style="vertical-align: baseline"
-                      >Select Count : {{ selectedCount }}</span
-                    >
-                  </div>
-                  <div class="col-xs-6 col-md-6">
-                    <button @click="visible = true" class="btn btn-secondary">
-                      <i class="bx bx-photo-album pr-1"></i>Show Gallery
-                    </button>
-                    <div
-                      class="btn-group"
-                      role="group"
-                      aria-label="Basic example"
-                    >
-                      <button
-                        @click="selected_id = []"
-                        :disabled="checkedCount"
-                        type="button"
-                        class="btn btn-primary"
-                      >
-                        Uncheck All
-                      </button>
-                      <button
-                        @click="checkAll"
-                        type="button"
-                        :disabled="allChecked"
-                        class="btn btn-info"
-                      >
-                        Check All
-                      </button>
-                      <div class="btn-group" role="group">
-                        <button
-                          :disabled="checkedCount"
-                          id="btnGroupDrop1"
-                          type="button"
-                          class="btn btn-secondary dropdown-toggle"
-                          data-toggle="dropdown"
-                          aria-haspopup="true"
-                          aria-expanded="false"
-                        >
-                          Action
-                        </button>
-                        <div
-                          class="dropdown-menu"
-                          aria-labelledby="btnGroupDrop1"
-                        >
-                          <button
-                            @click="activationImages(1)"
-                            class="dropdown-item"
-                          >
-                            Active
-                          </button>
-                          <button
-                            @click="activationImages(0)"
-                            class="dropdown-item"
-                          >
-                            Inactive
-                          </button>
-                          <button @click="deleteImages" class="dropdown-item">
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- image file uploads -->
-                <!-- photos gallery -->
-                <!-- Draggable List : OPEN -->
-                <draggable
-                  v-show="galleryLoad"
-                  tag="transition-group"
-                  :component-data="{
-                    tag: 'div',
-                    type: 'transition',
-                    name: 'flip-list',
-                    class: 'row'
-                  }"
-                  :list="gallery_list"
-                  v-bind="dragOptions"
-                  @start="isDragging = true"
-                  @end="isDragging = false"
-                  class="row"
-                  @change="saveSortRank"
-                  handle=".handle"
-                  item-key="id"
-                >
-                  <template #item="{ element: image }">
-                    <div
-                      class="col-lg-2 col-md-3 col-xs-6 p-0 m-1"
-                      style="min-width: 200px"
-                    >
-                      <input
-                        style="display: none"
-                        type="checkbox"
-                        v-model="selected_id"
-                        :id="'checkbox_' + image.id"
-                        :value="image.id"
-                      />
-                      <label :for="'checkbox_' + image.id">
-                        <img
-                          style="cursor: pointer; min-width: 200px"
-                          :src="parseAbsoluteOrRelativeUrl(image.image_url)"
-                          class="handle img-thumbnail"
-                        />
-                        <i
-                          v-if="image.active == '0'"
-                          class="bx bx-hide mask"
-                        ></i>
-                      </label>
-                    </div>
-                  </template>
-                </draggable>
-                <!-- Draggable List : CLOSE -->
-                <div class="row">
-                  <div class="col-12 font-weight-bold">
-                    <h5>Number of Images : {{ imagesCount }}</h5>
-                  </div>
-                </div>
-                <!-- end photos gallery -->
+    <section id="dropzone-examples" class="mg-page">
+      <vue-easy-lightbox
+        escDisabled
+        moveDisabled
+        :visible="visible"
+        :imgs="galleryLinks"
+        @hide="handleHide"
+      ></vue-easy-lightbox>
+
+      <div role="alert" class="mg-notice">
+        <i class="bx bx-info-circle"></i>
+        <span>
+          NOTE: HEIC/HEIF and WebP Images will be automatically converted to JPG
+          to provide broader support for third-party syndication. Maximum Image
+          Size acceptable is 30MB.
+        </span>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="mg-toolbar">
+        <div class="mg-toolbar-left">
+          <input
+            ref="fileInput"
+            type="file"
+            style="display: none"
+            multiple
+            @change="onFileChanged"
+          />
+          <button
+            type="button"
+            class="mg-btn mg-btn-primary"
+            @click="$refs.fileInput.click()"
+          >
+            <i class="bx bxs-cloud-upload"></i>
+            <span>Upload</span>
+          </button>
+          <span v-if="!checkedCount" class="mg-select-count">
+            Select Count : <strong>{{ selectedCount }}</strong>
+          </span>
+        </div>
+        <div class="mg-toolbar-right">
+          <button type="button" @click="visible = true" class="mg-btn mg-btn-ghost">
+            <i class="bx bx-photo-album"></i>
+            <span>Show Gallery</span>
+          </button>
+          <div class="mg-btn-group" role="group" aria-label="Basic example">
+            <button
+              @click="selected_id = []"
+              :disabled="checkedCount"
+              type="button"
+              class="mg-btn mg-btn-ghost"
+            >
+              Uncheck All
+            </button>
+            <button
+              @click="checkAll"
+              type="button"
+              :disabled="allChecked"
+              class="mg-btn mg-btn-ghost"
+            >
+              Check All
+            </button>
+            <div class="btn-group" role="group">
+              <button
+                :disabled="checkedCount"
+                id="btnGroupDrop1"
+                type="button"
+                class="mg-btn mg-btn-dark dropdown-toggle"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Action
+              </button>
+              <div
+                class="dropdown-menu dropdown-menu-right mg-dropdown"
+                aria-labelledby="btnGroupDrop1"
+              >
+                <button @click="activationImages(1)" class="dropdown-item">
+                  <i class="bx bx-show"></i> Active
+                </button>
+                <button @click="activationImages(0)" class="dropdown-item">
+                  <i class="bx bx-hide"></i> Inactive
+                </button>
+                <button @click="deleteImages" class="dropdown-item mg-dropdown-danger">
+                  <i class="bx bx-trash"></i> Delete
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- remove all thumbnails file upload ends -->
+
+      <!-- photos gallery -->
+      <!-- Draggable List : OPEN -->
+      <draggable
+        v-show="galleryLoad"
+        tag="transition-group"
+        :component-data="{
+          tag: 'div',
+          type: 'transition',
+          name: 'flip-list',
+          class: 'mg-grid'
+        }"
+        :list="gallery_list"
+        v-bind="dragOptions"
+        @start="isDragging = true"
+        @end="isDragging = false"
+        class="mg-grid"
+        @change="saveSortRank"
+        handle=".handle"
+        item-key="id"
+      >
+        <template #item="{ element: image }">
+          <div
+            class="mg-card"
+            :class="{ 'is-selected': selected_id.includes(image.id) }"
+          >
+            <input
+              class="mg-checkbox-input"
+              type="checkbox"
+              v-model="selected_id"
+              :id="'checkbox_' + image.id"
+              :value="image.id"
+            />
+            <label :for="'checkbox_' + image.id" class="mg-thumb">
+              <img
+                :src="parseAbsoluteOrRelativeUrl(image.image_url)"
+                class="handle"
+              />
+              <span class="mg-check"><i class="bx bx-check"></i></span>
+              <i v-if="image.active == '0'" class="bx bx-hide mask"></i>
+            </label>
+          </div>
+        </template>
+      </draggable>
+      <!-- Draggable List : CLOSE -->
+
+      <div class="mg-footer">
+        Number of Images : <strong>{{ imagesCount }}</strong>
+      </div>
+      <!-- end photos gallery -->
     </section>
     <!-- // photo  form layout section end -->
   </div>
@@ -516,20 +483,207 @@ export default {
 };
 </script>
 <style lang="scss">
-#media-block-list input:checked + label {
-  opacity: 0.6;
-}
-#media-block-list input:checked + label img {
-  border: 0px;
-}
+/* ==========================================================================
+   Inventory — Media tab. Scoped to #media-block-list.
+   ========================================================================== */
+#media-block-list {
+  .mg-page {
+    padding: 8px 20px 96px;
+    color: #0f172a;
+  }
 
-#media-block-list .mask {
-  position: absolute;
-  z-index: 2;
-  font-size: 3em;
-  color: white;
-  text-shadow: -1px 0px #ccc;
-  left: 0;
-  background: #0006;
+  .mg-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    background: #fffbeb;
+    color: #92400e;
+    font-size: 13px;
+    line-height: 1.5;
+    i { font-size: 18px; margin-top: 1px; }
+  }
+
+  .mg-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+  }
+  .mg-toolbar-left,
+  .mg-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .mg-select-count {
+    font-size: 13px;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #eff6ff;
+    strong { color: #2563eb; }
+  }
+
+  .mg-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    i { font-size: 16px; position: static; top: 0; }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+    &:focus { outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+  }
+  .mg-btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+    &:hover:not(:disabled) { background: #1d4ed8; }
+  }
+  .mg-btn-ghost {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #475569;
+    &:hover:not(:disabled) { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
+  }
+  .mg-btn-dark {
+    background: #334155;
+    color: #ffffff;
+    &:hover:not(:disabled) { background: #1e293b; }
+    &::after { margin-left: 6px; }
+  }
+  .mg-btn-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mg-dropdown {
+    min-width: 160px;
+    padding: 6px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #334155;
+      i { font-size: 16px; color: #64748b; position: static; top: 0; }
+      &:hover { background: #f1f5f9; color: #0f172a; }
+    }
+    .mg-dropdown-danger,
+    .mg-dropdown-danger i { color: #dc2626; }
+    .mg-dropdown-danger:hover { background: #fef2f2; color: #dc2626; }
+  }
+
+  .mg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+
+  .mg-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    &:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+    &.is-selected {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
+    }
+  }
+  .mg-checkbox-input { display: none; }
+
+  .mg-thumb {
+    position: relative;
+    display: block;
+    margin: 0;
+    aspect-ratio: 4 / 3;
+    background: #f1f5f9;
+    cursor: pointer;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+    }
+  }
+
+  .mg-check {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1.5px solid #cbd5e1;
+    color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .mg-card:hover .mg-check,
+  .mg-card.is-selected .mg-check { opacity: 1; }
+  .mg-card.is-selected .mg-check {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+  }
+
+  .mask {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4em;
+    color: #ffffff;
+    background: rgba(15, 23, 42, 0.55);
+    text-shadow: none;
+    pointer-events: none;
+  }
+
+  .mg-footer {
+    margin-top: 14px;
+    font-size: 13px;
+    color: #64748b;
+    strong { color: #0f172a; }
+  }
+
+  .flip-list-move { transition: transform 0.3s; }
+  .ghost { opacity: 0.4; }
 }
 </style>

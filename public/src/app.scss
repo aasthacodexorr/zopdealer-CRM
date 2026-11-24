@@ -1,15 +1,815 @@
 @import "_pageloader.scss";
 
+/* ==========================================================================
+   Footer Action Bar - Fixed Dock with Sidebar Clearance
+   ========================================================================== */
 .custom-footer-fixed-action-bar {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  left: 0;
+  position: fixed !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  left: 260px !important;
   margin-bottom: 0 !important;
-  justify-content: right;
-  background: #e7e7e7 !important;
-  z-index: 3;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0.75rem 2rem !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-top: 1px solid #e2e8f0 !important;
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08) !important;
+  z-index: 1030 !important;
+  gap: 0.75rem !important;
+  transition: left 0.3s ease !important;
 }
+
+body.menu-collapsed .custom-footer-fixed-action-bar,
+.menu-collapsed .custom-footer-fixed-action-bar {
+  left: 70px !important;
+}
+
+@media (max-width: 1199.98px) {
+  .custom-footer-fixed-action-bar {
+    left: 0 !important;
+  }
+}
+
+/* Strictly hide buttons that have v-show="false" (display: none) */
+.custom-footer-fixed-action-bar [style*="display: none"],
+.custom-footer-fixed-action-bar [style*="display:none"],
+.custom-footer-fixed-action-bar button[style*="display: none"],
+.custom-footer-fixed-action-bar button[style*="display:none"] {
+  display: none !important;
+}
+
+.custom-footer-fixed-action-bar .btn:not([style*="display: none"]):not([style*="display:none"]) {
+  height: 38px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 0 1.25rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+}
+
+.custom-footer-fixed-action-bar .btn-primary {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+}
+
+.custom-footer-fixed-action-bar .btn-primary:hover:not(:disabled) {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+.custom-footer-fixed-action-bar .btn-secondary {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+.custom-footer-fixed-action-bar .btn-secondary:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+/* Button Icon & Text Vertical Alignment */
+.btn i,
+.btn .bx,
+.btn [class*="bx-"],
+.btn-back-nav i,
+.btn-back-nav .bx,
+.custom-footer-fixed-action-bar .btn i,
+.custom-footer-fixed-action-bar .btn .bx,
+#general-block-list .btn i,
+#general-block-list .btn .bx {
+  position: static !important;
+  top: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+.custom-footer-fixed-action-bar .btn i,
+.custom-footer-fixed-action-bar .btn .bx,
+.right-scroll-list.nav-tabs .btn-back-nav i,
+.right-scroll-list.nav-tabs .btn-back-nav .bx {
+  font-size: 1.15rem !important;
+  margin-right: 0.4rem !important;
+}
+
+/* ==========================================================================
+   Header and Tab Bar
+   ========================================================================== */
+.right-scroll-list.nav-tabs {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 0.5rem 1.5rem !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none;
+  align-items: center !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+  min-height: 52px !important;
+  gap: 0.15rem !important;
+}
+
+.right-scroll-list.nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.right-scroll-list.nav-tabs .nav-item {
+  margin: 0 0 -1px 0 !important;
+  padding: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+/* back button keeps its size; the tabs share the remaining width */
+.right-scroll-list.nav-tabs .nav-item:first-child {
+  flex: 0 0 auto !important;
+}
+
+.right-scroll-list.nav-tabs .nav-item .nav-link {
+  width: 100% !important;
+  justify-content: center !important;
+}
+
+.right-scroll-list.nav-tabs .btn-back-nav {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  padding: 0.4rem 0.85rem !important;
+  margin-right: 0.75rem !important;
+  transition: all 0.15s ease !important;
+  height: 34px !important;
+  line-height: 1 !important;
+}
+
+.right-scroll-list.nav-tabs .btn-back-nav.btn-back-nav--icon {
+  width: 34px !important;
+  padding: 0 !important;
+  justify-content: center !important;
+  margin-right: 0.5rem !important;
+}
+
+.right-scroll-list.nav-tabs .btn-back-nav.btn-back-nav--icon i,
+.right-scroll-list.nav-tabs .btn-back-nav.btn-back-nav--icon .bx {
+  margin-right: 0 !important;
+}
+
+.right-scroll-list.nav-tabs .btn-back-nav:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+.right-scroll-list.nav-tabs .nav-link {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.7rem 0.75rem !important;
+  font-size: 1rem !important;
+  white-space: nowrap !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  border: 1px solid transparent !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 6px 6px 0 0 !important;
+  background: transparent !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.right-scroll-list.nav-tabs .nav-link:hover {
+  color: #2563eb !important;
+  background: #f8fafc !important;
+}
+
+.right-scroll-list.nav-tabs .nav-link.active {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid #2563eb !important;
+  background: #ffffff !important;
+}
+
+.inventory-manage-page-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 1.25rem 2rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
+}
+
+.inventory-manage-page-header .inventory-manage-main-title {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+/* ==========================================================================
+   Form, Inputs, Checks, Switches, Alignments
+   ========================================================================== */
+#general-block-list {
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  padding: 0 1rem 6rem !important;
+}
+
+#general-block-list .card {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+  background: #ffffff !important;
+  margin-bottom: 1.75rem !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+#general-block-list .card:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+#general-block-list .card-header.border-line-bottom-title {
+  padding: 1.25rem 1.75rem !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  background: #fcfdfd !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+#general-block-list .card-header.border-line-bottom-title .card-title {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.01em !important;
+  margin-bottom: 0 !important;
+}
+
+#general-block-list .card-body {
+  padding: 1.75rem !important;
+}
+
+/* Strictly honor Vue v-show (display: none) */
+#general-block-list [style*="display: none"],
+#general-block-list [style*="display:none"],
+#general-block-list .form-group[style*="display: none"],
+#general-block-list .form-group[style*="display:none"],
+#dropzone-examples [style*="display: none"],
+#dropzone-examples [style*="display:none"],
+#dropzone-examples .form-group[style*="display: none"],
+#dropzone-examples .form-group[style*="display:none"] {
+  display: none !important;
+}
+
+/* Form Group & Row Center Alignment */
+#general-block-list .form-group:not([style*="display: none"]):not([style*="display:none"]) {
+  margin-bottom: 1.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: 40px !important;
+}
+
+#general-block-list .form-group > fieldset {
+  width: 100% !important;
+}
+
+/* rich-text fields (Title) should fill the column like other inputs */
+#general-block-list .form-group > .quill-editor {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#general-block-list .col-md-4 > label {
+  min-height: 40px !important;
+  margin-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  letter-spacing: 0.01em !important;
+}
+
+#general-block-list label {
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  letter-spacing: 0.01em !important;
+  margin-bottom: 0.4rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+#general-block-list label[style*="color: red"],
+#general-block-list label[style*="color:red"] {
+  color: #334155 !important;
+}
+
+#general-block-list label[style*="color: red"]::after,
+#general-block-list label[style*="color:red"]::after {
+  content: " *" !important;
+  color: #ef4444 !important;
+  font-weight: 700 !important;
+  margin-left: 2px !important;
+}
+
+/* Inputs & Selects */
+#general-block-list .form-control,
+#general-block-list .custom-select {
+  height: 40px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  padding: 0.5rem 0.85rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+#general-block-list .form-control::placeholder,
+#general-block-list .custom-select::placeholder {
+  color: #94a3b8 !important;
+}
+
+#general-block-list .form-control:focus,
+#general-block-list .custom-select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+  background-color: #ffffff !important;
+  outline: none !important;
+}
+
+#general-block-list .form-control.is-invalid,
+#general-block-list .custom-select.is-invalid {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+#general-block-list textarea.form-control {
+  height: auto !important;
+  min-height: 90px !important;
+}
+
+/* Input group alignment (Status, Price, etc.) */
+#general-block-list .input-group {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+#general-block-list .input-group .custom-select,
+#general-block-list .input-group .form-control {
+  margin: 0 !important;
+  margin-right: 0.5rem !important;
+}
+
+#general-block-list .input-group .custom-select:last-child,
+#general-block-list .input-group .form-control:last-child {
+  margin-right: 0 !important;
+}
+
+/* Checkbox alignment - Always horizontal with text on the right */
+#general-block-list .checkbox {
+  position: relative !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  min-height: 38px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+#general-block-list .checkbox input[type="checkbox"],
+#general-block-list .checkbox .checkbox-input {
+  position: static !important;
+  display: inline-block !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  margin: 0 0.65rem 0 0 !important;
+  cursor: pointer !important;
+  accent-color: #2563eb !important;
+  vertical-align: middle !important;
+  flex-shrink: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+}
+
+#general-block-list .checkbox label {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+}
+
+#general-block-list .checkbox label::before,
+#general-block-list .checkbox label::after {
+  display: none !important;
+}
+
+/* Custom Switch (Clean modern toggle - No ON/OFF text) */
+#general-block-list .custom-switch,
+.custom-switch {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 40px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: relative !important;
+  cursor: pointer !important;
+  width: auto !important;
+}
+
+#general-block-list .custom-switch .custom-control-input,
+.custom-switch .custom-control-input {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: 0 !important;
+  width: 2.75rem !important;
+  height: 1.45rem !important;
+  opacity: 0 !important;
+  z-index: 2 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+}
+
+#general-block-list .custom-switch .custom-control-label,
+.custom-switch .custom-control-label {
+  display: inline-block !important;
+  position: relative !important;
+  width: 2.75rem !important;
+  height: 1.45rem !important;
+  min-height: 1.45rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  user-select: none !important;
+}
+
+#general-block-list .custom-switch .custom-control-label::before,
+.custom-switch .custom-control-label::before {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  width: 2.75rem !important;
+  height: 1.45rem !important;
+  border-radius: 1rem !important;
+  border: 1px solid #cbd5e1 !important;
+  background-color: #e2e8f0 !important;
+  transition: all 0.2s ease !important;
+  content: "" !important;
+}
+
+#general-block-list .custom-switch .custom-control-label::after,
+.custom-switch .custom-control-label::after {
+  position: absolute !important;
+  top: 2px !important;
+  left: 2px !important;
+  margin: 0 !important;
+  width: calc(1.45rem - 4px) !important;
+  height: calc(1.45rem - 4px) !important;
+  border-radius: 1rem !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25) !important;
+  transition: all 0.2s ease !important;
+  content: "" !important;
+}
+
+#general-block-list .custom-switch .custom-control-input:checked ~ .custom-control-label::before,
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+#general-block-list .custom-switch .custom-control-input:checked ~ .custom-control-label::after,
+.custom-switch .custom-control-input:checked ~ .custom-control-label::after {
+  transform: translateX(1.3rem) !important;
+}
+
+/* Strictly hide ON and OFF beside/inside toggle button */
+.custom-switch .switch-icon-left,
+.custom-switch .switch-icon-right,
+.custom-switch .custom-control-label .switch-icon-left,
+.custom-switch .custom-control-label .switch-icon-right,
+#general-block-list .custom-switch .switch-icon-left,
+#general-block-list .custom-switch .switch-icon-right,
+#general-block-list .custom-switch .custom-control-label .switch-icon-left,
+#general-block-list .custom-switch .custom-control-label .switch-icon-right,
+.custom-switch span.switch-icon-left,
+.custom-switch span.switch-icon-right {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  font-size: 0 !important;
+}
+
+/* Pricing Addon & Fields */
+#general-block-list .input-group-append .input-group-text,
+#general-block-list .input-group-prepend .input-group-text,
+#general-block-list .input-group-text.s-color-box {
+  height: 40px !important;
+  border: 1px solid #cbd5e1 !important;
+  border-right: none !important;
+  border-radius: 8px 0 0 8px !important;
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 0.85rem !important;
+}
+
+#general-block-list .input-group > .form-control:not(:first-child) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+#general-block-list .checkbox[style*="margin-left"] {
+  margin-left: 1rem !important;
+  margin-top: 0 !important;
+}
+
+/* Description Action Buttons Spacing (AI Rewriter & Use Template) */
+#general-block-list .text-right,
+#vehicle-form-description .text-right {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin-top: 0.75rem !important;
+}
+
+#general-block-list .text-right button,
+#general-block-list .text-right .btn {
+  margin: 0 !important;
+  border-radius: 8px !important;
+  height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 1.15rem !important;
+}
+
+/* VIN Input & Decode Button */
+#general-block-list #Vin-Number {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  letter-spacing: 0.08em !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  color: #0f172a !important;
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+#general-block-list #Vin-Number:focus {
+  background-color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+#general-block-list #button-addon2 .btn-primary {
+  height: 40px !important;
+  padding: 0 1.25rem !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  background: #2563eb !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#general-block-list #button-addon2 .btn-primary:hover {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+/* only when visible: v-show hides these links on the edit page */
+#general-block-list .col-xs-12.col-md-7.mb-50:not([style*="display: none"]):not([style*="display:none"]) {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+  margin-top: -0.25rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+#general-block-list .col-xs-12.col-md-7.mb-50 br {
+  display: none !important;
+}
+
+#general-block-list .col-xs-12.col-md-7.mb-50 a {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.4rem 0.85rem !important;
+  background: #f1f5f9 !important;
+  color: #2563eb !important;
+  border-radius: 6px !important;
+  font-size: 0.785rem !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  border: 1px solid #e2e8f0 !important;
+  transition: all 0.15s ease !important;
+}
+
+#general-block-list .col-xs-12.col-md-7.mb-50 a:hover {
+  background: #e2e8f0 !important;
+  color: #1d4ed8 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Vehicle Tags Vue-Select Full Width & Proper Height */
+#general-block-list .v-select {
+  width: 100% !important;
+  flex: 1 1 auto !important;
+  max-width: 100% !important;
+}
+
+#general-block-list .v-select .vs__dropdown-toggle {
+  min-height: 40px !important;
+  height: auto !important;
+  width: 100% !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  padding: 3px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+#general-block-list .v-select.vs--open .vs__dropdown-toggle {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+#general-block-list .v-select .vs__selected-options {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  flex: 1 1 auto !important;
+  min-height: 32px !important;
+  gap: 4px !important;
+  padding: 0 !important;
+}
+
+#general-block-list .v-select .vs__search,
+#general-block-list .v-select .vs__search:focus {
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  min-height: 30px !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+#general-block-list .v-select .vs__search::placeholder {
+  color: #94a3b8 !important;
+  font-size: 0.875rem !important;
+}
+
+#general-block-list .v-select .vs__selected {
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #1d4ed8 !important;
+  border-radius: 6px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  padding: 2px 8px !important;
+  margin: 2px 0 !important;
+  height: auto !important;
+}
+
+#general-block-list .v-select .vs__deselect,
+#general-block-list .vs__deselect,
+.v-select .vs__deselect {
+  fill: #000000 !important;
+  color: #000000 !important;
+  stroke: #000000 !important;
+  text-shadow: none !important;
+  opacity: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 6px !important;
+  cursor: pointer !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+#general-block-list .v-select .vs__deselect svg,
+#general-block-list .vs__deselect svg,
+.v-select .vs__deselect svg {
+  fill: #000000 !important;
+  color: #000000 !important;
+  stroke: #000000 !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+#general-block-list .v-select .vs__deselect:hover,
+#general-block-list .vs__deselect:hover,
+.v-select .vs__deselect:hover {
+  fill: #000000 !important;
+  color: #000000 !important;
+  opacity: 0.75 !important;
+}
+
+#general-block-list .v-select .vs__actions {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 4px !important;
+}
+
+/* Syndication Category Dropdowns */
+#dropzone-examples .col-md-2.form-group,
+#dropzone-examples .col-md-3.form-group,
+#dropzone-examples .col-md-4.form-group {
+  min-width: 260px !important;
+}
+
+#dropzone-examples label {
+  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  margin-bottom: 0 !important;
+  min-height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+#general-block-list .collapsible .card.collapse-header,
+#general-block-list .accordion .card.collapse-header {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  margin-bottom: 0.65rem !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+#general-block-list .collapsible .card.collapse-header .card-header,
+#general-block-list .accordion .card.collapse-header .card-header {
+  padding: 0.85rem 1.25rem !important;
+  background: #f8fafc !important;
+  cursor: pointer !important;
+  border-bottom: 1px solid transparent !important;
+}
+
+#general-block-list .collapsible .card.collapse-header .card-header:hover,
+#general-block-list .accordion .card.collapse-header .card-header:hover {
+  background: #f1f5f9 !important;
+}
+
+#general-block-list .collapsible .card.collapse-header.open .card-header,
+#general-block-list .accordion .card.collapse-header.open .card-header {
+  border-bottom-color: #e2e8f0 !important;
+  background: #f1f5f9 !important;
+}
+
 
 .copy-hover {
   text-decoration-line: underline;
@@ -69,4 +869,133 @@ div.mx-datepicker {
     background-color: #fdecea;
     border: 1px solid #ea5455;
     color: #842029;
+}
+
+/* Eye-Catching Magnifier Quick-View Icon on Inventory Vehicle Photo */
+.inventory-table-head-row,
+.inventory-table-head-row th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  background: #f8fafc !important;
+}
+
+.inventory-table-row {
+  cursor: pointer !important;
+}
+
+.col-photo {
+  width: 52px !important;
+  min-width: 52px !important;
+}
+
+.vehicle-thumbnail-wrapper {
+  position: relative !important;
+  width: 44px !important;
+  height: 30px !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.12);
+    transition: background 0.2s ease;
+    pointer-events: none;
+  }
+
+  &:hover::after {
+    background: rgba(15, 23, 42, 0.28);
+  }
+
+  .vehicle-thumbnail {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  .thumbnail-count-badge {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    background: rgba(15, 23, 42, 0.85);
+    color: #ffffff;
+    font-size: 8px;
+    padding: 1px 3px;
+    border-radius: 3px;
+    line-height: 1;
+    z-index: 3;
+  }
+}
+
+.thumbnail-magnifier-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  left: auto;
+  transform: none;
+  transform-origin: center center;
+  width: 17.5px;
+  height: 17.5px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border: 1.2px solid #ffffff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.5), 0 1px 2px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1 !important;
+  pointer-events: auto;
+
+  i {
+    font-size: 9.5px !important;
+    line-height: 1 !important;
+    color: #ffffff !important;
+    position: static !important;
+    top: 0 !important;
+    display: inline-block;
+  }
+
+  &:hover {
+    transform: scale(1.18);
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.vehicle-thumbnail-wrapper:hover .thumbnail-magnifier-btn {
+  transform: scale(1.18);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+tr.row-compact {
+  .vehicle-thumbnail-wrapper {
+    width: 34px !important;
+    height: 24px !important;
+    border-radius: 4px !important;
+  }
+
+  .thumbnail-magnifier-btn {
+    width: 14px !important;
+    height: 14px !important;
+    top: 1.5px !important;
+    right: 1.5px !important;
+
+    i {
+      font-size: 8px !important;
+    }
+  }
 }

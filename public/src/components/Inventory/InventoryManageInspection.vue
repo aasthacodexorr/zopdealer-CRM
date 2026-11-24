@@ -5,14 +5,13 @@
     aria-labelledby="Inventory Inspection Panel"
     role="tabpanel"
   >
-    <section id="inventory-inspection-section">
-      <div class="row match-height">
-        <div class="col-md-12 col-12">
+    <section id="inventory-inspection-section" class="ins-page">
+      <div class="ins-wrap">
+        <div>
           <ul
-            class="nav nav-pills"
+            class="nav nav-pills ins-pills"
             id="pills-tab"
             role="tablist"
-            style="justify-content: center;"
           >
             <li class="nav-item">
               <a
@@ -23,7 +22,7 @@
                 role="tab"
                 aria-controls="internal-inspection"
                 aria-selected="true"
-                >Internal Inspection</a
+                ><i class="bx bx-clipboard"></i>Internal Inspection</a
               >
             </li>
             <li class="nav-item">
@@ -35,7 +34,7 @@
                 role="tab"
                 aria-controls="web-inspection"
                 aria-selected="false"
-                >Web Inspection</a
+                ><i class="bx bx-globe"></i>Web Inspection</a
               >
             </li>
             <li class="nav-item">
@@ -47,7 +46,7 @@
                 role="tab"
                 aria-controls="dvi"
                 aria-selected="false"
-                >Digital Vehicle Inspection</a
+                ><i class="bx bx-search-alt"></i>Digital Vehicle Inspection</a
               >
             </li>
           </ul>
@@ -119,12 +118,40 @@ export default {
 </script>
 <style lang="scss" scoped>
 #inventory-inspection-panel {
-  ul.nav {
+  .ins-page {
+    padding: 8px 20px 96px;
+  }
+  .ins-pills {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px;
+    margin: 0 0 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f1f5f9;
+    .nav-item { margin: 0; }
     a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
       text-decoration: none;
+      background: transparent;
+      box-shadow: none;
+      transition: background 0.15s, color 0.15s;
+      i { font-size: 16px; }
+      &:hover { color: #0f172a; background: rgba(255, 255, 255, 0.6); }
     }
     a.active {
-      color: white;
+      color: #2563eb;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
     }
   }
 }

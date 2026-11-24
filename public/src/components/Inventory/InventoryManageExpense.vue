@@ -6,308 +6,207 @@
     role="tabpanel"
   >
     <!-- Expenses  form layout section start -->
-    <section id="expenses">
-      <div class="row">
-        <div class="col-12">
-          <div class="card shadow-none">
-            <div class="card-content">
-              <div class="card-body pt-0">
-                <div class="row p-1">
-                  <h5 class="col-xs-12 text-danger" style="font-size: 0.8em">
-                    Note : This information is visible only to the owner and
-                    managers. It is not shared with public nor with staff.
-                  </h5>
-                  <div class="col-xs-12 col-12 mb-1">
+    <section id="expenses" class="ex-page">
+      <div class="ex-head">
+        <h5 class="ex-private">
+          <i class="bx bx-lock-alt"></i>
+          Note : This information is visible only to the owner and
+          managers. It is not shared with public nor with staff.
+        </h5>
+        <button
+          type="button"
+          class="btn btn-primary ex-btn ex-btn-primary"
+          data-toggle="modal"
+          data-target="#inventoryExpenseCost"
+        >
+          <i class="bx bx-list-plus"></i>
+          Add Expense
+        </button>
+      </div>
+
+      <div class="ex-card">
+        <div class="table-responsive">
+          <table class="table inventory_costs ex-table">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Details</th>
+                <th scope="col">Vendor</th>
+                <th class="text-right" scope="col">Price</th>
+                <th class="text-center" scope="col">Qty</th>
+                <th class="text-right" scope="col">Discount</th>
+                <th class="text-right" scope="col">Total Tax</th>
+                <th class="text-right" scope="col">Sub Total</th>
+                <th class="text-right" scope="col" style="width: 200px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="cost in inventory_costs" :key="cost.id">
+                <td class="ex-muted ex-nowrap">
+                  {{ formatDate(cost.purchase_date) }}
+                </td>
+                <td>
+                  <h6 class="ex-name">{{ cost.name }}</h6>
+                  <p class="ex-desc">
+                    {{ $helpers.truncate(cost.description, 50, "...") }}
+                  </p>
+                </td>
+                <td class="ex-muted">
+                  {{ cost.vendor_name }}
+                </td>
+                <td class="text-right">
+                  <div class="ex-amount">
+                    {{ `$ ${Number(cost.price).toLocaleString()}` }}
+                  </div>
+                  <span
+                    :title="cost.tax_percentage + ` %`"
+                    class="ex-tax-chip"
+                  >
+                    {{ cost.tax_type }}
+                  </span>
+                  <span
+                    v-show="cost.tax_type_secondary !== ''"
+                    :title="cost.tax_percentage_secondary + ` %`"
+                    class="ex-tax-chip"
+                  >
+                    {{ cost.tax_type_secondary }}
+                  </span>
+                </td>
+                <td class="text-center">{{ cost.quantity }}</td>
+                <td class="text-right ex-muted">
+                  {{
+                    `$ ${Number(cost.discount).toLocaleString()}`
+                  }}
+                </td>
+                <td class="text-right ex-muted">
+                  {{
+                    `$ ${Number(
+                      cost.tax_amount_total,
+                    ).toLocaleString()}`
+                  }}
+                </td>
+                <td class="text-right ex-amount">
+                  {{
+                    `$ ${Number(cost.sub_total).toLocaleString()}`
+                  }}
+                </td>
+                <td class="text-right">
+                  <div class="ex-actions">
                     <button
-                      style="font-weight: 800"
-                      type="button"
-                      class="btn btn-primary"
-                      data-toggle="modal"
-                      data-target="#inventoryExpenseCost"
+                      class="btn btn-info ex-icon-btn"
+                      @click.prevent="editExpense(cost.id)"
                     >
-                      <i
-                        style="font-size: 1.4em; padding-right: 0.5em"
-                        class="bx bx-list-plus"
-                      ></i>
-                      Add Expense
+                      <i class="bx bx-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-danger ex-icon-btn ex-icon-btn--danger"
+                      @click.prevent="deleteExpense(cost.id)"
+                    >
+                      <i class="bx bx-trash-alt"></i>
                     </button>
                   </div>
-                  <div class="col-xs-12 col-12">
-                    <div class="table-responsive">
-                      <table class="table inventory_costs">
-                        <thead>
-                          <tr>
-                            <th class="text-center" scope="col">Date</th>
-                            <th class="text-center" scope="col">Details</th>
-                            <th class="text-center" scope="col">Vendor</th>
-                            <th class="text-center" scope="col">Price</th>
-                            <th class="text-center" scope="col">Qty</th>
-                            <th class="text-center" scope="col">Discount</th>
-                            <th class="text-center" scope="col">Total Tax</th>
-                            <th class="text-center" scope="col">Sub Total</th>
-                            <th
-                              class="text-center"
-                              scope="col"
-                              style="width: 200px"
-                            ></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="cost in inventory_costs" :key="cost.id">
-                            <td class="text-center">
-                              {{ formatDate(cost.purchase_date) }}
-                            </td>
-                            <td class="p-1">
-                              <h6 class="col-12">{{ cost.name }}</h6>
-                              <p class="col-12" style="font-size: 0.8em">
-                                {{ $helpers.truncate(cost.description, 50, "...") }}
-                              </p>
-                            </td>
-                            <td class="text-center p-0">
-                              {{ cost.vendor_name }}
-                            </td>
-                            <td class="text-center p-0">
-                              <div class="pt-1">
-                                {{ `$ ${Number(cost.price).toLocaleString()}` }}
-                              </div>
-                              <p
-                                :title="cost.tax_percentage + ` %`"
-                                class="text-primary mb-0"
-                                style="font-weight: 600"
-                              >
-                                {{ cost.tax_type }}
-                              </p>
-                              <p
-                                v-show="cost.tax_type_secondary !== ''"
-                                :title="cost.tax_percentage_secondary + ` %`"
-                                class="text-primary"
-                                style="font-weight: 600"
-                              >
-                                {{ cost.tax_type_secondary }}
-                              </p>
-                            </td>
-                            <td class="text-center p-0">{{ cost.quantity }}</td>
-                            <td class="text-center p-0">
-                              {{
-                                `$ ${Number(cost.discount).toLocaleString()}`
-                              }}
-                            </td>
-                            <td class="text-center p-0">
-                              {{
-                                `$ ${Number(
-                                  cost.tax_amount_total,
-                                ).toLocaleString()}`
-                              }}
-                            </td>
-                            <td class="text-center p-0">
-                              {{
-                                `$ ${Number(cost.sub_total).toLocaleString()}`
-                              }}
-                            </td>
-                            <td class="p-0">
-                              <button
-                                class="btn btn-info"
-                                @click.prevent="editExpense(cost.id)"
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                "
-                              >
-                                <i class="bx bx-edit"></i>
-                              </button>
-                              <button
-                                class="btn btn-danger"
-                                @click.prevent="deleteExpense(cost.id)"
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                "
-                              >
-                                <i class="bx bx-trash-alt"></i>
-                              </button>
-                              <div class="w-100 mt-1"></div>
-                              <a
-                                :href="parseAttachmentUrl(cost.url)"
-                                class="btn btn-secondary p-50 text-uppercase"
-                                target="_blank"
-                                v-show="showAttachment(cost.url)"
-                                rel="noopener noreferrer"
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                  cursor: pointer;
-                                "
-                              >
-                                View File
-                              </a>
-                              <button
-                                @click.prevent="
-                                  deleteAttachmentConfirmation(cost.url)
-                                "
-                                class="btn btn-danger text-uppercase"
-                                target="_blank"
-                                v-show="showAttachment(cost.url)"
-                                rel="noopener noreferrer"
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                  cursor: pointer;
-                                "
-                              >
-                                <i class="bx bx-folder-minus"></i>
-                              </button>
-                              <label
-                                class="btn btn-secondary p-50 text-uppercase"
-                                v-show="!showAttachment(cost.url)"
-                                :for="`inventory_expense_attachment_${cost.id}`"
-                                style="
-                                  padding-right: 0.8em;
-                                  padding-left: 0.8em;
-                                  cursor: pointer;
-                                "
-                              >
-                                Upload File
-                              </label>
-                              <input
-                                :id="`inventory_expense_attachment_${cost.id}`"
-                                class="d-none"
-                                type="file"
-                                ref="attachment"
-                                @change="saveExpenseAttachment($event, cost.id)"
-                              />
-                            </td>
-                          </tr>
-                          <tr v-show="showTotal">
-                            <td
-                              class="p-0 pt-1 text-center"
-                              rowspan="6"
-                              style="border-bottom: 0px"
-                              colspan="5"
-                            >
-                              <div class="small" style="margin: auto">
-                                <doughnut :chart-data="chartData"></doughnut>
-                              </div>
-                            </td>
-                            <td
-                              class="p-0 pt-1"
-                              style="border-bottom: 0px"
-                              colspan="3"
-                            >
-                              <h5>Vehicle Purchase Price</h5>
-                            </td>
-                            <td
-                              class="p-0 pt-1"
-                              style="border-bottom: 0px"
-                              colspan="2"
-                            >
-                              <h5>
-                                {{
-                                  `$ ${Number(
-                                    vehiclePurchasePrice,
-                                  ).toLocaleString()}`
-                                }}
-                              </h5>
-                            </td>
-                          </tr>
-                          <tr v-show="showTotal">
-                            <td
-                              class="p-0"
-                              style="border-bottom: 0px"
-                              colspan="3"
-                            >
-                              <h5>Additional Expenses Total</h5>
-                            </td>
-                            <td
-                              class="p-0"
-                              style="border-bottom: 0px"
-                              colspan="2"
-                            >
-                              <h5>
-                                {{
-                                  `$ ${Number(getTotalPrice).toLocaleString()}`
-                                }}
-                              </h5>
-                            </td>
-                          </tr>
-                          <tr v-show="showTotal">
-                            <td
-                              class="p-0"
-                              style="border-bottom: 0px"
-                              colspan="3"
-                            >
-                              <h5>Discount</h5>
-                            </td>
-                            <td
-                              class="p-0"
-                              style="border-bottom: 0px"
-                              colspan="2"
-                            >
-                              <h5
-                                style="position: relative"
-                                class="text-success"
-                              >
-                                <span style="position: absolute; left: -1em"
-                                  >-</span
-                                >{{
-                                  `$ ${Number(
-                                    getTotalDiscount,
-                                  ).toLocaleString()}`
-                                }}
-                              </h5>
-                            </td>
-                          </tr>
-                          <tr v-show="showTotal">
-                            <td class="p-0" colspan="3"><h5>Sub Total</h5></td>
-                            <td class="p-0" colspan="2">
-                              <h5 style="position: relative">
-                                {{
-                                  `$ ${Number(
-                                    getTotalBeforTax,
-                                  ).toLocaleString()}`
-                                }}
-                              </h5>
-                            </td>
-                          </tr>
-                          <tr v-show="showTotal">
-                            <td class="p-0" colspan="3"><h5>Total Tax</h5></td>
-                            <td class="p-0" colspan="2">
-                              <h5
-                                style="position: relative"
-                                class="text-danger"
-                              >
-                                <span style="position: absolute; left: -1em"
-                                  >+</span
-                                >{{
-                                  `$ ${Number(getTotalTax).toLocaleString()}`
-                                }}
-                              </h5>
-                            </td>
-                          </tr>
-                          <tr v-show="showTotal">
-                            <td
-                              class="p-0 pt-1"
-                              style="border-bottom: 0px"
-                              colspan="3"
-                            >
-                              <h5>Total Amount</h5>
-                            </td>
-                            <td
-                              class="p-0 pt-1"
-                              style="border-bottom: 0px"
-                              colspan="2"
-                            >
-                              <h5>
-                                {{ `$ ${Number(getTotal).toLocaleString()}` }}
-                              </h5>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                  <div class="ex-actions ex-actions--file">
+                    <a
+                      :href="parseAttachmentUrl(cost.url)"
+                      class="btn btn-secondary ex-file-btn"
+                      target="_blank"
+                      v-show="showAttachment(cost.url)"
+                      rel="noopener noreferrer"
+                    >
+                      View File
+                    </a>
+                    <button
+                      @click.prevent="
+                        deleteAttachmentConfirmation(cost.url)
+                      "
+                      class="btn btn-danger ex-icon-btn ex-icon-btn--danger"
+                      target="_blank"
+                      v-show="showAttachment(cost.url)"
+                      rel="noopener noreferrer"
+                    >
+                      <i class="bx bx-folder-minus"></i>
+                    </button>
+                    <label
+                      class="btn btn-secondary ex-file-btn ex-file-btn--upload"
+                      v-show="!showAttachment(cost.url)"
+                      :for="`inventory_expense_attachment_${cost.id}`"
+                    >
+                      Upload File
+                    </label>
+                    <input
+                      :id="`inventory_expense_attachment_${cost.id}`"
+                      class="d-none"
+                      type="file"
+                      ref="attachment"
+                      @change="saveExpenseAttachment($event, cost.id)"
+                    />
                   </div>
-                </div>
-              </div>
-            </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="ex-card ex-summary" v-show="showTotal">
+        <div class="ex-chart">
+          <div class="small">
+            <doughnut :chart-data="chartData"></doughnut>
+          </div>
+        </div>
+        <div class="ex-totals">
+          <div class="ex-total-row">
+            <h5>Vehicle Purchase Price</h5>
+            <h5>
+              {{
+                `$ ${Number(
+                  vehiclePurchasePrice,
+                ).toLocaleString()}`
+              }}
+            </h5>
+          </div>
+          <div class="ex-total-row">
+            <h5>Additional Expenses Total</h5>
+            <h5>
+              {{
+                `$ ${Number(getTotalPrice).toLocaleString()}`
+              }}
+            </h5>
+          </div>
+          <div class="ex-total-row">
+            <h5>Discount</h5>
+            <h5 class="text-success">
+              <span>-</span>{{
+                `$ ${Number(
+                  getTotalDiscount,
+                ).toLocaleString()}`
+              }}
+            </h5>
+          </div>
+          <div class="ex-total-row ex-total-row--line">
+            <h5>Sub Total</h5>
+            <h5>
+              {{
+                `$ ${Number(
+                  getTotalBeforTax,
+                ).toLocaleString()}`
+              }}
+            </h5>
+          </div>
+          <div class="ex-total-row">
+            <h5>Total Tax</h5>
+            <h5 class="text-danger">
+              <span>+</span>{{
+                `$ ${Number(getTotalTax).toLocaleString()}`
+              }}
+            </h5>
+          </div>
+          <div class="ex-total-row ex-total-row--grand">
+            <h5>Total Amount</h5>
+            <h5>
+              {{ `$ ${Number(getTotal).toLocaleString()}` }}
+            </h5>
           </div>
         </div>
       </div>
@@ -315,14 +214,14 @@
 
     <!-- Modal -->
     <div
-      class="modal fade"
+      class="modal fade ex-modal"
       id="inventoryExpenseCost"
       tabindex="-1"
       role="dialog"
       aria-labelledby="Cost Setting Modal"
       aria-hidden="true"
     >
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
@@ -1409,3 +1308,321 @@ export default {
   width: 300px;
 }
 </style>
+<style lang="scss">
+/* ==========================================================================
+   Inventory — Expenses tab redesign (look only).
+   ========================================================================== */
+#expenses-block-list {
+  .ex-page {
+    padding: 8px 20px 96px;
+    color: #0f172a;
+  }
+  .ex-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .ex-private {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 500;
+    i { font-size: 15px; }
+  }
+  .ex-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: none !important;
+    i { position: static; top: 0; font-size: 18px; }
+  }
+  .ex-btn-primary {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    &:hover { background: #1d4ed8 !important; }
+  }
+
+  .ex-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .table-responsive { margin: 0; }
+  .ex-table {
+    margin: 0;
+    th {
+      padding: 12px 14px;
+      background: #f8fafc;
+      border-top: 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: none;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      border-top: 1px solid #f1f5f9;
+      vertical-align: middle;
+      font-size: 13px;
+      color: #1e293b;
+    }
+    tbody tr:first-child td { border-top: 0; }
+    tbody tr:hover td { background: #fafbfd; }
+  }
+  .ex-nowrap { white-space: nowrap; }
+  .ex-muted { color: #64748b; }
+  .ex-name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .ex-desc {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #64748b;
+  }
+  .ex-amount { font-weight: 600; color: #0f172a; white-space: nowrap; }
+  .ex-tax-chip {
+    display: inline-block;
+    margin: 4px 0 0 4px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .ex-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+  }
+  .ex-actions--file { margin-top: 8px; }
+  .ex-icon-btn,
+  .ex-file-btn {
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin: 0;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    box-shadow: none !important;
+    cursor: pointer;
+    i { position: static; top: 0; font-size: 16px; }
+  }
+  .ex-icon-btn {
+    width: 32px;
+    padding: 0;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #2563eb !important;
+    &:hover { background: #eff6ff !important; }
+  }
+  .ex-icon-btn--danger {
+    border-color: #fecaca !important;
+    color: #dc2626 !important;
+    &:hover { background: #fef2f2 !important; }
+  }
+  .ex-file-btn {
+    padding: 0 10px;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    &:hover { background: #f8fafc !important; }
+  }
+  .ex-file-btn--upload {
+    border-style: dashed !important;
+    color: #2563eb !important;
+    &::before {
+      font-family: "boxicons";
+      content: "\eb01";
+      font-size: 15px;
+    }
+    &:hover { background: #eff6ff !important; }
+  }
+
+  .ex-summary {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 24px;
+  }
+  .ex-chart {
+    display: flex;
+    justify-content: center;
+    .small { max-width: 100%; }
+  }
+  .ex-totals {
+    max-width: 460px;
+    width: 100%;
+    margin-left: auto;
+  }
+  .ex-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 8px 0;
+    h5 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+    }
+    h5:last-child {
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+      &.text-success { color: #16a34a !important; }
+      &.text-danger { color: #dc2626 !important; }
+      span { margin-right: 2px; }
+    }
+  }
+  .ex-total-row--line { border-top: 1px dashed #e2e8f0; margin-top: 4px; }
+  .ex-total-row--grand {
+    margin-top: 8px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #eff6ff;
+    h5 { color: #1e40af; font-weight: 600; }
+    h5:last-child { color: #1d4ed8; font-size: 18px; }
+  }
+
+  @media (max-width: 991px) {
+    .ex-summary { grid-template-columns: 1fr; }
+    .ex-totals { margin: 0 auto; }
+  }
+
+  /* ---------- Add / Edit expense modal ---------- */
+  .ex-modal {
+    .modal-dialog { max-width: 620px; }
+    .modal-content {
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+      overflow: hidden;
+    }
+    .modal-header {
+      align-items: center;
+      padding: 16px 22px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #ffffff;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .close {
+      margin: 0;
+      padding: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      opacity: 1;
+      color: #64748b;
+      text-shadow: none;
+      box-shadow: none;
+      transform: none;
+      background: transparent;
+      &:hover { background: #f1f5f9; color: #0f172a; }
+    }
+    .modal-body { padding: 18px 22px 6px; }
+    .alert-light-warning {
+      margin-bottom: 14px !important;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #475569;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-bottom: 6px;
+    }
+    .form-control,
+    .custom-select {
+      height: 38px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #0f172a;
+      box-shadow: none;
+      &:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+    }
+    textarea.form-control { height: auto; min-height: 80px; }
+    #sub_total {
+      font-weight: 600;
+      color: #1d4ed8;
+      background: #eff6ff !important;
+      border-color: #bfdbfe;
+    }
+    .v-select .vs__dropdown-toggle {
+      min-height: 38px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+    }
+    .modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid #e2e8f0;
+      gap: 8px;
+      .btn {
+        height: 38px;
+        padding: 0 18px;
+        border-radius: 8px;
+        font-weight: 500;
+        box-shadow: none !important;
+        margin: 0;
+      }
+      .btn-secondary {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #334155 !important;
+      }
+      .btn-primary {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
+      }
+    }
+  }
+  #expense_purchase_date .vdpComponent input {
+    height: 38px;
+    border-color: #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+}
+</style>
+

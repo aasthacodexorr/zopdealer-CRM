@@ -6,166 +6,168 @@
     role="tabpanel"
   >
     <!-- form layout section start -->
-    <section id="customer-main">
-      <div class="row match-height">
-        <div class="col-12 col-xs-12 col-md-8">
-          <div class="card">
-            <div class="card-content">
-              <div class="card-body pb-0 mx-25">
-                <h4 class="card-title col-12">Notes</h4>
-                <!-- Form to be submitted -->
-                <div class="row">
-                  <h5 class="col-12 text-danger" style="font-size: 0.8em">
-                    Internal notes, not visible on paperwork.
-                  </h5>
-                  <div class="col-12 mb-2">
-                    <div class="form-group">
-                      <input
-                        type="text"
-                        v-model="form.title"
-                        id="title"
-                        class="form-control"
-                        name="title"
-                        placeholder="Title"
-                      />
-                    </div>
-                    <div class="form-group">
-                      <textarea
-                        type="text"
-                        id="text"
-                        v-model="form.description"
-                        class="form-control"
-                        name="text"
-                        placeholder="Type note..."
-                      ></textarea>
-                    </div>
-                    <div class="form-row">
-                      <div class="col">
-                        <div class="custom-file">
-                          <input
-                            :class="{
-                              'is-invalid': errors.hasOwnProperty('attachment'),
-                            }"
-                            :title="errors.attachment"
-                            type="file"
-                            ref="attachment"
-                            @change="saveFile($event)"
-                            class="custom-file-input"
-                            id="attachment"
-                          />
-                          <label
-                            class="custom-file-label"
-                            id="attachment_label"
-                            for="attachment"
-                            >Choose Attachment</label
-                          >
-                        </div>
-                      </div>
-                      <div class="col">
-                        <button
-                          type="button"
-                          @click.prevent="saveNote()"
-                          :disabled="disableButton"
-                          class="float-right btn btn-primary shadow mr-1 mb-1"
-                        >
-                          Submit
-                        </button>
-
-                        <button
-                          type="button"
-                          @click.prevent="resetForm()"
-                          class="float-right btn btn-secondary shadow mr-1 mb-1"
-                        >
-                          Reset
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <form action></form>
-                </div>
-                <!-- end of form to be submitted -->
-                <div class="row">
-                  <!-- each note -->
-                  <div
-                    class="mb-0 col-md-12 col-sm-12"
-                    v-for="each_note in all_notes"
-                    :key="each_note.id + `_note`"
-                  >
-                    <div class="card" style="background: #f5f5f5">
-                      <div class="card-content mb-0">
-                        <div class="card-body">
-                          <h6 class="card-title mb-0">
-                            <span class="pr-3">{{ each_note.title }}</span>
-                            <span
-                              v-if="showDeleteUpdateButtons(each_note.user_id)"
-                              class="lead-note-buttons"
-                              style="position: absolute; right: 1em; top: 1em"
-                            >
-                              <i
-                                @click.prevent="openEditNote(each_note.id)"
-                                style="font-size: 1.4em; background: whitesmoke"
-                                class="bx text-info bx bx-edit"
-                              ></i>
-                              <i
-                                @click.prevent="deleteNote(each_note.id)"
-                                style="font-size: 1.4em; background: whitesmoke"
-                                class="bx text-danger bx bx-trash"
-                              ></i>
-                            </span>
-                          </h6>
-                          <p
-                            class="card-text"
-                            v-if="
-                              each_note.description != null &&
-                              each_note.description != ''
-                            "
-                          >
-                            {{ each_note.description }}
-                          </p>
-                          <medium
-                            class="d-block"
-                            v-if="each_note.attachment != null"
-                          >
-                            <a
-                              :href="
-                                parseAbsoluteOrRelativeUrl(each_note.attachment)
-                              "
-                              target="_blank"
-                            >
-                              <i class="bx-link-alt bx"></i>
-                              {{ attachment_link(each_note.attachment) }}
-                            </a>
-                          </medium>
-                          <small class="d-block text-muted">
-                            <span class="font-weight-bold font-italic">
-                              {{ note_author(each_note.user_id) }}
-                            </span>
-                            <span style="float: right">
-                              <i
-                                style="
-                                  vertical-align: middle;
-                                  padding-right: 1em;
-                                "
-                                class="bxs-time bx"
-                              ></i>
-                              {{ modified_data(each_note.updated_at) }}
-                            </span>
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- each note -->
-                </div>
-              </div>
+    <section id="customer-main" class="nt-page">
+      <div class="nt-layout">
+        <!-- Composer : START -->
+        <div class="nt-card nt-composer">
+          <div class="nt-composer-top">
+            <h4 class="nt-feed-title">Notes</h4>
+            <h5 class="nt-internal">
+              <i class="bx bx-lock-alt"></i>
+              Internal notes, not visible on paperwork.
+            </h5>
+          </div>
+          <div class="nt-composer-head">
+            <span class="nt-avatar" :style="noteAvatarStyle(noteComposerName)">{{
+              noteInitials(noteComposerName)
+            }}</span>
+            <div class="nt-composer-fields">
+              <input
+                type="text"
+                v-model="form.title"
+                id="title"
+                class="nt-title-input"
+                name="title"
+                placeholder="Title"
+              />
+              <textarea
+                type="text"
+                id="text"
+                v-model="form.description"
+                class="nt-textarea"
+                name="text"
+                rows="3"
+                placeholder="Type note..."
+              ></textarea>
             </div>
           </div>
+
+          <div class="nt-composer-foot">
+            <div class="custom-file nt-attach">
+              <input
+                :class="{
+                  'is-invalid': errors.hasOwnProperty('attachment'),
+                }"
+                :title="errors.attachment"
+                type="file"
+                ref="attachment"
+                @change="saveFile($event)"
+                class="custom-file-input"
+                id="attachment"
+              />
+              <label
+                class="custom-file-label nt-file-label"
+                id="attachment_label"
+                for="attachment"
+                >Choose Attachment</label
+              >
+            </div>
+            <div class="nt-composer-actions">
+              <button
+                type="button"
+                @click.prevent="resetForm()"
+                class="btn nt-ghost-btn"
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                @click.prevent="saveNote()"
+                :disabled="disableButton"
+                class="btn btn-primary nt-primary-btn"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+          <form action></form>
         </div>
+        <!-- Composer : END -->
+
+        <!-- Notes feed : START -->
+        <div class="nt-card" v-if="all_notes.length">
+          <ul class="nt-feed">
+            <!-- each note -->
+            <li
+              class="nt-note"
+              v-for="each_note in all_notes"
+              :key="each_note.id + `_note`"
+            >
+              <span
+                class="nt-avatar"
+                :style="noteAvatarStyle(note_author(each_note.user_id))"
+                >{{ noteInitials(note_author(each_note.user_id)) }}</span
+              >
+              <div class="nt-note-body">
+                <div class="nt-note-head">
+                  <div class="nt-note-meta">
+                    <span class="nt-author">{{
+                      note_author(each_note.user_id)
+                    }}</span>
+                    <span class="nt-time"
+                      ><i class="bx bx-time-five"></i>
+                      {{ modified_data(each_note.updated_at) }}</span
+                    >
+                  </div>
+                  <div
+                    v-if="showDeleteUpdateButtons(each_note.user_id)"
+                    class="lead-note-buttons nt-note-actions"
+                  >
+                    <button
+                      type="button"
+                      class="nt-icon-btn"
+                      title="Edit"
+                      @click.prevent="openEditNote(each_note.id)"
+                    >
+                      <i class="bx bx-edit-alt"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="nt-icon-btn nt-icon-btn--danger"
+                      title="Delete"
+                      @click.prevent="deleteNote(each_note.id)"
+                    >
+                      <i class="bx bx-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <h6 class="nt-note-title" v-if="each_note.title">
+                  {{ each_note.title }}
+                </h6>
+                <p
+                  class="nt-note-text"
+                  v-if="
+                    each_note.description != null &&
+                    each_note.description != ''
+                  "
+                >
+                  {{ each_note.description }}
+                </p>
+                <a
+                  v-if="each_note.attachment != null"
+                  class="nt-attachment"
+                  :href="parseAbsoluteOrRelativeUrl(each_note.attachment)"
+                  target="_blank"
+                >
+                  <span class="nt-attachment-icon"
+                    ><i class="bx" :class="noteFileIcon(each_note.attachment)"></i
+                  ></span>
+                  <span class="nt-attachment-name">{{
+                    attachment_link(each_note.attachment)
+                  }}</span>
+                  <i class="bx bx-link-external nt-attachment-open"></i>
+                </a>
+              </div>
+            </li>
+            <!-- each note -->
+          </ul>
+        </div>
+        <!-- Notes feed : END -->
       </div>
     </section>
     <!-- Model -->
     <div
-      class="modal fade"
+      class="modal fade nt-modal"
       id="editNote"
       tabindex="-1"
       role="dialog"
@@ -174,36 +176,36 @@
     >
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Update Lead</h5>
+          <div class="nt-modal-header">
+            <h5 class="nt-modal-title" id="exampleModalLabel">Update Lead</h5>
             <button
               type="button"
-              class="close"
+              class="nt-close"
               data-dismiss="modal"
               aria-label="Close"
             >
-              <span aria-hidden="true">&times;</span>
+              <i class="bx bx-x"></i>
             </button>
           </div>
           <!--form model -->
           <form action="#">
-            <div class="modal-body">
-              <div class="form-group">
+            <div class="modal-body nt-modal-body">
+              <div class="nt-field">
                 <input
                   type="text"
                   v-model="edit_form.title"
                   id="title"
-                  class="form-control"
+                  class="form-control nt-input"
                   name="title"
                   placeholder="Title"
                 />
               </div>
-              <div class="form-group">
+              <div class="nt-field mb-0">
                 <textarea
                   type="text"
                   id="text"
                   v-model="edit_form.description"
-                  class="form-control"
+                  class="form-control nt-input nt-input-area"
                   name="text"
                   placeholder="Type note..."
                 ></textarea>
@@ -211,10 +213,10 @@
             </div>
           </form>
           <!-- end of form model -->
-          <div class="modal-footer">
+          <div class="nt-modal-footer">
             <button
               type="button"
-              class="btn btn-secondary"
+              class="btn nt-ghost-btn"
               data-dismiss="modal"
             >
               Close
@@ -222,7 +224,7 @@
             <button
               type="button"
               @click.prevent="updateNote(edit_form.id)"
-              class="btn btn-primary"
+              class="btn btn-primary nt-primary-btn"
             >
               Update Note
             </button>
@@ -235,7 +237,9 @@
 </template>
 <script>
 import Toast from "../../../library/Toast";
+import noteDisplay from "../../../mixins/noteDisplay";
 export default {
+  mixins: [noteDisplay],
   props: {
     id: { required: true },
     allUsers: { required: true },
@@ -495,6 +499,16 @@ export default {
 };
 </script>
 <style lang="scss">
+@import "../../../assets/scss/notes-tab";
+
+/* Shared Notes tab design (same as Leads). */
+#customer-notes {
+  @include notes-tab;
+  .lead-note-buttons i:hover {
+    font-size: inherit !important;
+  }
+}
+
 .lead-note-buttons {
   i {
     transition-timing-function: linear;

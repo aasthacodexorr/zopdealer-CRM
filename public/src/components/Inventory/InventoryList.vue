@@ -607,7 +607,7 @@
           >
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm" role="document">
               <div class="modal-content">
-                <div class="modal-header pl-1 pr-1">
+                <div class="modal-header pl-1 pr-1 col-list-header">
                   <h4 class="modal-title font-weight-bold" id="gridListLabel">Column List</h4>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <i class="bx bx-x"></i>
@@ -627,19 +627,25 @@
                     item-key="header"
                   >
                     <template #item="{ element, index }">
-                      <li class="list-group-item d-flex align-items-center">
-                        <span style="cursor: pointer" class="bx bx-grid-vertical pr-1 handle text-muted"></span>
-                        <div class="checkbox mb-0">
+                      <li
+                        class="list-group-item d-flex align-items-center col-list-item"
+                        :class="{ 'is-off': element.visibility != '1' }"
+                      >
+                        <span style="cursor: pointer" class="bx bx-grid-vertical handle col-list-handle"></span>
+                        <label :for="'dragging_' + index" class="col-list-name">{{
+                          String(element.header || "").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
+                        }}</label>
+                        <div class="custom-control custom-switch col-list-switch">
                           <input
                             type="checkbox"
                             @change="unsavedView"
                             v-model="element.visibility"
-                            class="checkbox-input"
+                            class="custom-control-input"
                             :id="'dragging_' + index"
                             :true-value="'1'"
                             :false-value="'0'"
                           />
-                          <label :for="'dragging_' + index" class="mb-0 ml-1">{{ element.header }}</label>
+                          <label :for="'dragging_' + index" class="custom-control-label"></label>
                         </div>
                       </li>
                     </template>
@@ -1193,9 +1199,7 @@ export default {
       },
     },
     bulk_select(newVal) {
-      if (newVal === "1" && this.getEntities && this.getEntities.length > 0) {
-        this.handleOpenPreview(this.getEntities[0]);
-      } else if (newVal === "0") {
+      if (newVal === "0") {
         this.closePreviewPanel();
       }
     },
@@ -1229,6 +1233,10 @@ export default {
       this.handleOpenPreview(item);
     },
     handleOpenPreview(item) {
+      if (this.isPreviewOpen && this.selectedInventoryId === item.inventory_id) {
+        this.closePreviewPanel();
+        return;
+      }
       this.selectedInventoryId = item.inventory_id;
       this.selectedVehicleItem = item;
       this.isPreviewOpen = true;
@@ -2104,14 +2112,40 @@ export default {
   align-items: center;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  padding: 5px 12px;
-  height: 32px;
+  padding: 0 14px;
+  height: 34px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
   color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
+  user-select: none;
+
+  i {
+    font-size: 16px;
+    margin-right: 8px !important;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+
+  &::after {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 12px;
+    color: #64748b;
+    vertical-align: middle;
+  }
 
   &:hover {
     border-color: #cbd5e1;
@@ -2827,9 +2861,12 @@ export default {
   background: #f8fafc;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 20;
 
   th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     padding: 0.6rem 0.55rem;
     font-size: 11px;
     font-weight: 700;
@@ -3148,6 +3185,121 @@ export default {
 </style>
 
 <style lang="scss">
+/* ---------- Views dropdown must sit above the sticky table header ---------- */
+.inventory-tier2-row {
+  position: relative;
+  z-index: 60;
+}
+
+/* ---------- Compact view: fit every visible column on one screen ---------- */
+.inventory-table-responsive.compact {
+  overflow-x: auto;
+  .inventory-main-table {
+    min-width: 0 !important;
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+  .inventory-main-table th,
+  .inventory-main-table td {
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0.3rem 0.35rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1.25 !important;
+  }
+  .inventory-table-head-row th {
+    font-size: 10px !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;
+  }
+  .inventory-main-table td * {
+    max-width: none;
+  }
+  .th-vehicle,
+  td.col-vehicle {
+    max-width: 190px !important;
+  }
+  .th-vehicle .vehicle-th-labels {
+    flex-wrap: wrap !important;
+    white-space: normal !important;
+    gap: 0 4px !important;
+  }
+  .vehicle-primary-title {
+    white-space: normal !important;
+    font-size: 0.78rem !important;
+  }
+  .vehicle-sub-meta {
+    white-space: normal !important;
+    font-size: 0.68rem !important;
+  }
+}
+
+/* ---------- Column List modal ---------- */
+#grid-list {
+  .modal-content {
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  }
+  .col-list-header {
+    align-items: center;
+    padding: 14px 18px !important;
+    border-bottom: 1px solid #e2e8f0;
+    .modal-title { font-size: 17px; color: #0f172a; }
+    .close {
+      margin: 0;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: transparent;
+      box-shadow: none;
+      transform: none;
+      opacity: 1;
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      &:hover { background: #f1f5f9; color: #0f172a; }
+    }
+  }
+  .list-group { margin: 0; padding: 6px 0; }
+  .col-list-item {
+    gap: 10px;
+    padding: 9px 18px;
+    border: 0;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 0 !important;
+    background: #ffffff;
+    &:last-child { border-bottom: 0; }
+    &:hover { background: #f8fafc; }
+    &.is-off .col-list-name { color: #94a3b8; }
+  }
+  .col-list-handle {
+    font-size: 18px;
+    color: #94a3b8;
+    cursor: grab !important;
+  }
+  .col-list-name {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+    text-transform: none;
+    letter-spacing: 0;
+    cursor: pointer;
+  }
+  .col-list-switch {
+    margin: 0;
+    padding-left: 2.25rem;
+    min-height: 0;
+    .custom-control-label { cursor: pointer; }
+  }
+}
+
 /* Suppress pace progress and header shadow */
 .pace,
 .pace-progress {
