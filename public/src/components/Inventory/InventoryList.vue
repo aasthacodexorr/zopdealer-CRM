@@ -1193,9 +1193,7 @@ export default {
       },
     },
     bulk_select(newVal) {
-      if (newVal === "1" && this.getEntities && this.getEntities.length > 0) {
-        this.handleOpenPreview(this.getEntities[0]);
-      } else if (newVal === "0") {
+      if (newVal === "0") {
         this.closePreviewPanel();
       }
     },

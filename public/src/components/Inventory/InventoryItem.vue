@@ -422,10 +422,8 @@ export default {
     onCheckboxChange() {
       if (this.checkValue === "1") {
         this.addInventoryId(this.item.inventory_id);
-        this.$emit("open-preview", this.item);
       } else {
         this.removeInventoryId(this.item.inventory_id);
-        this.$emit("close-preview-if-selected", this.item.inventory_id);
       }
     },
     onRowClick(e) {
@@ -438,8 +436,8 @@ export default {
       ) {
         return;
       }
-      this.checkValue = this.checkValue === "1" ? "0" : "1";
-      this.onCheckboxChange();
+      // Row tap opens the vehicle detail page.
+      this.$router.push({ name: "inventory-update", params: { id: this.item.inventory_id } });
     },
     copyVin() {
       if (this.item.vin) {

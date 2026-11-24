@@ -6,7 +6,7 @@
     role="tabpanel"
   >
     <!-- form layout section start -->
-    <section id="purchase-initial-section">
+    <section id="purchase-initial-section" class="pu-page">
       <div class="row match-height">
         <div class="col-md-12 col-12">
           <div class="card shadow-none mb-0">
@@ -16,7 +16,7 @@
                   <div class="form-body">
                     <div class="row">
                       <div class="col-md-12 col-12">
-                        <div class="m-width-s">
+                        <div class="m-width-s pu-card pu-card--basics">
                           <div class="row">
                             <div class="col-md-4">
                               <label>Purchased On</label>
@@ -169,7 +169,7 @@
                               </div>
                             </div>
                             <div class="col-md-12 col-12">
-                              <p class="alert alert-light mb-0">
+                              <p class="alert alert-light mb-0 pu-info">
                                 Vendor information in the section below doesn't
                                 affect the Vendor information saved in Vendor
                                 module.
@@ -179,7 +179,7 @@
                         </div>
                       </div>
                       <div class="col-md-12 col-12">
-                        <div class="m-width-s">
+                        <div class="m-width-s pu-card pu-card--vendor">
                           <div class="row">
                             <div class="col-md-6 form-group">
                               <v-select
@@ -217,13 +217,13 @@
                         </div>
                       </div>
                       <div class="col-md-12 col-12">
-                        <div class="m-width-s">
+                        <div class="m-width-s pu-card pu-card--seller">
                           <div class="row">
-                            <h3 class="col-xs-12">
+                            <h3 class="col-xs-12 pu-card-title">
                               Who did you purchase this vehicle from ?
                             </h3>
                             <h5
-                              class="col-xs-12 text-danger"
+                              class="col-xs-12 text-danger pu-private"
                               style="font-size: 0.8em"
                             >
                               Note : This information is visible only to the
@@ -623,7 +623,7 @@
                       </div>
                       <!-- section for taxes : START -->
                       <div class="col-md-12 col-12">
-                        <div class="m-width-s">
+                        <div class="m-width-s pu-card pu-card--pricing">
                           <div class="row">
                             <div class="col-md-3">
                               <div class="col-xs-12">
@@ -825,7 +825,7 @@
                       <!-- additional information about transfer : START -->
                       <!-- section for taxes : START -->
                       <div class="col-md-12 col-12">
-                        <div class="m-width-s">
+                        <div class="m-width-s pu-card pu-card--status">
                           <div class="row">
                             <!-- Payment : START -->
                             <div class="col-md-4">
@@ -2027,5 +2027,190 @@ export default {
 
 input:read-only {
   background: #eee !important;
+}
+
+/* ==========================================================================
+   Inventory — Purchase tab redesign (look only; markup/fields unchanged).
+   ========================================================================== */
+#purchase-initial-section.pu-page {
+  padding: 8px 20px 96px;
+  color: #0f172a;
+
+  > .row > [class*="col-"] > .card,
+  > .row > [class*="col-"] > .card > .card-content > .card-body {
+    background: transparent;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* each existing block becomes a card */
+  .pu-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 20px 6px;
+    margin-bottom: 16px;
+    max-width: none;
+    > .row { margin-left: -8px; margin-right: -8px; }
+    > .row > [class*="col-"] { padding-left: 8px; padding-right: 8px; }
+  }
+  .pu-card--vendor { padding-bottom: 18px; }
+  .pu-card--vendor .form-group { margin-bottom: 0; }
+  .pu-card--pricing,
+  .pu-card--status { padding-top: 16px; }
+
+  .pu-card-title {
+    width: 100%;
+    margin: 0 0 4px;
+    padding: 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  /* labels */
+  label:not(.custom-control-label):not(.btn) {
+    font-size: 12px;
+    font-weight: 500;
+    color: #475569;
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 6px;
+  }
+  .pu-card--basics > .row > .col-md-4 > label,
+  .pu-card--basics > .row > .col-md-3 > label,
+  .pu-card--status > .row > .col-md-4 > label,
+  .pu-card--status > .row > .col-md-3 > label,
+  .pu-card--seller > .row > .col-md-2 > label {
+    font-size: 13px;
+    color: #1e293b;
+    line-height: 38px;
+    margin: 0;
+  }
+
+  /* inputs / selects */
+  .form-control,
+  .custom-select {
+    height: 38px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #0f172a;
+    box-shadow: none;
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    &.is-invalid { border-color: #ef4444; }
+    &:disabled { background: #f8fafc; }
+  }
+  .has-icon-left .form-control-position {
+    height: 38px;
+    line-height: 38px;
+    color: #94a3b8;
+  }
+  .has-icon-left .form-control-position i { line-height: 38px; }
+
+  /* total amount stands out */
+  #total_purchase_amount {
+    font-weight: 600;
+    color: #1d4ed8;
+    background: #eff6ff !important;
+    border-color: #bfdbfe;
+  }
+  .pu-card--pricing label[for="total_purchase_amount"] { color: #1d4ed8; }
+
+  /* vendor picker */
+  .v-select .vs__dropdown-toggle {
+    min-height: 38px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+
+  /* toggles */
+  .custom-switch { min-height: 38px; display: flex; align-items: center; }
+
+  /* buttons (existing inline padding kept, look refreshed) */
+  .btn {
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: none !important;
+    letter-spacing: 0;
+    box-shadow: none !important;
+    vertical-align: middle !important;
+    i { position: static; top: 0; font-size: 16px; }
+  }
+  .btn-secondary {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    &:hover { background: #f8fafc !important; border-color: #cbd5e1 !important; }
+  }
+  label.btn-secondary {
+    border-style: dashed !important;
+    color: #2563eb !important;
+    &::before {
+      font-family: "boxicons";
+      content: "\eb01";
+      font-size: 16px;
+    }
+    &:hover { background: #eff6ff !important; border-color: #93c5fd !important; }
+  }
+  .btn-danger {
+    width: 38px;
+    padding: 0 !important;
+    margin-left: 4px;
+    background: #ffffff !important;
+    border: 1px solid #fecaca !important;
+    color: #dc2626 !important;
+    &:hover { background: #fef2f2 !important; }
+  }
+  .btn-info {
+    background: #2563eb !important;
+    border: 1px solid #2563eb !important;
+    color: #ffffff !important;
+    &:hover { background: #1d4ed8 !important; }
+  }
+
+  /* notices */
+  .pu-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 12px !important;
+    padding: 10px 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff !important;
+    color: #1e40af !important;
+    font-size: 13px;
+    opacity: 1;
+    &::before {
+      font-family: "boxicons";
+      content: "\eabf";
+      font-size: 17px;
+    }
+  }
+  .pu-private {
+    width: 100%;
+    margin: 0 8px 14px;
+    padding: 0;
+    font-size: 12px !important;
+    font-weight: 500;
+    color: #b91c1c !important;
+  }
+
+  /* status block: each question row separated */
+  .pu-card--status > .row > .w-100 {
+    height: 1px;
+    margin: 4px 8px 14px;
+    background: #f1f5f9;
+  }
 }
 </style>

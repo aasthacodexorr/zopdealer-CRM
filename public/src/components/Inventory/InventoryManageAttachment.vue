@@ -6,496 +6,509 @@
     role="tabpanel"
   >
     <!-- Attachments  form layout section start -->
-    <section id="attachments ">
-      <div class="row">
-        <div class="col-12">
-          <div class="card shadow-none mt-1 mb-0">
-            <div class="card-header border-line-bottom-title">
-              <h4 class="card-title">Attachments</h4>
-            </div>
-            <div class="card-content">
-              <div class="card-body pt-0 pb-0">
-                <form
-                  class="form form-horizontal webapp-form"
-                  id="vehicle-form"
-                >
-                  <div class="form-body">
-                    <div class="mb-0 pb-0 border-0">
-                      <div class="row">
-                        <div class="col-md-3">
-                          <label>Vehicle History Report</label>
-                        </div>
-                        <div class="col-md-9 row pb-1">
-                          <div class="col-3">
-                            <div class="form-check">
-                              <div class="checkbox">
-                                <input
-                                  type="checkbox"
-                                  class="checkbox-input"
-                                  id="vehicleHistoryReport"
-                                  v-model="vehicleHistoryReportFile"
-                                  :true-value="'1'"
-                                  :false-value="'0'"
-                                />
-                                <label
-                                  class="form-check-label"
-                                  for="vehicleHistoryReport"
-                                  style="cursor: pointer"
-                                >
-                                  Check To Add File.
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div
-                            class="col-5"
-                            v-if="vehicleHistoryReportFile == '1'"
+    <section id="attachments " class="at-page">
+      <div class="at-card">
+        <div class="at-card-head border-line-bottom-title">
+          <h4 class="at-title">Attachments</h4>
+        </div>
+        <form
+          class="form form-horizontal webapp-form"
+          id="vehicle-form"
+        >
+          <div class="form-body">
+            <div class="at-list">
+                <div class="at-row">
+                  <div class="at-row-label">
+                    <span class="at-icon at-icon--0"><i class="bx bx-history"></i></span>
+                    <label>Vehicle History Report</label>
+                  </div>
+                  <div class="at-row-controls">
+                    <div class="at-check">
+                      <div class="form-check">
+                        <div class="checkbox">
+                          <input
+                            type="checkbox"
+                            class="checkbox-input"
+                            id="vehicleHistoryReport"
+                            v-model="vehicleHistoryReportFile"
+                            :true-value="'1'"
+                            :false-value="'0'"
+                          />
+                          <label
+                            class="form-check-label"
+                            for="vehicleHistoryReport"
+                            style="cursor: pointer"
                           >
-                            <div class="custom-file">
-                              <input
-                                type="file"
-                                class="custom-file-input"
-                                @change="
-                                  saveFile(
-                                    $event,
-                                    'vehicleHistoryReport',
-                                    'Vehicle History Report',
-                                    'vehicleHistoryReportUrl'
-                                  )
-                                "
-                                id="vehicleHistoryReportFileInput"
-                              />
-                              <label
-                                class="custom-file-label attach-file-label"
-                                for="vehicleHistoryReportFileInput"
-                                >Upload file</label
-                              >
-                            </div>
-                          </div>
-                          <div class="col-5" v-else>
-                            <input
-                              type="text"
-                              style="width: 70%; display: inline-block"
-                              v-model="vehicleHistoryReportInput"
-                              class="form-control"
-                              placeholder="Vehicle History Report Url"
-                            />
-                            <button
-                              style="padding-top: 0.3em"
-                              @click.prevent="
-                                saveUrl(
-                                  'vehicleHistoryReportInput',
-                                  'Vehicle History Report',
-                                  'vehicleHistoryReportUrl'
-                                )
-                              "
-                              class="btn btn-primary"
-                            >
-                              <i class="bx bxs-save"></i> Save
-                            </button>
-                          </div>
-                          <div class="col-2 p-0" v-if="vehicleHistoryReportUrl">
-                            <a
-                              :href="vehicleHistoryReportUrl"
-                              target="_blank"
-                              class="btn btn-info"
-                              rel="noopener noreferrer"
-                              ><i class="bx bx-link-external pr-50"></i>View</a
-                            >
-                          </div>
-                          <div class="col-2 p-0" v-if="vehicleHistoryReportUrl">
-                            <button
-                              @click.prevent="
-                                deleteFile(
-                                  'Vehicle History Report',
-                                  'vehicleHistoryReportUrl'
-                                )
-                              "
-                              class="btn btn-danger"
-                            >
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </div>
+                            Check To Add File.
+                          </label>
                         </div>
-                        <div class="col-md-3">
-                          <label>Vehicle Repair Report </label>
-                        </div>
-                        <div class="col-md-9 row pb-1">
-                          <div class="col-3">
-                            <div class="form-check">
-                              <div class="checkbox">
-                                <input
-                                  type="checkbox"
-                                  class="checkbox-input"
-                                  id="vehicleRepairReportFile"
-                                  v-model="vehicleRepairReportFile"
-                                  :true-value="'1'"
-                                  :false-value="'0'"
-                                />
-                                <label
-                                  class="form-check-label"
-                                  for="vehicleRepairReportFile"
-                                  style="cursor: pointer"
-                                >
-                                  Check To Add File.
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div
-                            class="col-5"
-                            v-if="vehicleRepairReportFile == '1'"
-                          >
-                            <div class="custom-file">
-                              <input
-                                type="file"
-                                class="custom-file-input"
-                                @change="
-                                  saveFile(
-                                    $event,
-                                    'vehicleRepairReport',
-                                    'Vehicle Repair Report',
-                                    'vehicleRepairReportUrl'
-                                  )
-                                "
-                                id="vehicleRepairReportFileInput"
-                              />
-                              <label
-                                class="custom-file-label attach-file-label"
-                                for="vehicleRepairReportFileInput"
-                                >Upload file</label
-                              >
-                            </div>
-                          </div>
-                          <div class="col-5" v-else>
-                            <input
-                              type="text"
-                              style="width: 70%; display: inline-block"
-                              v-model="vehicleRepairReportInput"
-                              class="form-control"
-                              placeholder="Vehicle Repair Report Url"
-                            />
-                            <button
-                              style="padding-top: 0.3em"
-                              @click.prevent="
-                                saveUrl(
-                                  'vehicleRepairReportInput',
-                                  'Vehicle Repair Report',
-                                  'vehicleRepairReportUrl'
-                                )
-                              "
-                              class="btn btn-primary"
-                            >
-                              <i class="bx bxs-save"></i> Save
-                            </button>
-                          </div>
-                          <div class="col-2 p-0" v-if="vehicleRepairReportUrl">
-                            <a
-                              :href="vehicleRepairReportUrl"
-                              target="_blank"
-                              class="btn btn-info"
-                              rel="noopener noreferrer"
-                              ><i class="bx bx-link-external pr-50"></i>View</a
-                            >
-                          </div>
-                          <div class="col-2 p-0" v-if="vehicleRepairReportUrl">
-                            <button
-                              @click.prevent="
-                                deleteFile(
-                                  'Vehicle Repair Report',
-                                  'vehicleRepairReportUrl'
-                                )
-                              "
-                              class="btn btn-danger"
-                            >
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </div>
-                        </div>
-                        <div class="col-md-3">
-                          <label>Window Sticker</label>
-                        </div>
-                        <div class="col-md-9 row pb-1">
-                          <div class="col-3">
-                            <div class="form-check">
-                              <div class="checkbox">
-                                <input
-                                  type="checkbox"
-                                  class="checkbox-input"
-                                  id="windowStickerFile"
-                                  v-model="windowStickerFile"
-                                  :true-value="'1'"
-                                  :false-value="'0'"
-                                />
-                                <label
-                                  class="form-check-label"
-                                  for="windowStickerFile"
-                                  style="cursor: pointer"
-                                >
-                                  Check To Add File.
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-5" v-if="windowStickerFile == '1'">
-                            <div class="custom-file">
-                              <input
-                                type="file"
-                                class="custom-file-input"
-                                @change="
-                                  saveFile(
-                                    $event,
-                                    'windowSticker',
-                                    'Window Sticker',
-                                    'windowStickerUrl'
-                                  )
-                                "
-                                id="windowStickerFileInput"
-                              />
-                              <label
-                                class="custom-file-label attach-file-label"
-                                for="windowStickerFileInput"
-                                >Upload file</label
-                              >
-                            </div>
-                          </div>
-                          <div class="col-5" v-else>
-                            <input
-                              type="text"
-                              style="width: 70%; display: inline-block"
-                              v-model="windowStickerInput"
-                              class="form-control"
-                              placeholder="Window Sticker Url"
-                            />
-                            <button
-                              style="padding-top: 0.3em"
-                              @click.prevent="
-                                saveUrl(
-                                  'windowStickerInput',
-                                  'Window Sticker',
-                                  'windowStickerUrl'
-                                )
-                              "
-                              class="btn btn-primary"
-                            >
-                              <i class="bx bxs-save"></i> Save
-                            </button>
-                          </div>
-                          <div class="col-2 p-0" v-if="windowStickerUrl">
-                            <a
-                              :href="windowStickerUrl"
-                              target="_blank"
-                              class="btn btn-info"
-                              rel="noopener noreferrer"
-                              ><i class="bx bx-link-external pr-50"></i>View</a
-                            >
-                          </div>
-                          <div class="col-2 p-0" v-if="windowStickerUrl">
-                            <button
-                              @click.prevent="
-                                deleteFile('Window Sticker', 'windowStickerUrl')
-                              "
-                              class="btn btn-danger"
-                            >
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </div>
-                        </div>
-                        <div class="col-md-3">
-                          <label>Other</label>
-                        </div>
-                        <div class="col-md-9 row pb-1">
-                          <div class="col-3">
-                            <div class="form-check">
-                              <div class="checkbox">
-                                <input
-                                  type="checkbox"
-                                  class="checkbox-input"
-                                  id="otherReport"
-                                  v-model="otherReportFile"
-                                  :true-value="'1'"
-                                  :false-value="'0'"
-                                />
-                                <label
-                                  class="form-check-label"
-                                  for="otherReport"
-                                  style="cursor: pointer"
-                                >
-                                  Check To Add File.
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="col-5" v-if="otherReportFile == '1'">
-                            <div class="custom-file">
-                              <input
-                                type="file"
-                                class="custom-file-input"
-                                @change="
-                                  saveFile(
-                                    $event,
-                                    'otherReport',
-                                    'Other Report',
-                                    'otherReportUrl'
-                                  )
-                                "
-                                id="otherReportFileInput"
-                              />
-                              <label
-                                class="custom-file-label attach-file-label"
-                                for="otherReportFileInput"
-                                >Upload file</label
-                              >
-                            </div>
-                          </div>
-                          <div class="col-5" v-else>
-                            <input
-                              type="text"
-                              style="width: 70%; display: inline-block"
-                              v-model="otherReportInput"
-                              class="form-control"
-                              placeholder="Other File Url"
-                            />
-                            <button
-                              style="padding-top: 0.3em"
-                              @click.prevent="
-                                saveUrl(
-                                  'otherReportInput',
-                                  'Other Report',
-                                  'otherReportUrl'
-                                )
-                              "
-                              class="btn btn-primary"
-                            >
-                              <i class="bx bxs-save"></i> Save
-                            </button>
-                          </div>
-                          <div class="col-2 p-0" v-if="otherReportUrl">
-                            <a
-                              :href="otherReportUrl"
-                              target="_blank"
-                              class="btn btn-info"
-                              rel="noopener noreferrer"
-                              ><i class="bx bx-link-external pr-50"></i>View</a
-                            >
-                          </div>
-                          <div class="col-2 p-0" v-if="otherReportUrl">
-                            <button
-                              class="btn btn-danger"
-                              @click.prevent="
-                                deleteFile('Other Report', 'otherReportUrl')
-                              "
-                            >
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </div>
-                        </div>
-                        <!-- Video -->
-                        <div class="col-md-3">
-                          <label>Video URL</label>
-                        </div>
-                        <div class="col-md-9 row pb-1">
-                          <div class="col-3" style="visibility: hidden">
-                            <div class="form-check">
-                              <div class="checkbox">
-                                <input
-                                  type="checkbox"
-                                  class="checkbox-input"
-                                  id="Video"
-                                  v-model="VideoFile"
-                                  :true-value="'1'"
-                                  :false-value="'0'"
-                                />
-                                <label
-                                  class="form-check-label"
-                                  for="Video"
-                                  style="cursor: pointer"
-                                >
-                                  Check To Add File.
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div
-                            class="col-5"
-                            style="visibility: hidden"
-                            v-if="VideoFile == '1'"
-                          >
-                            <div class="custom-file">
-                              <input
-                                type="file"
-                                class="custom-file-input"
-                                @change="
-                                  saveFile(
-                                    $event,
-                                    'Video',
-                                    'Video Url',
-                                    'VideoUrl'
-                                  )
-                                "
-                                id="VideoFileInput"
-                              />
-                              <label
-                                class="custom-file-label attach-file-label"
-                                for="VideoFileInput"
-                                >Upload file</label
-                              >
-                            </div>
-                          </div>
-                          <div class="col-5" v-else>
-                            <input
-                              type="text"
-                              style="width: 70%; display: inline-block"
-                              v-model="VideoInput"
-                              class="form-control"
-                              placeholder="Video Url"
-                            />
-                            <button
-                              style="padding-top: 0.3em"
-                              @click.prevent="
-                                saveUrl('VideoInput', 'Video Url', 'VideoUrl')
-                              "
-                              class="btn btn-primary"
-                            >
-                              <i class="bx bxs-save"></i> Save
-                            </button>
-                          </div>
-                          <div class="col-2 p-0" v-if="VideoUrl">
-                            <a
-                              :href="VideoUrl"
-                              target="_blank"
-                              class="btn btn-info"
-                              rel="noopener noreferrer"
-                              ><i class="bx bx-link-external pr-50"></i>View</a
-                            >
-                          </div>
-                          <div class="col-2 p-0" v-if="VideoUrl">
-                            <button
-                              class="btn btn-danger"
-                              @click.prevent="
-                                deleteFile('Video Url', 'VideoUrl')
-                              "
-                            >
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </div>
-                        </div>
-                        <!-- Video -->
                       </div>
                     </div>
+                    <div
+                      class="at-input"
+                      v-if="vehicleHistoryReportFile == '1'"
+                    >
+                      <div class="custom-file at-file">
+                        <input
+                          type="file"
+                          class="custom-file-input"
+                          @change="
+                            saveFile(
+                              $event,
+                              'vehicleHistoryReport',
+                              'Vehicle History Report',
+                              'vehicleHistoryReportUrl'
+                            )
+                          "
+                          id="vehicleHistoryReportFileInput"
+                        />
+                        <label
+                          class="custom-file-label attach-file-label"
+                          for="vehicleHistoryReportFileInput"
+                          >Upload file</label
+                        >
+                      </div>
+                    </div>
+                    <div class="at-input at-url" v-else>
+                      <input
+                        type="text"
+                        v-model="vehicleHistoryReportInput"
+                        class="form-control"
+                        placeholder="Vehicle History Report Url"
+                      />
+                      <button
+                        @click.prevent="
+                          saveUrl(
+                            'vehicleHistoryReportInput',
+                            'Vehicle History Report',
+                            'vehicleHistoryReportUrl'
+                          )
+                        "
+                        class="btn btn-primary at-btn at-btn-primary"
+                      >
+                        <i class="bx bxs-save"></i> Save
+                      </button>
+                    </div>
+                    <div class="at-actions">
+                      <a
+                        v-if="vehicleHistoryReportUrl"
+                        :href="vehicleHistoryReportUrl"
+                        target="_blank"
+                        class="btn btn-info at-btn at-btn-ghost"
+                        rel="noopener noreferrer"
+                        ><i class="bx bx-link-external"></i>View</a
+                      >
+                      <button
+                        v-if="vehicleHistoryReportUrl"
+                        @click.prevent="
+                          deleteFile(
+                            'Vehicle History Report',
+                            'vehicleHistoryReportUrl'
+                          )
+                        "
+                        class="btn btn-danger at-btn at-btn-danger"
+                      >
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </div>
                   </div>
-                </form>
-              </div>
+                </div>
+                <div class="at-row">
+                  <div class="at-row-label">
+                    <span class="at-icon at-icon--1"><i class="bx bx-wrench"></i></span>
+                    <label>Vehicle Repair Report </label>
+                  </div>
+                  <div class="at-row-controls">
+                    <div class="at-check">
+                      <div class="form-check">
+                        <div class="checkbox">
+                          <input
+                            type="checkbox"
+                            class="checkbox-input"
+                            id="vehicleRepairReportFile"
+                            v-model="vehicleRepairReportFile"
+                            :true-value="'1'"
+                            :false-value="'0'"
+                          />
+                          <label
+                            class="form-check-label"
+                            for="vehicleRepairReportFile"
+                            style="cursor: pointer"
+                          >
+                            Check To Add File.
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="at-input"
+                      v-if="vehicleRepairReportFile == '1'"
+                    >
+                      <div class="custom-file at-file">
+                        <input
+                          type="file"
+                          class="custom-file-input"
+                          @change="
+                            saveFile(
+                              $event,
+                              'vehicleRepairReport',
+                              'Vehicle Repair Report',
+                              'vehicleRepairReportUrl'
+                            )
+                          "
+                          id="vehicleRepairReportFileInput"
+                        />
+                        <label
+                          class="custom-file-label attach-file-label"
+                          for="vehicleRepairReportFileInput"
+                          >Upload file</label
+                        >
+                      </div>
+                    </div>
+                    <div class="at-input at-url" v-else>
+                      <input
+                        type="text"
+                        v-model="vehicleRepairReportInput"
+                        class="form-control"
+                        placeholder="Vehicle Repair Report Url"
+                      />
+                      <button
+                        @click.prevent="
+                          saveUrl(
+                            'vehicleRepairReportInput',
+                            'Vehicle Repair Report',
+                            'vehicleRepairReportUrl'
+                          )
+                        "
+                        class="btn btn-primary at-btn at-btn-primary"
+                      >
+                        <i class="bx bxs-save"></i> Save
+                      </button>
+                    </div>
+                    <div class="at-actions">
+                      <a
+                        v-if="vehicleRepairReportUrl"
+                        :href="vehicleRepairReportUrl"
+                        target="_blank"
+                        class="btn btn-info at-btn at-btn-ghost"
+                        rel="noopener noreferrer"
+                        ><i class="bx bx-link-external"></i>View</a
+                      >
+                      <button
+                        v-if="vehicleRepairReportUrl"
+                        @click.prevent="
+                          deleteFile(
+                            'Vehicle Repair Report',
+                            'vehicleRepairReportUrl'
+                          )
+                        "
+                        class="btn btn-danger at-btn at-btn-danger"
+                      >
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="at-row">
+                  <div class="at-row-label">
+                    <span class="at-icon at-icon--2"><i class="bx bx-receipt"></i></span>
+                    <label>Window Sticker</label>
+                  </div>
+                  <div class="at-row-controls">
+                    <div class="at-check">
+                      <div class="form-check">
+                        <div class="checkbox">
+                          <input
+                            type="checkbox"
+                            class="checkbox-input"
+                            id="windowStickerFile"
+                            v-model="windowStickerFile"
+                            :true-value="'1'"
+                            :false-value="'0'"
+                          />
+                          <label
+                            class="form-check-label"
+                            for="windowStickerFile"
+                            style="cursor: pointer"
+                          >
+                            Check To Add File.
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="at-input"
+                      v-if="windowStickerFile == '1'"
+                    >
+                      <div class="custom-file at-file">
+                        <input
+                          type="file"
+                          class="custom-file-input"
+                          @change="
+                            saveFile(
+                              $event,
+                              'windowSticker',
+                              'Window Sticker',
+                              'windowStickerUrl'
+                            )
+                          "
+                          id="windowStickerFileInput"
+                        />
+                        <label
+                          class="custom-file-label attach-file-label"
+                          for="windowStickerFileInput"
+                          >Upload file</label
+                        >
+                      </div>
+                    </div>
+                    <div class="at-input at-url" v-else>
+                      <input
+                        type="text"
+                        v-model="windowStickerInput"
+                        class="form-control"
+                        placeholder="Window Sticker Url"
+                      />
+                      <button
+                        @click.prevent="
+                          saveUrl(
+                            'windowStickerInput',
+                            'Window Sticker',
+                            'windowStickerUrl'
+                          )
+                        "
+                        class="btn btn-primary at-btn at-btn-primary"
+                      >
+                        <i class="bx bxs-save"></i> Save
+                      </button>
+                    </div>
+                    <div class="at-actions">
+                      <a
+                        v-if="windowStickerUrl"
+                        :href="windowStickerUrl"
+                        target="_blank"
+                        class="btn btn-info at-btn at-btn-ghost"
+                        rel="noopener noreferrer"
+                        ><i class="bx bx-link-external"></i>View</a
+                      >
+                      <button
+                        v-if="windowStickerUrl"
+                        @click.prevent="
+                          deleteFile(
+                            'Window Sticker',
+                            'windowStickerUrl'
+                          )
+                        "
+                        class="btn btn-danger at-btn at-btn-danger"
+                      >
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="at-row">
+                  <div class="at-row-label">
+                    <span class="at-icon at-icon--3"><i class="bx bx-file"></i></span>
+                    <label>Other</label>
+                  </div>
+                  <div class="at-row-controls">
+                    <div class="at-check">
+                      <div class="form-check">
+                        <div class="checkbox">
+                          <input
+                            type="checkbox"
+                            class="checkbox-input"
+                            id="otherReport"
+                            v-model="otherReportFile"
+                            :true-value="'1'"
+                            :false-value="'0'"
+                          />
+                          <label
+                            class="form-check-label"
+                            for="otherReport"
+                            style="cursor: pointer"
+                          >
+                            Check To Add File.
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="at-input"
+                      v-if="otherReportFile == '1'"
+                    >
+                      <div class="custom-file at-file">
+                        <input
+                          type="file"
+                          class="custom-file-input"
+                          @change="
+                            saveFile(
+                              $event,
+                              'otherReport',
+                              'Other Report',
+                              'otherReportUrl'
+                            )
+                          "
+                          id="otherReportFileInput"
+                        />
+                        <label
+                          class="custom-file-label attach-file-label"
+                          for="otherReportFileInput"
+                          >Upload file</label
+                        >
+                      </div>
+                    </div>
+                    <div class="at-input at-url" v-else>
+                      <input
+                        type="text"
+                        v-model="otherReportInput"
+                        class="form-control"
+                        placeholder="Other File Url"
+                      />
+                      <button
+                        @click.prevent="
+                          saveUrl(
+                            'otherReportInput',
+                            'Other Report',
+                            'otherReportUrl'
+                          )
+                        "
+                        class="btn btn-primary at-btn at-btn-primary"
+                      >
+                        <i class="bx bxs-save"></i> Save
+                      </button>
+                    </div>
+                    <div class="at-actions">
+                      <a
+                        v-if="otherReportUrl"
+                        :href="otherReportUrl"
+                        target="_blank"
+                        class="btn btn-info at-btn at-btn-ghost"
+                        rel="noopener noreferrer"
+                        ><i class="bx bx-link-external"></i>View</a
+                      >
+                      <button
+                        v-if="otherReportUrl"
+                        @click.prevent="
+                          deleteFile(
+                            'Other Report',
+                            'otherReportUrl'
+                          )
+                        "
+                        class="btn btn-danger at-btn at-btn-danger"
+                      >
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Video -->
+                <div class="at-row">
+                  <div class="at-row-label">
+                    <span class="at-icon at-icon--4"><i class="bx bx-video"></i></span>
+                    <label>Video URL</label>
+                  </div>
+                  <div class="at-row-controls">
+                    <div class="at-check" style="visibility: hidden">
+                      <div class="form-check">
+                        <div class="checkbox">
+                          <input
+                            type="checkbox"
+                            class="checkbox-input"
+                            id="Video"
+                            v-model="VideoFile"
+                            :true-value="'1'"
+                            :false-value="'0'"
+                          />
+                          <label
+                            class="form-check-label"
+                            for="Video"
+                            style="cursor: pointer"
+                          >
+                            Check To Add File.
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="at-input" style="visibility: hidden"
+                      v-if="VideoFile == '1'"
+                    >
+                      <div class="custom-file at-file">
+                        <input
+                          type="file"
+                          class="custom-file-input"
+                          @change="
+                            saveFile(
+                              $event,
+                              'Video',
+                              'Video Url',
+                              'VideoUrl'
+                            )
+                          "
+                          id="VideoFileInput"
+                        />
+                        <label
+                          class="custom-file-label attach-file-label"
+                          for="VideoFileInput"
+                          >Upload file</label
+                        >
+                      </div>
+                    </div>
+                    <div class="at-input at-url" v-else>
+                      <input
+                        type="text"
+                        v-model="VideoInput"
+                        class="form-control"
+                        placeholder="Video Url"
+                      />
+                      <button
+                        @click.prevent="
+                          saveUrl(
+                            'VideoInput',
+                            'Video Url',
+                            'VideoUrl'
+                          )
+                        "
+                        class="btn btn-primary at-btn at-btn-primary"
+                      >
+                        <i class="bx bxs-save"></i> Save
+                      </button>
+                    </div>
+                    <div class="at-actions">
+                      <a
+                        v-if="VideoUrl"
+                        :href="VideoUrl"
+                        target="_blank"
+                        class="btn btn-info at-btn at-btn-ghost"
+                        rel="noopener noreferrer"
+                        ><i class="bx bx-link-external"></i>View</a
+                      >
+                      <button
+                        v-if="VideoUrl"
+                        @click.prevent="
+                          deleteFile(
+                            'Video Url',
+                            'VideoUrl'
+                          )
+                        "
+                        class="btn btn-danger at-btn at-btn-danger"
+                      >
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Video -->
             </div>
           </div>
-        </div>
-        <div class="col-12">
-          <carfax-order
-            :app_metadata="app_metadata"
-            :stock_no="stock_no"
-            :vin="vin"
-          ></carfax-order>
-        </div>
+        </form>
+      </div>
+      <div class="at-carfax">
+        <carfax-order
+          :app_metadata="app_metadata"
+          :stock_no="stock_no"
+          :vin="vin"
+        ></carfax-order>
       </div>
     </section>
     <!-- // Attachments  form layout section end -->
@@ -767,3 +780,198 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+/* ==========================================================================
+   Inventory — Attachments tab. Scoped to #attachments-block-list.
+   ========================================================================== */
+#attachments-block-list {
+  .at-page {
+    padding: 8px 20px 96px;
+    color: #0f172a;
+  }
+
+  .at-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: visible;
+  }
+  .at-card-head {
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .at-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .at-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .at-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 260px) 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.15s;
+    &:last-child { border-bottom: 0; }
+    &:hover { background: #f8fafc; }
+  }
+  .at-row-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    label {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e293b;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+  }
+  .at-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    &--0 { background: #eff6ff; color: #2563eb; }
+    &--1 { background: #fff7ed; color: #ea580c; }
+    &--2 { background: #ecfdf5; color: #059669; }
+    &--3 { background: #f1f5f9; color: #475569; }
+    &--4 { background: #f5f3ff; color: #7c3aed; }
+  }
+
+  .at-row-controls {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr) 132px;
+    align-items: center;
+    gap: 12px;
+  }
+  .at-check {
+    .form-check { padding-left: 0; }
+    .checkbox label {
+      font-size: 13px;
+      color: #475569;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+  }
+
+  .at-input { min-width: 0; }
+  .at-url {
+    display: flex;
+    gap: 8px;
+    .form-control {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 36px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #0f172a;
+      box-shadow: none;
+      &:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+    }
+  }
+  .at-file {
+    height: 36px;
+    .custom-file-input { height: 36px; cursor: pointer; }
+    .custom-file-label {
+      height: 36px;
+      line-height: 34px;
+      padding: 0 12px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 13px;
+      text-transform: none;
+      letter-spacing: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      box-shadow: none;
+      &::after {
+        height: 34px;
+        line-height: 34px;
+        padding: 0 12px;
+        border-left: 1px solid #e2e8f0;
+        border-radius: 0 8px 8px 0;
+        background: #ffffff;
+        color: #2563eb;
+        font-weight: 500;
+      }
+    }
+    &:hover .custom-file-label { border-color: #2563eb; background: #eff6ff; }
+  }
+
+  .at-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 110px;
+  }
+  .at-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: none !important;
+    i { font-size: 16px; position: static; top: 0; line-height: 1; }
+  }
+  .at-btn-primary {
+    background: #2563eb !important;
+    border: 1px solid #2563eb !important;
+    color: #ffffff !important;
+    &:hover { background: #1d4ed8 !important; }
+  }
+  .at-btn-ghost {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #2563eb !important;
+    &:hover { background: #eff6ff !important; border-color: #bfdbfe !important; }
+  }
+  .at-btn-danger {
+    width: 36px;
+    padding: 0;
+    background: #ffffff !important;
+    border: 1px solid #fecaca !important;
+    color: #dc2626 !important;
+    &:hover { background: #fef2f2 !important; }
+  }
+
+  .at-carfax { margin-top: 4px; }
+
+  @media (max-width: 1199px) {
+    .at-row { grid-template-columns: 1fr; gap: 10px; }
+  }
+  @media (max-width: 767px) {
+    .at-row-controls { grid-template-columns: 1fr; }
+    .at-actions { justify-content: flex-start; }
+  }
+}
+</style>
+

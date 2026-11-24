@@ -5,311 +5,181 @@
     aria-labelledby="Disclosure"
     role="tabpanel"
   >
-    <!-- form layout section start -->
-    <section id="disclosures">
-      <div class="row match-height">
-        <div class="col-md-12 col-12">
-          <div class="card shadow-none mb-0">
-            <div class="card-content">
-              <div class="card-body pt-0">
-                <form class="form form-horizontal webapp-form">
-                  <div class="form-body">
-                    <div class="row">
-                      <span style="position: absolute; right: 1em; z-index: 2">
-                        <i
-                          class="bx bx-repost pr-1 bx-md"
-                          title="Reset Disclosures"
-                          style="cursor: pointer"
-                          @click="confirmResetAction"
-                        ></i>
-                      </span>
-                      <!-- loop through disclosures : START -->
-                      <template v-for="(disclosure, index) in disclosures">
-                        <!-- textbox : START -->
-                        <div
-                          class="col-md-12 col-12 pt-25 pb-25"
-                          :key="`disclosure_div_${index}`"
-                          v-if="disclosure.type === `Textbox`"
-                        >
-                          <div class="row">
-                            <div class="col-md-3">
-                              {{ disclosure.question }}
-                            </div>
-                            <div class="col-md-7">
-                              <textarea
-                                @change="
-                                  checkForPrefilledTemplate(disclosures[index])
-                                "
-                                v-model="disclosures[index].answer"
-                                class="form-control"
-                                rows="3"
-                              ></textarea>
-                            </div>
-                          </div>
-                          <div
-                            class="row"
-                            v-if="disclosure.question === 'Complete Disclosure'"
-                          >
-                            <div class="col-md-10 text-right p-1">
-                              <inventory-disclosure-template-c-t-a :elementId="'inventory_disclosure'" />
-                            </div>
-                          </div>
-                        </div>
-                        <!-- textbox : END -->
+    <section id="disclosures" class="dc-page">
+      <div class="dc-header">
+        <button
+          type="button"
+          class="dc-btn dc-btn-ghost"
+          title="Reset Disclosures"
+          @click="confirmResetAction"
+        >
+          <i class="bx bx-reset"></i>
+          <span>Reset</span>
+        </button>
+      </div>
 
-                        <!-- InputField : START -->
-                        <div
-                          class="col-md-12 col-12 pt-25 pb-25"
-                          :key="`disclosure_div_${index}`"
-                          v-if="disclosure.type === `InputField`"
-                        >
-                          <div class="row">
-                            <div class="col-md-3">
-                              {{ disclosure.question }}
-                            </div>
-                            <div class="col-md-7">
-                              <input
-                                type="text"
-                                @change="
-                                  checkForPrefilledTemplate(disclosures[index])
-                                "
-                                v-model="disclosures[index].answer"
-                                class="form-control"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <!-- InputField : END -->
+      <form class="form form-horizontal webapp-form dc-form">
+        <div
+          class="dc-card"
+          v-for="(section, sIndex) in sections"
+          :key="`disclosure_section_${sIndex}`"
+        >
+          <div class="dc-card-head" v-if="section.title">
+            <span class="dc-card-icon" :class="`dc-card-icon--${sIndex % 4}`">
+              <i class="bx" :class="sectionIcon(section.title)"></i>
+            </span>
+            <h5 class="dc-card-title">{{ section.title }}</h5>
+          </div>
 
-                        <!-- button group : START -->
-                        <div
-                          class="col-md-6 col-6 pt-25 pb-25"
-                          :key="`disclosure_div_${index}`"
-                          v-if="disclosure.type === `YesNoQuestion`"
-                        >
-                          <div class="row">
-                            <div class="col-md-6">
-                              {{ disclosure.question }}
-                            </div>
-                            <div class="col-md-6">
-                              <div
-                                class="btn-group"
-                                role="group"
-                                aria-label="Basic example"
-                              >
-                                <button
-                                  @click="
-                                    disclosures[index].answer = option;
-                                    checkForPrefilledTemplate(
-                                      disclosures[index]
-                                    );
-                                  "
-                                  type="button"
-                                  class="btn"
-                                  :class="
-                                    switchButtonColor(
-                                      option,
-                                      disclosures[index].answer
-                                    )
-                                  "
-                                  v-for="option in disclosure.options"
-                                  :key="`disclosure_div_${index}_${option}`"
-                                >
-                                  {{
-                                    option == "" || option == "Not Applicable"
-                                      ? "N/A"
-                                      : option
-                                  }}
-                                </button>
-                              </div>
-                            </div>
-                            <div
-                              class="col-md-12 p-25"
-                              v-if="
-                                disclosure.has_additional_information === '1' &&
-                                disclosures[index].answer === 'Yes'
-                              "
-                            >
-                              <input
-                                type="text"
-                                v-model="
-                                  disclosures[index].additional_information
-                                "
-                                :placeholder="
-                                  disclosures[index]
-                                    .additional_information_placeholder
-                                "
-                                class="form-control"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <!-- button group : END -->
-
-                        <!-- dropdown : START -->
-                        <div
-                          class="col-md-6 col-6 pt-25 pb-25"
-                          :key="`disclosure_div_${index}`"
-                          v-if="disclosure.type === `Dropdown`"
-                        >
-                          <div class="row">
-                            <div class="col-md-6">
-                              {{ disclosure.question }}
-                            </div>
-                            <div class="col-md-6">
-                              <select
-                                :name="disclosure.question"
-                                class="form-control"
-                                @change="
-                                  checkForPrefilledTemplate(disclosures[index])
-                                "
-                                v-model="disclosures[index].answer"
-                                id=""
-                              >
-                                <option
-                                  :value="option"
-                                  v-for="option in disclosure.options"
-                                  :key="`disclosure_div_${index}_${option}`"
-                                >
-                                  {{ option == "" ? "Not Applicable" : option }}
-                                </option>
-                              </select>
-                            </div>
-                            <div
-                              class="col-md-12 p-25"
-                              v-if="
-                                disclosure.has_additional_information === '1' &&
-                                disclosures[index].answer === 'Yes'
-                              "
-                            >
-                              <input
-                                type="text"
-                                v-model="
-                                  disclosures[index].additional_information
-                                "
-                                :placeholder="
-                                  disclosures[index]
-                                    .additional_information_placeholder
-                                "
-                                class="form-control"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <!-- dropdown : END -->
-
-                        <!-- header : START -->
-                        <div
-                          class="col-md-12 col-12 pt-25 pb-25"
-                          :key="`disclosure_div_${index}`"
-                          v-if="disclosure.type === `Header`"
-                        >
-                          <div class="row">
-                            <h2 class="col-12">{{ disclosure.question }}</h2>
-                          </div>
-                        </div>
-                        <!-- header : END -->
-
-                        <!-- DynamicInputField : START -->
-                        <div
-                          class="col-md-3 col-3 pt-25 pb-25"
-                          :key="`disclosure_div_${index}`"
-                          :class="disclosure.css_class"
-                          v-if="disclosure.type === `DynamicInputField`"
-                        >
-                          <div class="row">
-                            <div class="col-md-12">
-                              {{ disclosure.question }}
-                            </div>
-                            <div class="col-md-12">
-                              <input
-                                type="text"
-                                @change="
-                                  checkForPrefilledTemplate(disclosures[index])
-                                "
-                                v-model="disclosures[index].answer"
-                                class="form-control"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <!-- DynamicInputField : END -->
-
-                        <!-- switch : START -->
-                        <div
-                          class="col-md-4 col-4 pt-50 pb-50"
-                          :class="disclosure.css_class"
-                          :key="`disclosure_div_${index}`"
-                          v-if="disclosure.type === `Switch`"
-                        >
-                          <div class="row">
-                            <div class="col-md-12">
-                              {{ disclosure.question }}
-                            </div>
-                            <div class="col-md-12">
-                              <div
-                                class="btn-group"
-                                role="group"
-                                :aria-label="disclosure.question"
-                              >
-                                <button
-                                  @click="
-                                    disclosures[index].answer = option;
-                                    checkForPrefilledTemplate(
-                                      disclosures[index]
-                                    );
-                                  "
-                                  type="button"
-                                  class="btn"
-                                  :class="
-                                    switchButtonColor(
-                                      option,
-                                      disclosures[index].answer
-                                    )
-                                  "
-                                  v-for="option in disclosure.options"
-                                  :key="`disclosure_div_${index}_${option}`"
-                                >
-                                  {{
-                                    option == "" || option == "Not Applicable"
-                                      ? "N/A"
-                                      : option
-                                  }}
-                                </button>
-                              </div>
-                            </div>
-                            <div
-                              class="col-md-12 p-25"
-                              v-if="
-                                disclosure.has_additional_information === '1' &&
-                                disclosures[index].answer === 'Yes'
-                              "
-                            >
-                              <input
-                                type="text"
-                                v-model="
-                                  disclosures[index].additional_information
-                                "
-                                :placeholder="
-                                  disclosures[index]
-                                    .additional_information_placeholder
-                                "
-                                class="form-control"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <!-- switch : END -->
-                      </template>
-                      <!-- loop through disclosures : END -->
-                    </div>
+          <div class="dc-grid">
+            <template v-for="{ disclosure, index } in section.items">
+              <!-- textbox : START -->
+              <div
+                class="dc-item dc-item--full"
+                :key="`disclosure_div_${index}`"
+                v-if="disclosure.type === `Textbox`"
+              >
+                <div class="dc-statement-head">
+                  <label class="dc-label mb-0" :for="`disclosure_${index}`">
+                    {{ disclosure.question }}
+                  </label>
+                  <div
+                    class="dc-template-cta"
+                    v-if="disclosure.question === 'Complete Disclosure'"
+                  >
+                    <inventory-disclosure-template-c-t-a :elementId="'inventory_disclosure'" />
                   </div>
-                </form>
+                </div>
+                <textarea
+                  :id="`disclosure_${index}`"
+                  @change="checkForPrefilledTemplate(disclosures[index])"
+                  v-model="disclosures[index].answer"
+                  class="form-control dc-textarea"
+                  rows="4"
+                ></textarea>
               </div>
-            </div>
+              <!-- textbox : END -->
+
+              <!-- InputField : START -->
+              <div
+                class="dc-item dc-item--half"
+                :key="`disclosure_div_${index}`"
+                v-if="disclosure.type === `InputField`"
+              >
+                <label class="dc-label" :for="`disclosure_${index}`">{{ disclosure.question }}</label>
+                <input
+                  :id="`disclosure_${index}`"
+                  type="text"
+                  @change="checkForPrefilledTemplate(disclosures[index])"
+                  v-model="disclosures[index].answer"
+                  class="form-control dc-input"
+                />
+              </div>
+              <!-- InputField : END -->
+
+              <!-- button group / switch : START -->
+              <div
+                class="dc-item dc-item--half dc-choice"
+                :class="disclosure.type === `Switch` ? disclosure.css_class : ''"
+                :key="`disclosure_div_${index}`"
+                v-if="disclosure.type === `YesNoQuestion` || disclosure.type === `Switch`"
+              >
+                <div class="dc-choice-row">
+                  <div class="dc-choice-text">
+                    <span class="dc-question">{{ disclosure.question }}</span>
+                  </div>
+                  <div
+                    class="dc-segmented"
+                    role="group"
+                    :aria-label="disclosure.question"
+                  >
+                    <button
+                      @click="
+                        disclosures[index].answer = option;
+                        checkForPrefilledTemplate(disclosures[index]);
+                      "
+                      type="button"
+                      class="dc-seg-btn"
+                      :class="segmentClass(option, disclosures[index].answer)"
+                      v-for="option in disclosure.options"
+                      :key="`disclosure_div_${index}_${option}`"
+                    >
+                      {{ optionLabel(option) }}
+                    </button>
+                  </div>
+                </div>
+                <input
+                  v-if="
+                    disclosure.has_additional_information === '1' &&
+                    disclosures[index].answer === 'Yes'
+                  "
+                  type="text"
+                  v-model="disclosures[index].additional_information"
+                  :placeholder="disclosures[index].additional_information_placeholder"
+                  class="form-control dc-input dc-additional"
+                />
+              </div>
+              <!-- button group / switch : END -->
+
+              <!-- dropdown : START -->
+              <div
+                class="dc-item dc-item--half dc-choice"
+                :key="`disclosure_div_${index}`"
+                v-if="disclosure.type === `Dropdown`"
+              >
+                <div class="dc-choice-row">
+                  <div class="dc-choice-text">
+                    <span class="dc-question">{{ disclosure.question }}</span>
+                  </div>
+                  <select
+                    :name="disclosure.question"
+                    class="form-control dc-select"
+                    @change="checkForPrefilledTemplate(disclosures[index])"
+                    v-model="disclosures[index].answer"
+                  >
+                    <option
+                      :value="option"
+                      v-for="option in disclosure.options"
+                      :key="`disclosure_div_${index}_${option}`"
+                    >
+                      {{ option == "" ? "Not Applicable" : option }}
+                    </option>
+                  </select>
+                </div>
+                <input
+                  v-if="
+                    disclosure.has_additional_information === '1' &&
+                    disclosures[index].answer === 'Yes'
+                  "
+                  type="text"
+                  v-model="disclosures[index].additional_information"
+                  :placeholder="disclosures[index].additional_information_placeholder"
+                  class="form-control dc-input dc-additional"
+                />
+              </div>
+              <!-- dropdown : END -->
+
+              <!-- DynamicInputField : START -->
+              <div
+                class="dc-item dc-item--quarter"
+                :key="`disclosure_div_${index}`"
+                :class="disclosure.css_class"
+                v-if="disclosure.type === `DynamicInputField`"
+              >
+                <label class="dc-label" :for="`disclosure_${index}`">{{ disclosure.question }}</label>
+                <input
+                  :id="`disclosure_${index}`"
+                  type="text"
+                  @change="checkForPrefilledTemplate(disclosures[index])"
+                  v-model="disclosures[index].answer"
+                  class="form-control dc-input"
+                />
+              </div>
+              <!-- DynamicInputField : END -->
+            </template>
           </div>
         </div>
-      </div>
+      </form>
       <inventory-disclosure-template :elementId="'inventory_disclosure'"  />
     </section>
   </div>
@@ -335,11 +205,45 @@ export default {
     };
   },
   computed: {
+    // Group the flat template into cards: every "Header" starts a new card.
+    sections() {
+      const sections = [];
+      let current = null;
+      this.disclosures.forEach((disclosure, index) => {
+        if (disclosure.type === "Header") {
+          current = { title: disclosure.question, items: [] };
+          sections.push(current);
+          return;
+        }
+        if (!current) {
+          current = { title: "", items: [] };
+          sections.push(current);
+        }
+        current.items.push({ disclosure, index });
+      });
+      return sections;
+    },
     updateView() {
       return this.$route.params.id && this.$route.name == "inventory-update";
     },
   },
   methods: {
+    optionLabel(option) {
+      return option == "" || option == "Not Applicable" ? "N/A" : option;
+    },
+    segmentClass(option, value) {
+      if (option !== value) return "";
+      if (option === "Yes") return "is-active is-yes";
+      if (option === "No") return "is-active is-no";
+      return "is-active is-na";
+    },
+    sectionIcon(title) {
+      const t = String(title || "").toLowerCase();
+      if (t.includes("history")) return "bx-history";
+      if (t.includes("title") || t.includes("status")) return "bx-certification";
+      if (t.includes("damage") || t.includes("repair")) return "bx-wrench";
+      return "bx-list-check";
+    },
     switchButtonColor(option, value) {
       if (option !== value) {
         return "";
@@ -620,3 +524,14 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+/* ==========================================================================
+   Inventory — Disclosures tab. Scoped to #disclosure-block-list.
+   Shared checklist design lives in assets/scss/_checklist-form.scss.
+   ========================================================================== */
+@import "../../assets/scss/checklist-form";
+
+#disclosure-block-list {
+  @include checklist-form;
+}
+</style>
