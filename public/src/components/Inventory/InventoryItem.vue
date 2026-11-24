@@ -77,6 +77,8 @@
       {{ formattedDis }}
     </td>
 
+    <!-- Regular columns: hidden while Syndication view is on (syndication columns then follow DIS) -->
+    <template v-if="!getCurrentSyndicationViewStatus">
     <!-- 5. Odometer -->
     <td class="col-odometer text-left" @click.stop>
       <inventory-item-odometer-component
@@ -158,6 +160,8 @@
     <td class="col-modified-at text-muted-sm" :title="item.updated_at || item.modified_at || ''">
       {{ formattedModifiedAt }}
     </td>
+
+    </template>
 
     <!-- 16. Dynamic Syndication Columns (Preserved if syndication view active) -->
     <template v-if="getCurrentSyndicationViewStatus">

@@ -393,6 +393,8 @@
                         </span>
                       </th>
 
+                      <!-- Regular columns: hidden while Syndication view is on (syndication columns then follow DIS) -->
+                      <template v-if="!getCurrentSyndicationViewStatus">
                       <!-- 5. Odometer Column with Sort -->
                       <th class="th-odometer th-sortable text-left" @click="toggleSort('odometer')">
                         <span class="lr-sort justify-content-start">
@@ -479,6 +481,8 @@
                           <span v-else class="sort-idle">⇅</span>
                         </span>
                       </th>
+
+                      </template>
 
                       <!-- Dynamic Syndication Headers -->
                       <template v-if="getCurrentSyndicationViewStatus">
