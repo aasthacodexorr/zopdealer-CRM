@@ -11,10 +11,11 @@
               title="Back To Inventory"
               tag="a"
               to="/inventory"
-              class="btn btn-sm btn-outline-secondary btn-back-nav mr-1"
+              aria-label="Back To Inventory"
+              class="btn btn-sm btn-outline-secondary btn-back-nav btn-back-nav--icon mr-1"
               exact
             >
-              <i class="bx bx-arrow-back mr-50"></i> Back to Inventory
+              <i class="bx bx-arrow-back"></i>
             </router-link>
           </li>
           <li class="nav-item">

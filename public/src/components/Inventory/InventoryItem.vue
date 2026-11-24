@@ -25,7 +25,7 @@
     <td class="col-photo">
       <div
         class="vehicle-thumbnail-wrapper"
-        @click.stop="openInventoryNewTab(item.inventory_id)"
+        @click.stop="openInventoryDetail(item.inventory_id)"
         title="Click to open vehicle details"
       >
         <img
@@ -53,7 +53,7 @@
       <div
         class="vehicle-primary-title"
         :title="'Click to open vehicle details: ' + vehicleFullTitle"
-        @click.stop="openInventoryNewTab(item.inventory_id)"
+        @click.stop="openInventoryDetail(item.inventory_id)"
       >
         {{ vehicleFullTitle }}
       </div>
@@ -457,7 +457,7 @@ export default {
       ) {
         return;
       }
-      this.openInventoryNewTab(this.item.inventory_id);
+      this.openInventoryDetail(this.item.inventory_id);
     },
     copyVin() {
       if (this.item.vin) {
@@ -488,6 +488,10 @@ export default {
     },
     getCheckValue() {
       this.onCheckboxChange();
+    },
+    // Row, photo and title open the vehicle detail page in the same tab.
+    openInventoryDetail(id) {
+      this.$router.push({ name: "inventory-update", params: { id: id } });
     },
     openInventoryNewTab(id) {
       const routeData = this.$router.resolve({

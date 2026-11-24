@@ -19,7 +19,7 @@
                         <div class="m-width-s">
                           <div class="row">
                             <div class="col-md-4">
-                              <label style="color: red">Vin Number *</label>
+                              <label style="color: red">Vin Number</label>
                             </div>
                             <div class="col-md-8 form-group">
                               <fieldset>
@@ -269,7 +269,7 @@
                               </text-editor>
                             </div>
                             <div class="col-md-4">
-                              <label style="color: red">Vehicle *</label>
+                              <label style="color: red">Vehicle</label>
                             </div>
                             <div class="col-md-8 form-group">
                               <fieldset>
