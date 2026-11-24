@@ -6,15 +6,15 @@
     >
       <div class="">
         <ul class="right-scroll-list nav nav-tabs" role="tablist">
-          <li class="nav-item pr-0 pl-0">
+          <li class="nav-item pr-0 pl-0 d-flex align-items-center">
             <router-link
-              title="Back To List"
+              title="Back To Inventory"
               tag="a"
               to="/inventory"
-              class="nav-link pr-0 pl-0 d-flex align-items-center"
+              class="btn btn-sm btn-outline-secondary btn-back-nav mr-1"
               exact
             >
-              <i class="bx bx-caret-left" style="font-size: 1.4em"></i>
+              <i class="bx bx-arrow-back mr-50"></i> Back to Inventory
             </router-link>
           </li>
           <li class="nav-item">
@@ -245,46 +245,52 @@
     <div class="app-content content">
       <div class="content-overlay"></div>
       <div class="">
-        <h3
-          style="vertical-align: super"
-          v-if="updateView && inventory.year !== ''"
-          class="m-width-s display-8 ml-1"
-        >
-          <i
-            data-v-c6dd3404=""
-            data-icon="inventory"
-            class="bx bxs-car bx-md mr-1"
-          ></i>
-          <span style="vertical-align: text-bottom"
-            >{{ inventory.year }} {{ inventory.make }} {{ inventory.model }} #{{
-              inventory.stock_no
-            }}
-            ({{ inventory.vin }})
-          </span>
-          <span v-show="showVDPUrl">
-            <a target="_blank" :href="inventory.page_url" class="btn btn-link"
-              ><i class="bx bx-link-external"></i
-            ></a>
-          </span>
-          <span v-show="getLeadCount > 0">
-            <div
-              class="d-inline-block"
-              style="position: relative; cursor: pointer"
-              @click="searchLeadResponseByStockNumber"
-            >
-              <i class="bx bxs-magnet bx-sm"></i>
+        <!-- Top Page Header: Create Mode -->
+        <div v-if="!updateView" class="inventory-manage-page-header">
+          <div class="d-flex align-items-center mb-0">
+            <h2 class="inventory-manage-main-title mb-0">Add Vehicle</h2>
+            <span class="badge badge-light-primary font-weight-bold ml-1 px-1 py-50">New Unit</span>
+          </div>
+          <p class="text-muted mb-0 font-small-3 mt-25">Enter vehicle specifications, pricing, details, and syndication settings</p>
+        </div>
 
-              <span
-                :title="`This vehicle has ${getLeadCount} lead(s).`"
-                class="badge badge-pill badge-primary badge-right"
-                >{{ getLeadCount }}</span
-              >
+        <!-- Top Page Header: Update Mode -->
+        <div
+          v-else-if="updateView && inventory.year !== ''"
+          class="inventory-manage-page-header"
+        >
+          <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div>
+              <div class="d-flex align-items-center mb-0">
+                <h2 class="inventory-manage-main-title mb-0">
+                  {{ inventory.year }} {{ inventory.make }} {{ inventory.model }}
+                </h2>
+                <span class="badge badge-light-secondary font-weight-bold ml-1 px-1 py-50">#{{ inventory.stock_no }}</span>
+                <span class="text-muted font-small-3 ml-1">({{ inventory.vin }})</span>
+              </div>
+              <div class="text-muted font-small-2 mt-25">
+                <span>Created: {{ created_at }}</span>
+                <span class="mx-50">•</span>
+                <span>Updated: {{ updated_at }}</span>
+              </div>
             </div>
-          </span>
-          <span class="pl-1" style="font-size: 0.4em"
-            >Created At : {{ created_at }} Last Updated : {{ updated_at }}</span
-          >
-        </h3>
+            <div class="d-flex align-items-center mt-50 mt-sm-0">
+              <a v-show="showVDPUrl" target="_blank" :href="inventory.page_url" class="btn btn-sm btn-outline-primary mr-1" title="View on Website">
+                <i class="bx bx-link-external mr-50"></i> View on Website
+              </a>
+              <div
+                v-show="getLeadCount > 0"
+                class="d-inline-block position-relative cursor-pointer mr-1"
+                @click="searchLeadResponseByStockNumber"
+              >
+                <button class="btn btn-sm btn-light-primary">
+                  <i class="bx bxs-magnet mr-50"></i> Leads
+                  <span class="badge badge-primary ml-50">{{ getLeadCount }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="content-body mb-3">
           <!-- form layout section start -->
           <div class="tab-content">
@@ -543,6 +549,14 @@
     <!-- model for print : END -->
     <!-- Action Bar : START -->
     <ul class="nav nav-tabs p-50 custom-footer-fixed-action-bar" role="tablist">
+      <router-link
+        to="/inventory"
+        class="btn btn-secondary mr-auto"
+        exact
+      >
+        <i class="bx bx-arrow-back mr-50"></i> Cancel
+      </router-link>
+
       <!-- dropdown menu : START -->
       <div class="btn-group mr-1" role="group" v-if="updateView">
         <button
@@ -565,7 +579,7 @@
           name: 'deal-create',
           params: { preselected_stock_no: inventory.stock_no },
         }"
-        class="d-inline-block"
+        class="d-inline-block mr-1"
         exact
       >
         <a class="btn btn-secondary">Create Deal</a>
@@ -575,37 +589,37 @@
         v-show="show_general_submit_button"
         type="submit"
         :disabled="!submit_button"
-        class="btn btn-primary mr-1 ml-4"
+        class="btn btn-primary mr-1"
         @click="createEvent"
       >
-        Save
+        <i class="bx bx-check mr-50"></i> Save
       </button>
       <button
         v-show="show_disclosures_submit_button"
         type="submit"
         :disabled="!submit_button"
-        class="btn btn-primary mr-1 ml-4"
+        class="btn btn-primary mr-1"
         @click="createDisclosureEvent"
       >
-        Save
+        <i class="bx bx-check mr-50"></i> Save
       </button>
       <button
         v-show="show_purchase_submit_button"
         type="submit"
         :disabled="!submit_button"
-        class="btn btn-primary mr-1 ml-4"
+        class="btn btn-primary mr-1"
         @click="createPurchaseEvent"
       >
-        Save
+        <i class="bx bx-check mr-50"></i> Save
       </button>
       <button
         v-show="show_digital_retailing_button"
         type="submit"
         :disabled="!submit_button"
-        class="btn btn-primary mr-1 ml-4"
+        class="btn btn-primary mr-1"
         @click="createDigitalRetailEvent"
       >
-        Save
+        <i class="bx bx-check mr-50"></i> Save
       </button>
     </ul>
     <!-- Action Bar : END -->

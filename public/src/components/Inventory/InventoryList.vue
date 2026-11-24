@@ -1229,6 +1229,10 @@ export default {
       this.handleOpenPreview(item);
     },
     handleOpenPreview(item) {
+      if (this.isPreviewOpen && this.selectedInventoryId === item.inventory_id) {
+        this.closePreviewPanel();
+        return;
+      }
       this.selectedInventoryId = item.inventory_id;
       this.selectedVehicleItem = item;
       this.isPreviewOpen = true;
@@ -2104,14 +2108,40 @@ export default {
   align-items: center;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  padding: 5px 12px;
-  height: 32px;
+  padding: 0 14px;
+  height: 34px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
   color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
+  user-select: none;
+
+  i {
+    font-size: 16px;
+    margin-right: 8px !important;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+
+  &::after {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 12px;
+    color: #64748b;
+    vertical-align: middle;
+  }
 
   &:hover {
     border-color: #cbd5e1;
@@ -2827,9 +2857,12 @@ export default {
   background: #f8fafc;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 20;
 
   th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
     padding: 0.6rem 0.55rem;
     font-size: 11px;
     font-weight: 700;
