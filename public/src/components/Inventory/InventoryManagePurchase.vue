@@ -17,11 +17,11 @@
                     <div class="row">
                       <div class="col-md-12 col-12">
                         <div class="m-width-s pu-card pu-card--basics">
-                          <div class="row">
-                            <div class="col-md-4">
+                          <div class="row align-items-center">
+                            <div class="col-md-3">
                               <label>Purchased On</label>
                             </div>
-                            <div class="col-md-4 form-group">
+                            <div class="col-md-3 form-group">
                               <fieldset class="has-icon-left">
                                 <date-picker
                                   v-model="form.purchase_date"
@@ -39,7 +39,7 @@
                               </fieldset>
                             </div>
                             <div
-                              class="col-md-4"
+                              class="col-md-6 form-group d-flex align-items-center"
                               v-show="inventory_purchase_id"
                             >
                               <a
@@ -144,10 +144,10 @@
                                 />
                               </fieldset>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                               <label>Bought from Public or Company?</label>
                             </div>
-                            <div class="col-md-8 form-group">
+                            <div class="col-md-9 form-group">
                               <div class="custom-control custom-switch">
                                 <input
                                   type="checkbox"
@@ -180,8 +180,8 @@
                       </div>
                       <div class="col-md-12 col-12">
                         <div class="m-width-s pu-card pu-card--vendor">
-                          <div class="row">
-                            <div class="col-md-6 form-group">
+                          <div class="pu-vendor-row">
+                            <div class="pu-vendor-select form-group">
                               <v-select
                                 append-to-body
                                 placeholder="Vendors List"
@@ -192,21 +192,17 @@
                                 :options="allVendors"
                               ></v-select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="pu-vendor-actions">
                               <router-link
                                 tag="button"
                                 :to="{ name: 'vendor-create' }"
                                 class="btn btn-info"
-                                style="vertical-align: text-top"
                                 exact
                               >
                                 Add New Vendor
                               </router-link>
-                            </div>
-                            <div class="col-md-3">
                               <button
                                 @click="resetFormValues"
-                                style="vertical-align: text-top"
                                 type="button"
                                 class="btn btn-secondary"
                               >
@@ -219,11 +215,11 @@
                       <div class="col-md-12 col-12">
                         <div class="m-width-s pu-card pu-card--seller">
                           <div class="row">
-                            <h3 class="col-xs-12 pu-card-title">
+                            <h3 class="col-12 pu-card-title">
                               Who did you purchase this vehicle from ?
                             </h3>
                             <h5
-                              class="col-xs-12 text-danger pu-private"
+                              class="col-12 text-danger pu-private"
                               style="font-size: 0.8em"
                             >
                               Note : This information is visible only to the
@@ -231,7 +227,9 @@
                               nor with staff.
                             </h5>
                             <div class="w-100"></div>
-                            <div class="col-md-4 col-xs-12 form-group">
+                            <div
+                              :class="parseInt(form.purchase_from_flag) == 1 ? 'col-md-6 col-12 form-group' : 'col-md-12 col-12 form-group'"
+                            >
                               <fieldset class="has-icon-left">
                                 <input
                                   type="text"
@@ -252,7 +250,7 @@
                               </fieldset>
                             </div>
                             <div
-                              class="col-md-4 col-xs-12 form-group"
+                              class="col-md-6 col-12 form-group"
                               v-if="parseInt(form.purchase_from_flag) == 1"
                             >
                               <fieldset class="has-icon-left">
@@ -2054,8 +2052,38 @@ input:read-only {
     > .row { margin-left: -8px; margin-right: -8px; }
     > .row > [class*="col-"] { padding-left: 8px; padding-right: 8px; }
   }
-  .pu-card--vendor { padding-bottom: 18px; }
-  .pu-card--vendor .form-group { margin-bottom: 0; }
+  .pu-card--vendor {
+    padding: 16px 20px;
+    .pu-vendor-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      width: 100%;
+    }
+    .pu-vendor-select {
+      flex: 0 1 300px;
+      width: 100%;
+      max-width: 300px;
+      min-width: 220px;
+      margin-bottom: 0;
+    }
+    .pu-vendor-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+  }
+  .pu-card--basics .vdpComponent {
+    display: block;
+    width: 100%;
+    input { width: 100%; }
+  }
+  .pu-card--basics label.btn-secondary {
+    margin-bottom: 0;
+  }
   .pu-card--pricing,
   .pu-card--status { padding-top: 16px; }
 
@@ -2182,6 +2210,7 @@ input:read-only {
   .pu-info {
     display: flex;
     align-items: center;
+    width: 100%;
     gap: 8px;
     margin: 4px 0 12px !important;
     padding: 10px 14px;

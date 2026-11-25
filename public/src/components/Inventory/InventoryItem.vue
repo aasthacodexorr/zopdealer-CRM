@@ -72,6 +72,15 @@
       </div>
     </td>
 
+    <!-- Body Type (before DIS) -->
+    <td
+      v-if="!getCurrentSyndicationViewStatus"
+      class="col-body-type text-left"
+      :title="item.body_type || ''"
+    >
+      {{ item.body_type || '—' }}
+    </td>
+
     <!-- 4. DIS (Days In Stock) -->
     <td class="col-dis text-left">
       {{ formattedDis }}
@@ -116,22 +125,6 @@
       </span>
     </td>
 
-    <!-- 9. Creation Date -->
-    <td class="col-creation-date" :title="item.created_at || ''">
-      {{ formattedCreatedAt }}
-    </td>
-
-    <!-- 10. Body Type -->
-    <td class="col-body-type">
-      {{ item.body_type || '—' }}
-    </td>
-
-    <!-- 11. Last Sync (Date & Time Stacked) -->
-    <td class="col-last-sync">
-      <div class="sync-date-line">{{ lastSyncDate }}</div>
-      <div class="sync-time-line">{{ lastSyncTime }}</div>
-    </td>
-
     <!-- 12. Website / VDP Link (Opens in new tab) -->
     <td class="col-action-btn text-center" @click.stop>
       <button
@@ -144,16 +137,9 @@
       </button>
     </td>
 
-    <!-- 14. Repair Report Button -->
-    <td class="col-action-btn text-center" @click.stop>
-      <button
-        type="button"
-        class="table-icon-btn btn-repair-report"
-        title="View Repair Report"
-        @click="openRepairReport"
-      >
-        <i class="bx bxs-file-pdf"></i>
-      </button>
+    <!-- 9. Creation Date -->
+    <td class="col-creation-date" :title="item.created_at || ''">
+      {{ formattedCreatedAt }}
     </td>
 
     <!-- 15. Modified At (Preserved column not in image) -->
@@ -697,34 +683,52 @@ export default {
 
 /* Vehicle Thumbnail */
 .col-photo {
-  width: 52px;
-  min-width: 52px;
+  width: 80px;
+  min-width: 80px;
 }
 
 .vehicle-thumbnail-wrapper {
   position: relative;
-  width: 44px;
-  height: 30px;
-  border-radius: 6px;
+  width: 68px;
+  height: 46px;
+  border-radius: 8px;
   overflow: hidden;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
   &::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(15, 23, 42, 0.12);
+    background: rgba(15, 23, 42, 0.04);
     transition: background 0.2s ease;
     pointer-events: none;
+    z-index: 1;
   }
 
-  &:hover::after {
-    background: rgba(15, 23, 42, 0.28);
+  &:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+
+    &::after {
+      background: rgba(15, 23, 42, 0.36);
+    }
+
+    .vehicle-thumbnail {
+      transform: scale(1.06);
+    }
+
+    .thumbnail-magnifier-btn {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 }
 
@@ -733,49 +737,56 @@ export default {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.25s ease;
 }
 
 .thumbnail-count-badge {
   position: absolute;
-  bottom: 1px;
-  right: 1px;
-  background: rgba(15, 23, 42, 0.8);
+  bottom: 3px;
+  right: 3px;
+  background: rgba(15, 23, 42, 0.82);
   color: #ffffff;
-  font-size: 8px;
-  padding: 1px 3px;
-  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 4px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   z-index: 3;
 
   i {
-    font-size: 7.5px;
+    font-size: 8.5px;
     vertical-align: middle;
   }
 }
 
 .thumbnail-magnifier-btn {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  left: auto;
-  transform: none;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  transform: translate(-50%, -50%) scale(0.75);
   transform-origin: center center;
-  width: 17.5px;
-  height: 17.5px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  border: 1.2px solid #ffffff;
+  border: 1.5px solid #ffffff;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.5), 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.55), 0 1px 3px rgba(0, 0, 0, 0.25);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.18s ease, box-shadow 0.18s ease;
+  z-index: 4;
 
   i {
-    font-size: 9.5px;
+    font-size: 13px;
     line-height: 1;
     color: #ffffff !important;
     position: static !important;
@@ -783,16 +794,17 @@ export default {
   }
 
   &:hover {
-    transform: scale(1.18);
+    transform: translate(-50%, -50%) scale(1.1);
     background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 }
 
 /* Combined Vehicle Identity Column */
 .col-vehicle {
-  min-width: 290px;
-  max-width: 360px;
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
   padding: 8px 12px;
 
   .vehicle-primary-title {
@@ -800,9 +812,11 @@ export default {
     font-weight: 600;
     color: #1e293b;
     line-height: 1.3;
-    white-space: nowrap;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
     cursor: pointer;
     transition: color 0.15s ease;
 
@@ -847,10 +861,14 @@ export default {
 }
 
 .col-body-type {
-  width: 85px;
-  min-width: 85px;
+  width: 95px;
+  min-width: 95px;
+  max-width: 120px;
   font-size: 12.5px;
   color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .col-dis {
@@ -1054,19 +1072,17 @@ tr.row-compact {
   }
 
   .vehicle-thumbnail-wrapper {
-    width: 34px !important;
-    height: 24px !important;
-    border-radius: 4px !important;
+    width: 48px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
   }
 
   .thumbnail-magnifier-btn {
-    width: 14px !important;
-    height: 14px !important;
-    top: 1.5px !important;
-    right: 1.5px !important;
+    width: 20px !important;
+    height: 20px !important;
 
     i {
-      font-size: 8px !important;
+      font-size: 11px !important;
     }
   }
 

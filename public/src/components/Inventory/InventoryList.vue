@@ -4,9 +4,80 @@
     <div class="content-overlay"></div>
     <div class="content-body" id="inventory-response-section">
       <div class="inventory-module-page">
-        <!-- TIER 1: Page Title & Add Inventory Split Button (matching Image 2 & 3) -->
+        <!-- TIER 1: Views Selector Dropdown (Left) & Add Inventory Split Button (Right) -->
         <div class="inventory-tier1-row">
-          <h1 class="inventory-page-title">Inventory</h1>
+          <!-- Views Dropdown -->
+          <div class="inventory-views-dropdown dropdown">
+            <button
+              class="btn-views-toggle dropdown-toggle"
+              type="button"
+              id="inventoryViewsMenu"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              title="Select View"
+            >
+              <i class="bx bx-list-ul mr-50 text-primary"></i>
+              <span>{{ selected_inventory }}</span>
+            </button>
+            <div class="dropdown-menu inventory-views-menu" aria-labelledby="inventoryViewsMenu">
+              <h6 class="dropdown-header">
+                Default Views
+              </h6>
+              <a
+                v-for="inventory_view in getDefaultViews"
+                :key="inventory_view.id"
+                class="dropdown-item inventory-view-item"
+                :class="{ 'is-active': inventory_view.header === selected_inventory }"
+                href="javascript:void(0)"
+                @click="changeInventoryView(inventory_view.id)"
+              >
+                <span class="view-item-label">{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
+                <router-link
+                  :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
+                  class="view-edit-link"
+                  title="Edit view"
+                  @click.stop
+                >
+                  <i class="bx bx-edit-alt"></i>
+                </router-link>
+              </a>
+
+              <div class="dropdown-divider"></div>
+              <h6 class="dropdown-header">
+                Custom Views
+              </h6>
+              <div class="custom-views-scrollable">
+                <a
+                  v-for="inventory_view in getCustomViews"
+                  :key="inventory_view.id"
+                  class="dropdown-item inventory-view-item"
+                  :class="{ 'is-active': inventory_view.header === selected_inventory }"
+                  href="javascript:void(0)"
+                  @click="changeInventoryView(inventory_view.id)"
+                >
+                  <span class="view-item-label">{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
+                  <router-link
+                    :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
+                    class="view-edit-link"
+                    title="Edit view"
+                    @click.stop
+                  >
+                    <i class="bx bx-edit-alt"></i>
+                  </router-link>
+                </a>
+              </div>
+
+              <div class="dropdown-divider"></div>
+              <router-link
+                :to="{ name: 'inventory-view-create' }"
+                class="dropdown-item view-create-link"
+              >
+                <i class="bx bx-plus"></i>
+                <span>New Custom View</span>
+              </router-link>
+            </div>
+          </div>
 
           <!-- Add Inventory Split Dropdown Button (matching Image 2 & 3) -->
           <div class="btn-group split-inventory-btn-group dropdown" :class="{ show: isAddMenuOpen }">
@@ -75,132 +146,7 @@
           </div>
         </div>
 
-        <!-- TIER 2: Views Selector Dropdown (Left) & 5 Action Icons (Right) -->
-        <div class="inventory-tier2-row">
-          <!-- Views Dropdown -->
-          <div class="inventory-views-dropdown dropdown">
-            <button
-              class="btn-views-toggle dropdown-toggle"
-              type="button"
-              id="inventoryViewsMenu"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-              title="Select View"
-            >
-              <i class="bx bx-list-ul mr-50 text-primary"></i>
-              <span>{{ selected_inventory }}</span>
-            </button>
-            <div class="dropdown-menu shadow-sm" aria-labelledby="inventoryViewsMenu">
-              <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
-                Default Views
-              </h6>
-              <a
-                v-for="inventory_view in getDefaultViews"
-                :key="inventory_view.id"
-                class="dropdown-item d-flex justify-content-between align-items-center"
-                href="javascript:void(0)"
-                @click="changeInventoryView(inventory_view.id)"
-              >
-                <span>{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
-                <router-link
-                  :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
-                  class="text-muted ml-2"
-                  @click.stop
-                >
-                  <i class="bx bx-edit-alt"></i>
-                </router-link>
-              </a>
-
-              <div class="dropdown-divider"></div>
-              <h6 class="dropdown-header text-uppercase font-small-2 font-weight-bold">
-                Custom Views
-              </h6>
-              <div class="custom-views-scrollable">
-                <a
-                  v-for="inventory_view in getCustomViews"
-                  :key="inventory_view.id"
-                  class="dropdown-item d-flex justify-content-between align-items-center"
-                  href="javascript:void(0)"
-                  @click="changeInventoryView(inventory_view.id)"
-                >
-                  <span>{{ $helpers.truncate(inventory_view.header, 25, "...") }}</span>
-                  <router-link
-                    :to="{ name: 'inventory-view-update', params: { id: inventory_view.id } }"
-                    class="text-muted ml-2"
-                    @click.stop
-                  >
-                    <i class="bx bx-edit-alt"></i>
-                  </router-link>
-                </a>
-              </div>
-
-              <div class="dropdown-divider"></div>
-              <router-link
-                :to="{ name: 'inventory-view-create' }"
-                class="dropdown-item text-primary font-weight-bold d-flex align-items-center"
-              >
-                <i class="bx bx-plus mr-1"></i> New Custom View
-              </router-link>
-            </div>
-          </div>
-
-          <!-- 5 Action Icons on Right: Filter, Grid, Expand, Syndication, Settings -->
-          <div class="inventory-tier2-actions">
-            <button
-              type="button"
-              class="btn-tier2-icon"
-              data-toggle="modal"
-              data-target="#filters"
-              :class="{ active: getFilterState }"
-              title="Filters"
-            >
-              <i class="bx bx-filter"></i>
-            </button>
-
-            <button
-              type="button"
-              class="btn-tier2-icon"
-              data-toggle="modal"
-              data-target="#grid-list"
-              title="Customize Columns"
-            >
-              <i class="bx bx-grid-alt"></i>
-            </button>
-
-            <button
-              type="button"
-              class="btn-tier2-icon"
-              @click="changeCompact"
-              :title="getCompact ? 'Normal View' : 'Compact View'"
-            >
-              <i class="bx" :class="getCompact ? 'bx-collapse' : 'bx-expand'"></i>
-            </button>
-
-            <button
-              v-if="isAuthorized"
-              type="button"
-              class="btn-tier2-icon"
-              :class="{ active: getCurrentSyndicationViewStatus }"
-              @click="changeSyndicationViewStatus"
-              title="Bulk Syndication"
-            >
-              <i class="bx bx-transfer"></i>
-            </button>
-
-            <button
-              type="button"
-              class="btn-tier2-icon"
-              data-toggle="modal"
-              data-target="#grid-list"
-              title="Settings"
-            >
-              <i class="bx bx-cog"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- TIER 3: Search Bar + 4 Dropdowns (Normal Mode, Image 2) OR Bulk Actions Bar (Selected Mode, Image 3) -->
+        <!-- TIER 3: Search Bar + 4 Dropdowns + 5 Action Icons (Normal Mode) OR Bulk Actions Bar (Selected Mode) -->
         <div class="inventory-tier3-card">
           <!-- Normal Mode (Image 2): Search Input on Left, 4 Quick Dropdowns on Right -->
           <div v-if="getInventoryIds.length === 0" class="tier3-normal-mode">
@@ -287,30 +233,75 @@
                 <i class="bx bx-x mr-25"></i> Clear
               </button>
             </div>
+
+            <!-- 5 Action Icons on Right: Filter, Grid, Expand, Syndication, Settings -->
+            <div class="inventory-tier2-actions tier3-actions-divider">
+              <button
+                type="button"
+                class="btn-tier2-icon"
+                data-toggle="modal"
+                data-target="#filters"
+                :class="{ active: getFilterState }"
+                title="Filters"
+              >
+                <i class="bx bx-filter"></i>
+              </button>
+
+              <button
+                type="button"
+                class="btn-tier2-icon"
+                data-toggle="modal"
+                data-target="#grid-list"
+                title="Customize Columns"
+              >
+                <i class="bx bx-grid-alt"></i>
+              </button>
+
+              <button
+                type="button"
+                class="btn-tier2-icon"
+                @click="changeCompact"
+                :title="getCompact ? 'Normal View' : 'Compact View'"
+              >
+                <i class="bx" :class="getCompact ? 'bx-collapse' : 'bx-expand'"></i>
+              </button>
+
+              <button
+                v-if="isAuthorized"
+                type="button"
+                class="btn-tier2-icon"
+                :class="{ active: getCurrentSyndicationViewStatus }"
+                @click="changeSyndicationViewStatus"
+                title="Bulk Syndication"
+              >
+                <i class="bx bx-transfer"></i>
+              </button>
+
+              <router-link
+                :to="{ name: 'inventory-settings' }"
+                class="btn-tier2-icon"
+                title="Settings"
+              >
+                <i class="bx bx-cog"></i>
+              </router-link>
+            </div>
           </div>
 
-          <!-- Bulk Selection Mode (Image 3): 1 Selected Pill, Cancel Selection, Delete, Bulk Update, Bulk Syndication -->
+          <!-- Bulk Selection Mode: Count + Clear link, Mass Update, and Three-Dots Menu -->
           <div v-else class="tier3-bulk-mode">
-            <div class="bulk-pill-badge">
-              <i class="bx bx-check-circle"></i>
-              <span>{{ getInventoryIds.length }} selected</span>
+            <div class="bulk-selection-summary">
+              <span class="bulk-selection-count">
+                <strong>{{ getInventoryIds.length }}</strong>
+                {{ getInventoryIds.length === 1 ? "Record" : "Records" }} Selected.
+              </span>
+              <button
+                type="button"
+                class="btn-bulk-clear"
+                @click="clearBulkSelection"
+              >
+                Clear
+              </button>
             </div>
-
-            <button
-              type="button"
-              class="btn-bulk-text btn-bulk-cancel"
-              @click="clearBulkSelection"
-            >
-              <i class="bx bx-x"></i> Cancel Selection
-            </button>
-
-            <button
-              type="button"
-              class="btn-bulk-text btn-bulk-delete"
-              @click="confirmDeleteAction"
-            >
-              <i class="bx bx-trash"></i> Delete
-            </button>
 
             <button
               type="button"
@@ -318,17 +309,44 @@
               data-toggle="modal"
               data-target="#bulk-list"
             >
-              <i class="bx bx-edit"></i> Bulk Update
+              <i class="bx bx-edit"></i> Mass Update
             </button>
 
-            <button
-              type="button"
-              class="btn-bulk-text btn-bulk-syndication"
-              data-toggle="modal"
-              data-target="#bulk-syndication-update"
-            >
-              <i class="bx bx-transfer"></i> Bulk Syndication
-            </button>
+            <div class="dropdown bulk-more-dropdown">
+              <button
+                type="button"
+                class="btn-bulk-text btn-bulk-more"
+                id="inventoryBulkMoreBtn"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                title="More actions"
+              >
+                <i class="bx bx-dots-horizontal-rounded"></i>
+              </button>
+              <div
+                class="dropdown-menu bulk-more-menu"
+                aria-labelledby="inventoryBulkMoreBtn"
+              >
+                <button
+                  type="button"
+                  class="dropdown-item bulk-more-item"
+                  data-toggle="modal"
+                  data-target="#bulk-syndication-update"
+                >
+                  <i class="bx bx-transfer"></i>
+                  <span>Bulk Syndication</span>
+                </button>
+                <button
+                  type="button"
+                  class="dropdown-item bulk-more-item is-danger"
+                  @click="confirmDeleteAction"
+                >
+                  <i class="bx bx-trash"></i>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -379,6 +397,20 @@
                           </span>
                           <i v-if="isSortAsc('year')" class="bx bx-up-arrow-alt sort-active"></i>
                           <i v-else-if="isSortDesc('year')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
+                      <!-- Body Type Column with Sort (before DIS) -->
+                      <th
+                        v-if="!getCurrentSyndicationViewStatus"
+                        class="th-body-type th-sortable text-left"
+                        @click="toggleSort('body_type')"
+                      >
+                        <span class="lr-sort justify-content-start">
+                          <span>BODY TYPE</span>
+                          <i v-if="isSortAsc('body_type')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('body_type')" class="bx bx-down-arrow-alt sort-active"></i>
                           <span v-else class="sort-idle">⇅</span>
                         </span>
                       </th>
@@ -435,6 +467,9 @@
                         </span>
                       </th>
 
+                      <!-- 12. Website / VDP Column -->
+                      <th class="th-website-vdp text-center">WEBSITE/ VDP</th>
+
                       <!-- 9. Creation Date Column with Sort -->
                       <th class="th-creation-date th-sortable" @click="toggleSort('created_at')">
                         <span class="lr-sort">
@@ -444,33 +479,6 @@
                           <span v-else class="sort-idle">⇅</span>
                         </span>
                       </th>
-
-                      <!-- 10. Body Type Column with Sort -->
-                      <th class="th-body-type th-sortable" @click="toggleSort('body_type')">
-                        <span class="lr-sort">
-                          <span>BODY TYPE</span>
-                          <i v-if="isSortAsc('body_type')" class="bx bx-up-arrow-alt sort-active"></i>
-                          <i v-else-if="isSortDesc('body_type')" class="bx bx-down-arrow-alt sort-active"></i>
-                          <span v-else class="sort-idle">⇅</span>
-                        </span>
-                      </th>
-
-                      <!-- 11. Last Sync Column with Sort -->
-                      <th class="th-last-sync th-sortable" @click="toggleSort('updated_at')">
-                        <span class="lr-sort">
-                          <span>LAST SYNC</span>
-                          <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt sort-active"></i>
-                          <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt sort-active"></i>
-                          <span v-else class="sort-idle">⇅</span>
-                        </span>
-                      </th>
-
-                      <!-- 12. Website / VDP Column -->
-                      <th class="th-website-vdp text-center">WEBSITE/ VDP</th>
-
-
-                      <!-- 14. Repair Report Column -->
-                      <th class="th-repair-report text-center">REPAIR REPORT</th>
 
                       <!-- 15. Modified At Column with Sort (Kept at last per instruction) -->
                       <th class="th-modified-at th-sortable" @click="toggleSort('updated_at')">
@@ -499,8 +507,8 @@
 
                   <!-- Table Body -->
                   <tbody>
-                    <!-- Loading Indicator (Initial load or loading when empty) -->
-                    <tr v-if="!getLoadState || (isTableLoading && getEntities.length === 0)">
+                    <!-- Loading Indicator (Initial load when overlay is not active) -->
+                    <tr v-if="!getLoadState && !isTableLoading">
                       <td colspan="20" class="text-center py-5 text-muted">
                         <div class="d-flex flex-column align-items-center justify-content-center py-4">
                           <i class="bx bx-loader-alt bx-spin text-primary mb-2" style="font-size: 32px;"></i>
@@ -542,51 +550,15 @@
                 <!-- 5. PAGINATION FOOTER: Docked & Always Visible -->
                 <div class="inventory-pagination-footer">
                   <div class="pagination-info">
-                    Showing {{ paginationStart }}–{{ paginationEnd }} of {{ totalInventoryCount }} vehicles
+                    Page {{ getCurrentPage }} of {{ (getPager && getPager.pageCount) ? getPager.pageCount : 1 }}
                   </div>
 
-                  <!-- Center/Right Pagination Buttons -->
-                  <div class="pagination-controls">
-                    <button
-                      type="button"
-                      class="pagination-nav-btn"
-                      :disabled="getPager.previous == null"
-                      @click="paginationWithUrl(getPager.previous)"
-                      title="Previous Page"
-                    >
-                      <i class="bx bx-chevron-left"></i>
-                    </button>
-
-                    <!-- Page Number Buttons -->
-                    <button
-                      v-for="p in visiblePageNumbers"
-                      :key="'page_' + p"
-                      type="button"
-                      class="pagination-num-btn"
-                      :class="{ active: p === getCurrentPage, ellipsis: p === '...' }"
-                      :disabled="p === '...'"
-                      @click="p !== '...' && pagination(p)"
-                    >
-                      {{ p }}
-                    </button>
-
-                    <button
-                      type="button"
-                      class="pagination-nav-btn"
-                      :disabled="getPager.next == null"
-                      @click="paginationWithUrl(getPager.next)"
-                      title="Next Page"
-                    >
-                      <i class="bx bx-chevron-right"></i>
-                    </button>
-                  </div>
-
-                  <!-- Page Size Selector -->
-                  <div class="pagination-page-size">
-                    <span class="mr-1 text-muted">Rows per page</span>
+                  <div class="pagination-right-group">
+                    <!-- Page Size Selector -->
                     <select
                       class="page-size-select"
                       v-model="getNumberOfEntities"
+                      aria-label="Rows per page"
                     >
                       <option value="10">10</option>
                       <option value="15">15</option>
@@ -594,6 +566,31 @@
                       <option value="50">50</option>
                       <option value="100">100</option>
                     </select>
+
+                    <!-- Prev / Current / Next -->
+                    <div class="pagination-controls">
+                      <button
+                        type="button"
+                        class="pagination-nav-btn"
+                        :disabled="getPager.previous == null"
+                        @click="paginationWithUrl(getPager.previous)"
+                        title="Previous Page"
+                      >
+                        Prev
+                      </button>
+
+                      <span class="pagination-current-page">{{ getCurrentPage }}</span>
+
+                      <button
+                        type="button"
+                        class="pagination-nav-btn"
+                        :disabled="getPager.next == null"
+                        @click="paginationWithUrl(getPager.next)"
+                        title="Next Page"
+                      >
+                        Next
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2158,6 +2155,114 @@ export default {
   }
 }
 
+.inventory-views-menu {
+  min-width: 270px;
+  padding: 8px;
+  margin-top: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+
+  .dropdown-header {
+    padding: 6px 10px 4px;
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+
+  .dropdown-divider {
+    margin: 6px 4px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .custom-views-scrollable {
+    max-height: 210px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+
+  .inventory-view-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 10px;
+    margin-bottom: 1px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #1e293b;
+    background: transparent;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover,
+    &:focus {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    &.is-active {
+      background: #eff6ff;
+      color: #2563eb;
+      font-weight: 600;
+    }
+  }
+
+  .view-item-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .view-edit-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    color: #64748b;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    i {
+      font-size: 15px;
+    }
+
+    &:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+  }
+
+  .view-create-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #2563eb;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    i {
+      font-size: 16px;
+    }
+
+    &:hover,
+    &:focus {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+  }
+}
+
 .custom-views-scrollable {
   max-height: 200px;
   overflow-y: auto;
@@ -2509,6 +2614,16 @@ export default {
 }
 
 /* TIER 2: Controls Row (Views Dropdown & Action Icons) */
+.inventory-tier1-row {
+  position: relative;
+  z-index: 60;
+}
+
+.tier3-actions-divider {
+  border-left: 1px solid #e2e8f0;
+  padding-left: 10px;
+}
+
 .inventory-tier2-row {
   display: flex;
   justify-content: space-between;
@@ -2559,6 +2674,8 @@ export default {
   padding: 8px 12px;
   margin-bottom: 12px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  position: relative;
+  z-index: 25;
 }
 
 .tier3-normal-mode {
@@ -2574,9 +2691,9 @@ export default {
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 280px;
-  max-width: 380px;
-  flex: 1;
+  min-width: 220px;
+  max-width: none;
+  flex: 1 1 240px;
 
   .search-icon {
     position: absolute;
@@ -2680,24 +2797,111 @@ export default {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
+  min-height: 34px;
 }
 
-.bulk-pill-badge {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #2563eb;
-  padding: 5px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+.bulk-selection-summary {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
+  margin-right: 4px;
+  font-size: 13.5px;
+  color: #1e293b;
+}
+
+.bulk-selection-count strong {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.btn-bulk-clear {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #334155;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: #0f172a;
+  }
+}
+
+.btn-bulk-text.btn-bulk-more {
+  padding: 5px 10px;
+  min-width: 36px;
+  justify-content: center;
+
+  i {
+    font-size: 18px;
+    color: #334155;
+  }
+}
+
+.bulk-more-dropdown {
+  position: relative;
+}
+
+.bulk-more-menu {
+  min-width: 210px;
+  padding: 6px;
+  margin-top: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+.bulk-more-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1e293b;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
 
   i {
     font-size: 15px;
+    color: #64748b;
+  }
+
+  &:hover,
+  &:focus {
+    background: #f1f5f9;
+    color: #0f172a;
+
+    i {
+      color: #0f172a;
+    }
+  }
+
+  &.is-danger {
+    color: #dc2626;
+
+    i {
+      color: #dc2626;
+    }
+
+    &:hover,
+    &:focus {
+      background: #fef2f2;
+      color: #b91c1c;
+
+      i {
+        color: #b91c1c;
+      }
+    }
   }
 }
 
@@ -2896,8 +3100,9 @@ export default {
   }
 
   .th-vehicle {
-    min-width: 290px;
-    max-width: 360px;
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
   }
 
   .th-dis {
@@ -3069,103 +3274,97 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 0.25rem 0.85rem;
-  border-top: 1px solid #e2e8f0;
+  gap: 10px;
+  padding: 5px 14px;
+  border-top: 1px solid #f1f5f9;
   background: #ffffff;
   z-index: 5;
 }
 
 .pagination-info {
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 12.5px;
+  color: #475569;
   font-weight: 500;
+}
+
+.pagination-right-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 5px;
 }
 
 .pagination-nav-btn {
-  width: 25px;
-  height: 25px;
-  border-radius: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  color: #475569;
-  display: flex;
+  color: #334155;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-
-  &:hover:not(:disabled) {
-    background: #f1f5f9;
-    color: #0f172a;
-  }
-
-  &:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-}
-
-.pagination-num-btn {
-  min-width: 25px;
-  height: 25px;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  color: #475569;
-  font-size: 0.775rem;
+  font-size: 12.5px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
 
-  &:hover:not(:disabled):not(.active) {
-    background: #f1f5f9;
+  &:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
     color: #0f172a;
   }
 
-  &.active {
-    background: #eff6ff;
-    border-color: #2563eb;
-    color: #2563eb;
-    font-weight: 600;
-  }
-
-  &.ellipsis {
-    border: none;
-    background: transparent;
-    cursor: default;
+  &:disabled {
     color: #94a3b8;
+    border-color: #f1f5f9;
+    background: #ffffff;
+    cursor: not-allowed;
   }
 }
 
-.pagination-page-size {
-  display: flex;
+.pagination-current-page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #60a5fa;
+  color: #2563eb;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: inline-flex;
   align-items: center;
-  font-size: 0.8rem;
-  color: #64748b;
+  justify-content: center;
 }
 
 .page-size-select {
+  appearance: none;
+  -webkit-appearance: none;
   border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  padding: 1px 4px;
-  font-size: 0.775rem;
-  height: 25px;
-  color: #1e293b;
+  border-radius: 6px;
+  padding: 0 22px 0 9px;
+  font-size: 12.5px;
+  font-weight: 500;
+  height: 28px;
+  color: #334155;
   outline: none;
-  background: #ffffff;
+  background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 7px center;
   cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
 
   &:focus {
-    border-color: #2563eb;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
   }
 }
 
@@ -3190,6 +3389,16 @@ export default {
 
 <style lang="scss">
 /* ---------- Views dropdown must sit above the sticky table header ---------- */
+.inventory-tier1-row {
+  position: relative;
+  z-index: 60;
+}
+
+.tier3-actions-divider {
+  border-left: 1px solid #e2e8f0;
+  padding-left: 10px;
+}
+
 .inventory-tier2-row {
   position: relative;
   z-index: 60;

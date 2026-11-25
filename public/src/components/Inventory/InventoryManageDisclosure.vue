@@ -6,18 +6,6 @@
     role="tabpanel"
   >
     <section id="disclosures" class="dc-page">
-      <div class="dc-header">
-        <button
-          type="button"
-          class="dc-btn dc-btn-ghost"
-          title="Reset Disclosures"
-          @click="confirmResetAction"
-        >
-          <i class="bx bx-reset"></i>
-          <span>Reset</span>
-        </button>
-      </div>
-
       <form class="form form-horizontal webapp-form dc-form">
         <div
           class="dc-card"
@@ -44,10 +32,21 @@
                     {{ disclosure.question }}
                   </label>
                   <div
-                    class="dc-template-cta"
+                    class="dc-statement-actions"
                     v-if="disclosure.question === 'Complete Disclosure'"
                   >
-                    <inventory-disclosure-template-c-t-a :elementId="'inventory_disclosure'" />
+                    <div class="dc-template-cta">
+                      <inventory-disclosure-template-c-t-a :elementId="'inventory_disclosure'" />
+                    </div>
+                    <button
+                      type="button"
+                      class="dc-btn dc-btn-ghost dc-btn-sm"
+                      title="Reset Disclosures"
+                      @click="confirmResetAction"
+                    >
+                      <i class="bx bx-reset"></i>
+                      <span>Reset</span>
+                    </button>
                   </div>
                 </div>
                 <textarea
@@ -80,7 +79,6 @@
               <!-- button group / switch : START -->
               <div
                 class="dc-item dc-item--half dc-choice"
-                :class="disclosure.type === `Switch` ? disclosure.css_class : ''"
                 :key="`disclosure_div_${index}`"
                 v-if="disclosure.type === `YesNoQuestion` || disclosure.type === `Switch`"
               >
@@ -161,9 +159,8 @@
 
               <!-- DynamicInputField : START -->
               <div
-                class="dc-item dc-item--quarter"
+                class="dc-item dc-item--half"
                 :key="`disclosure_div_${index}`"
-                :class="disclosure.css_class"
                 v-if="disclosure.type === `DynamicInputField`"
               >
                 <label class="dc-label" :for="`disclosure_${index}`">{{ disclosure.question }}</label>

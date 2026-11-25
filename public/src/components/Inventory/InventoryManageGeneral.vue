@@ -10,8 +10,11 @@
       <div class="row match-height">
         <div class="col-md-12 col-12">
           <div class="card shadow-none mb-0">
+            <div class="card-header border-line-bottom-title">
+              <h4 class="card-title">Vehicle Information</h4>
+            </div>
             <div class="card-content">
-              <div class="card-body pt-0">
+              <div class="card-body">
                 <form class="form form-horizontal webapp-form">
                   <div class="form-body">
                     <div class="row">
@@ -58,7 +61,7 @@
                             <div v-show="!updateView" class="col-md-4"></div>
                             <div
                               v-show="!updateView"
-                              class="col-xs-12 col-md-7 mb-50"
+                              class="col-xs-12 col-md-8 mb-50"
                             >
                               <router-link
                                 tag="a"
@@ -87,7 +90,7 @@
                               </router-link>
                             </div>
                             <div class="col-md-4"></div>
-                            <div class="col-md-7 form-group">
+                            <div class="col-md-8 form-group">
                               <div class="checkbox">
                                 <input
                                   type="checkbox"
@@ -105,7 +108,7 @@
                             <div class="col-md-4">
                               <label style="color: red">Stock #</label>
                             </div>
-                            <div class="col-md-7 form-group">
+                            <div class="col-md-8 form-group">
                               <fieldset>
                                 <div class="input-group">
                                   <input
@@ -140,7 +143,7 @@
                             <div class="col-md-4">
                               <label>Status</label>
                             </div>
-                            <div class="col-md-7 form-group">
+                            <div class="col-md-8 form-group">
                               <fieldset>
                                 <div class="input-group">
                                   <select
@@ -196,7 +199,7 @@
                             <div class="col-md-4">
                               <label>Vehicle Type</label>
                             </div>
-                            <div class="col-md-5 form-group">
+                            <div class="col-md-8 form-group">
                               <select
                                 class="custom-select form-control"
                                 v-model="form.vehicle_type"
@@ -309,7 +312,6 @@
                                     v-model="form.make"
                                     id="make"
                                     name="make"
-                                    style="width: 17%"
                                   >
                                     <option value="" selected disabled>
                                       Make
@@ -335,7 +337,6 @@
                                     id="model"
                                     name="model"
                                     placeholder="Model"
-                                    style="width: 17%"
                                   />
                                 </div>
                               </fieldset>
@@ -400,7 +401,7 @@
                             <div class="col-md-4">
                               <label>Engine</label>
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-8 form-group">
                               <fieldset>
                                 <div class="input-group">
                                   <input
@@ -414,7 +415,7 @@
                                   />
                                   <div class="input-group-append">
                                     <span
-                                      class="input-group-text"
+                                      class="input-group-text input-group-text-suffix"
                                       id="basic-addon2"
                                       >L</span
                                     >
@@ -427,7 +428,7 @@
                                     ></option>
                                   </datalist>
                                   <select
-                                    class="custom-select ml-2 form-control"
+                                    class="custom-select form-control"
                                     id="engine"
                                     name="engine"
                                     v-model="form.engine"
@@ -490,7 +491,7 @@
                             <div class="col-md-4">
                               <label>Passengers</label>
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-8 form-group">
                               <fieldset>
                                 <div class="input-group">
                                   <select
@@ -515,7 +516,7 @@
                             <div class="col-md-4">
                               <label>Odometer</label>
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-8 form-group">
                               <fieldset>
                                 <div class="input-group">
                                   <input
@@ -532,7 +533,6 @@
                                     class="form-control mr-1"
                                     v-model="form.odometer"
                                     placeholder=""
-                                    style="width: 60%"
                                   />
                                   <select
                                     class="custom-select form-control"
@@ -558,7 +558,7 @@
                             <div class="col-md-4">
                               <label>Fuel Type</label>
                             </div>
-                            <div class="col-md-5 form-group">
+                            <div class="col-md-8 form-group">
                               <select
                                 class="custom-select form-control"
                                 v-model="form.fuel_type"
@@ -579,7 +579,7 @@
                             <div class="col-md-4">
                               <label>Fuel Consumption</label>
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-8 form-group">
                               <fieldset>
                                 <div class="input-group">
                                   <input
@@ -772,7 +772,7 @@
                                 ></div>
                               </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-md-3 form-group">
                               <input
                                 type="text"
                                 v-model="form.exterior_color"
@@ -885,7 +885,7 @@
                                 ></div>
                               </div>
                             </div>
-                            <div class="col-3">
+                            <div class="col-md-3 form-group">
                               <input
                                 type="text"
                                 v-model="form.interior_color"
@@ -1134,7 +1134,6 @@
                               <div class="row">
                                 <div class="col-md-4">
                                   <label
-                                    style="position: relative; top: 25%"
                                     class="text-muted"
                                     >Downpayment</label
                                   >
@@ -1177,7 +1176,6 @@
                                 </div>
                                 <div class="col-md-4">
                                   <label
-                                    style="position: relative; top: 25%"
                                     class="text-muted"
                                     >Interest Rate</label
                                   >
@@ -1219,7 +1217,6 @@
                                 </div>
                                 <div class="col-md-4">
                                   <label
-                                    style="position: relative; top: 25%"
                                     class="text-muted"
                                     >Term</label
                                   >
@@ -1264,7 +1261,7 @@
                                     >Payment Frequency</label
                                   >
                                 </div>
-                                <div class="col-md-5 form-group">
+                                <div class="col-md-8 form-group">
                                   <select
                                     v-model="form.payment_frequency"
                                     class="custom-select form-control"
@@ -1301,7 +1298,7 @@
                             <div class="col-md-4">
                               <label>Location</label>
                             </div>
-                            <div class="col-md-5 form-group">
+                            <div class="col-md-8 form-group">
                               <select
                                 class="custom-select form-control"
                                 v-model="form.location"
@@ -1381,16 +1378,16 @@
       <div class="row match-height">
         <div class="col-md-12 col-12">
           <div class="card shadow-none mb-0">
-            <div class="card-header border-line-bottom-title">
-              <h4 class="card-title">
+            <div class="card-header border-line-bottom-title d-flex align-items-center justify-content-between flex-wrap">
+              <h4 class="card-title mb-0">
                 Features
-                <button
-                  class="float-right btn btn-secondary"
-                  @click="populateDefaultOptions"
-                >
-                  Populate Vehicle Options
-                </button>
               </h4>
+              <button
+                class="btn btn-secondary"
+                @click="populateDefaultOptions"
+              >
+                Populate Vehicle Options
+              </button>
             </div>
             <div class="card-content">
               <div class="card-body">
@@ -1905,7 +1902,7 @@
               <h4 class="card-title">Syndication</h4>
             </div>
             <div class="card-content">
-              <div class="card-body pb-0 pt-0">
+              <div class="card-body">
                 <form
                   class="form form-horizontal webapp-form"
                   id="vehicle-form"

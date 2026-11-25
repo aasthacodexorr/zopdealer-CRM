@@ -5,19 +5,175 @@
       style="overflow: visible"
     >
       <div class="">
-        <ul class="right-scroll-list nav nav-tabs" role="tablist">
-          <li class="nav-item pr-0 pl-0 d-flex align-items-center">
-            <router-link
-              title="Back To Inventory"
-              tag="a"
-              to="/inventory"
-              aria-label="Back To Inventory"
-              class="btn btn-sm btn-outline-secondary btn-back-nav btn-back-nav--icon mr-1"
-              exact
-            >
-              <i class="bx bx-arrow-back"></i>
-            </router-link>
-          </li>
+        <!-- Top Page Header: Create Mode -->
+        <div v-if="!updateView" class="inventory-manage-page-header">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center">
+              <router-link
+                title="Back To Inventory"
+                tag="a"
+                to="/inventory"
+                aria-label="Back To Inventory"
+                class="btn btn-sm btn-outline-secondary btn-back-nav btn-back-nav--icon mr-1"
+                exact
+              >
+                <i class="bx bx-arrow-back"></i>
+              </router-link>
+              <div>
+                <div class="d-flex align-items-center mb-0">
+                  <h2 class="inventory-manage-main-title mb-0">Add Vehicle</h2>
+                  <span class="badge badge-light-primary font-weight-bold ml-1 px-1 py-50">New Unit</span>
+                </div>
+                <p class="text-muted mb-0 font-small-3 mt-25">Enter vehicle specifications, pricing, details, and syndication settings</p>
+              </div>
+            </div>
+            <div class="inventory-header-actions d-flex align-items-center">
+              <button
+                v-show="show_general_submit_button"
+                type="submit"
+                :disabled="!submit_button"
+                class="btn btn-primary zd-header-btn"
+                @click="createEvent"
+              >
+                <i class="bx bx-check mr-50"></i> Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Page Header: Update Mode -->
+        <div
+          v-else-if="updateView"
+          class="inventory-manage-page-header"
+        >
+          <div class="d-flex align-items-center justify-content-between flex-wrap">
+            <div class="d-flex align-items-center">
+              <router-link
+                title="Back To Inventory"
+                tag="a"
+                to="/inventory"
+                aria-label="Back To Inventory"
+                class="btn btn-sm btn-outline-secondary btn-back-nav btn-back-nav--icon mr-1"
+                exact
+              >
+                <i class="bx bx-arrow-back"></i>
+              </router-link>
+              <div class="inventory-header-thumb mr-1">
+                <img
+                  :src="headerThumbnailUrl"
+                  :alt="`${inventory.year} ${inventory.make} ${inventory.model}`"
+                  @error="onHeaderImageError"
+                />
+              </div>
+              <div>
+                <template v-if="inventory.year !== ''">
+                  <div class="d-flex align-items-center flex-wrap mb-0">
+                    <h2 class="inventory-manage-main-title mb-0">
+                      {{ inventory.year }} {{ inventory.make }} {{ inventory.model }}
+                    </h2>
+                    <span v-if="inventory.stock_no" class="badge badge-light-secondary font-weight-bold ml-1 px-1 py-50">#{{ inventory.stock_no }}</span>
+                    <span v-if="inventory.vin" class="text-muted font-small-3 ml-1">({{ inventory.vin }})</span>
+                  </div>
+                  <div v-if="created_at || updated_at" class="text-muted font-small-2 mt-25">
+                    <span v-if="created_at">Created: {{ created_at }}</span>
+                    <span v-if="created_at && updated_at" class="mx-50">•</span>
+                    <span v-if="updated_at">Updated: {{ updated_at }}</span>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="d-flex align-items-center mb-50" style="gap: 8px;">
+                    <span class="zd-skeleton zd-skeleton--title"></span>
+                    <span class="zd-skeleton zd-skeleton--badge"></span>
+                    <span class="zd-skeleton zd-skeleton--vin"></span>
+                  </div>
+                  <span class="zd-skeleton zd-skeleton--meta"></span>
+                </template>
+              </div>
+            </div>
+            <div class="inventory-header-actions d-flex align-items-center flex-wrap mt-50 mt-sm-0">
+              <a
+                v-show="showVDPUrl"
+                target="_blank"
+                :href="inventory.page_url"
+                class="btn btn-sm btn-outline-primary zd-header-btn"
+                title="View on Website"
+              >
+                <i class="bx bx-link-external mr-50"></i> View on Website
+              </a>
+              <div
+                v-show="getLeadCount > 0"
+                class="position-relative cursor-pointer"
+                @click="searchLeadResponseByStockNumber"
+              >
+                <button class="btn btn-sm btn-light-primary zd-header-btn">
+                  <i class="bx bxs-magnet mr-50"></i> Leads
+                  <span class="badge badge-primary ml-50">{{ getLeadCount }}</span>
+                </button>
+              </div>
+              <button
+                id="inventoryPrintDropDown"
+                type="button"
+                class="btn btn-sm btn-outline-secondary zd-header-btn"
+                data-toggle="modal"
+                data-target="#inventory-print-options"
+              >
+                <i class="bx bx-printer mr-50"></i> Print
+              </button>
+              <router-link
+                :to="{
+                  name: 'deal-create',
+                  params: { preselected_stock_no: inventory.stock_no },
+                }"
+                class="btn btn-sm btn-outline-secondary zd-header-btn"
+                exact
+              >
+                Create Deal
+              </router-link>
+              <button
+                v-show="show_general_submit_button"
+                type="submit"
+                :disabled="!submit_button"
+                class="btn btn-sm btn-primary zd-header-btn"
+                @click="createEvent"
+              >
+                <i class="bx bx-check mr-50"></i> Save
+              </button>
+              <button
+                v-show="show_disclosures_submit_button"
+                type="submit"
+                :disabled="!submit_button"
+                class="btn btn-sm btn-primary zd-header-btn"
+                @click="createDisclosureEvent"
+              >
+                <i class="bx bx-check mr-50"></i> Save
+              </button>
+              <button
+                v-show="show_purchase_submit_button"
+                type="submit"
+                :disabled="!submit_button"
+                class="btn btn-sm btn-primary zd-header-btn"
+                @click="createPurchaseEvent"
+              >
+                <i class="bx bx-check mr-50"></i> Save
+              </button>
+              <button
+                v-show="show_digital_retailing_button"
+                type="submit"
+                :disabled="!submit_button"
+                class="btn btn-sm btn-primary zd-header-btn"
+                @click="createDigitalRetailEvent"
+              >
+                <i class="bx bx-check mr-50"></i> Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ul
+          class="right-scroll-list nav nav-tabs"
+          :class="{ 'is-create-mode': !updateView }"
+          role="tablist"
+        >
           <li class="nav-item">
             <a
               class="nav-link d-flex align-items-center pr-0 pl-0 active"
@@ -246,52 +402,6 @@
     <div class="app-content content">
       <div class="content-overlay"></div>
       <div class="">
-        <!-- Top Page Header: Create Mode -->
-        <div v-if="!updateView" class="inventory-manage-page-header">
-          <div class="d-flex align-items-center mb-0">
-            <h2 class="inventory-manage-main-title mb-0">Add Vehicle</h2>
-            <span class="badge badge-light-primary font-weight-bold ml-1 px-1 py-50">New Unit</span>
-          </div>
-          <p class="text-muted mb-0 font-small-3 mt-25">Enter vehicle specifications, pricing, details, and syndication settings</p>
-        </div>
-
-        <!-- Top Page Header: Update Mode -->
-        <div
-          v-else-if="updateView && inventory.year !== ''"
-          class="inventory-manage-page-header"
-        >
-          <div class="d-flex align-items-center justify-content-between flex-wrap">
-            <div>
-              <div class="d-flex align-items-center mb-0">
-                <h2 class="inventory-manage-main-title mb-0">
-                  {{ inventory.year }} {{ inventory.make }} {{ inventory.model }}
-                </h2>
-                <span class="badge badge-light-secondary font-weight-bold ml-1 px-1 py-50">#{{ inventory.stock_no }}</span>
-                <span class="text-muted font-small-3 ml-1">({{ inventory.vin }})</span>
-              </div>
-              <div class="text-muted font-small-2 mt-25">
-                <span>Created: {{ created_at }}</span>
-                <span class="mx-50">•</span>
-                <span>Updated: {{ updated_at }}</span>
-              </div>
-            </div>
-            <div class="d-flex align-items-center mt-50 mt-sm-0">
-              <a v-show="showVDPUrl" target="_blank" :href="inventory.page_url" class="btn btn-sm btn-outline-primary mr-1" title="View on Website">
-                <i class="bx bx-link-external mr-50"></i> View on Website
-              </a>
-              <div
-                v-show="getLeadCount > 0"
-                class="d-inline-block position-relative cursor-pointer mr-1"
-                @click="searchLeadResponseByStockNumber"
-              >
-                <button class="btn btn-sm btn-light-primary">
-                  <i class="bx bxs-magnet mr-50"></i> Leads
-                  <span class="badge badge-primary ml-50">{{ getLeadCount }}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="content-body mb-3">
           <!-- form layout section start -->
           <div class="tab-content">
@@ -548,82 +658,6 @@
       </div>
     </div>
     <!-- model for print : END -->
-    <!-- Action Bar : START -->
-    <ul class="nav nav-tabs p-50 custom-footer-fixed-action-bar" role="tablist">
-      <router-link
-        to="/inventory"
-        class="btn btn-secondary mr-auto"
-        exact
-      >
-        <i class="bx bx-arrow-back mr-50"></i> Cancel
-      </router-link>
-
-      <!-- dropdown menu : START -->
-      <div class="btn-group mr-1" role="group" v-if="updateView">
-        <button
-          id="inventoryPrintDropDown"
-          style="line-height: 1.2em"
-          type="button"
-          class="btn btn-secondary"
-          data-toggle="modal"
-          data-target="#inventory-print-options"
-        >
-          <i class="bx bx-printer mr-50"></i> Print
-        </button>
-      </div>
-
-      <!-- dropdown menu : END -->
-      <router-link
-        v-if="updateView"
-        tag="li"
-        :to="{
-          name: 'deal-create',
-          params: { preselected_stock_no: inventory.stock_no },
-        }"
-        class="d-inline-block mr-1"
-        exact
-      >
-        <a class="btn btn-secondary">Create Deal</a>
-      </router-link>
-
-      <button
-        v-show="show_general_submit_button"
-        type="submit"
-        :disabled="!submit_button"
-        class="btn btn-primary mr-1"
-        @click="createEvent"
-      >
-        <i class="bx bx-check mr-50"></i> Save
-      </button>
-      <button
-        v-show="show_disclosures_submit_button"
-        type="submit"
-        :disabled="!submit_button"
-        class="btn btn-primary mr-1"
-        @click="createDisclosureEvent"
-      >
-        <i class="bx bx-check mr-50"></i> Save
-      </button>
-      <button
-        v-show="show_purchase_submit_button"
-        type="submit"
-        :disabled="!submit_button"
-        class="btn btn-primary mr-1"
-        @click="createPurchaseEvent"
-      >
-        <i class="bx bx-check mr-50"></i> Save
-      </button>
-      <button
-        v-show="show_digital_retailing_button"
-        type="submit"
-        :disabled="!submit_button"
-        class="btn btn-primary mr-1"
-        @click="createDigitalRetailEvent"
-      >
-        <i class="bx bx-check mr-50"></i> Save
-      </button>
-    </ul>
-    <!-- Action Bar : END -->
   </div>
 </template>
 <script>
@@ -687,9 +721,19 @@ export default {
       },
       lead_count: "",
       inventory_print_pdfs: [],
+      header_image_url: "",
+      placeholder_image: "",
     };
   },
   watch: {
+    "$route.params.id": function(newVal) {
+      if (newVal && this.$route.name == "inventory-update") {
+        this.prefillHeaderFromStore();
+        this.getHeaderImage();
+      } else {
+        this.header_image_url = "";
+      }
+    },
     "inventory.stock_no": function(newVal, oldVal) {
       if (newVal.length > 0) {
         if (newVal !== oldVal) {
@@ -712,7 +756,26 @@ export default {
     ]),
     ...mapGetters("users", ["allUsers"]),
     getLeadCount() {
-      return parseInt(this.lead_count, 10);
+      const parsed = parseInt(this.lead_count, 10);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    },
+    headerThumbnailUrl() {
+      if (this.header_image_url) {
+        return this.header_image_url;
+      }
+      const rawUrls = this.inventory.image_urls || this.inventory.image_url || this.inventory.image || "";
+      if (rawUrls) {
+        const parts = String(rawUrls).includes(";")
+          ? String(rawUrls).split(";")
+          : String(rawUrls).split(",");
+        const cleanParts = parts.map((p) => p.trim()).filter(Boolean);
+        const selected = cleanParts[0];
+        if (selected) {
+          const cdn = window.global && window.global.cdn ? window.global.cdn : "";
+          return this.$helpers.parseAbsoluteOrRelativeUrl(cdn, selected);
+        }
+      }
+      return this.placeholder_image || "/media/logo/placeholder.png";
     },
     showVDPUrl() {
       return (
@@ -748,6 +811,82 @@ export default {
       leadCommitSearchString: "commitSearchString",
       leadCommitLoadState: "commitLoadState",
     }),
+    onHeaderImageError(e) {
+      if (e && e.target && !e.target.dataset.fallbackApplied) {
+        e.target.dataset.fallbackApplied = "1";
+        e.target.src = this.placeholder_image || "/media/logo/placeholder.png";
+      }
+    },
+    prefillHeaderFromStore() {
+      if (!this.updateView || !Array.isArray(this.getEntities)) return;
+      const match = this.getEntities.find(
+        (item) => String(item.id) === String(this.$route.params.id)
+      );
+      if (match) {
+        this.inventory = {
+          year: match.year || "",
+          make: match.make || "",
+          model: match.model || "",
+          stock_no: match.stock_no || "",
+          vin: match.vin || "",
+          page_url: match.page_url || "",
+          status: match.status || "",
+          image_urls: match.image_urls || "",
+        };
+        if (match.created_at) {
+          this.created_at = this.$helpers.changeUTCtoLocalDate(
+            match.created_at,
+            "MM/DD/YYYY hh:mm A",
+            this.timeZoneName
+          );
+        }
+        if (match.updated_at) {
+          this.updated_at = this.$helpers.changeUTCtoLocalDate(
+            match.updated_at,
+            "MM/DD/YYYY hh:mm A",
+            this.timeZoneName
+          );
+        }
+      }
+    },
+    async getHeaderImage() {
+      if (!this.updateView) return;
+      try {
+        const { data } = await axios({
+          method: "get",
+          url: `${window.location.origin}/api/business/inventory/image/${this.$route.params.id}`,
+          headers: {
+            Authorization: "Bearer " + window.$cookies.get("_token"),
+          },
+        });
+        const list = Array.isArray(data && data.gallery) ? data.gallery : [];
+        const first = list.find((img) => String(img.active) !== "0") || list[0];
+        if (first && first.image_url) {
+          const cdn = window.global && window.global.cdn ? window.global.cdn : "";
+          this.header_image_url =
+            this.$helpers.parseAbsoluteOrRelativeUrl(cdn, first.image_url) + "?width=200";
+        } else {
+          this.header_image_url = "";
+        }
+      } catch (e) {
+        this.header_image_url = "";
+      }
+    },
+    async getPlaceholderImage() {
+      try {
+        const { data } = await axios({
+          method: "get",
+          url: `${window.location.origin}/api/business/image/placeholder`,
+          headers: {
+            Authorization: "Bearer " + window.$cookies.get("_token"),
+          },
+        });
+        if (data && data.image_url) {
+          const cdn = window.global && window.global.cdn ? window.global.cdn : "";
+          this.placeholder_image = this.$helpers.parseAbsoluteOrRelativeUrl(cdn, data.image_url);
+        }
+      } catch (e) {}
+    },
     async searchLeadResponseByStockNumber() {
       this.leadCommitSearchState(true);
       this.leadCommitSearchString(this.inventory.stock_no);
@@ -986,6 +1125,7 @@ export default {
     const vm = this;
     Event.listen("save_complete", (data) => {
       vm.$data.submit_button = true;
+      vm.getHeaderImage();
 
       if (data.hasOwnProperty("success")) {
         if (data.success == "Inventory has been created.") {
@@ -1022,9 +1162,12 @@ export default {
     });
 
     if (this.$route.params.id && this.$route.name == "inventory-update") {
+      this.prefillHeaderFromStore();
       this.commitCurrentEntity(this.$route.params.id);
+      this.getHeaderImage();
     }
 
+    this.getPlaceholderImage();
     this.getAllUsers();
   },
   beforeUnmount() {
@@ -1038,5 +1181,84 @@ export default {
 <style lang="scss">
 ul.nav.nav-tabs {
   border-bottom: 1px solid #dfe3e7;
+}
+
+.inventory-manage-page-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding: 1rem 1.75rem !important;
+  margin-bottom: 0 !important;
+  box-shadow: none !important;
+
+  .btn-back-nav.btn-back-nav--icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    background: #ffffff;
+    flex-shrink: 0;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+  }
+
+  .inventory-header-thumb {
+    width: 68px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  .zd-skeleton {
+    display: inline-block;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: zd-shimmer 1.4s ease-in-out infinite;
+  }
+  .zd-skeleton--title { width: 200px; height: 22px; }
+  .zd-skeleton--badge { width: 72px; height: 22px; }
+  .zd-skeleton--vin { width: 130px; height: 16px; }
+  .zd-skeleton--meta { width: 220px; height: 13px; display: block; }
+
+  .inventory-header-actions {
+    gap: 8px;
+
+    .zd-header-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      margin: 0 !important;
+    }
+  }
+}
+
+@keyframes zd-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

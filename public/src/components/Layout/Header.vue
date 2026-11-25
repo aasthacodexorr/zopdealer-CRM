@@ -20,65 +20,7 @@
                   ></a>
                 </li>
               </ul>
-              <ul class="nav navbar-nav bookmark-icons">
-                <router-link
-                  tag="li"
-                  :to="{ name: 'calendar' }"
-                  class="nav-item zd-icon-item d-none d-lg-block"
-                  data-toggle="tooltip"
-                  data-placement="bottom"
-                  title="Calendar"
-                  exact
-                >
-                  <i class="ficon bx bx-calendar-alt"></i>
-                  <span
-                    v-if="getTodayCount != 0"
-                    class="badge badge-pill badge-danger badge-up zd-count"
-                    >{{ getTodayCount }}</span
-                  >
-                </router-link>
-
-                <router-link
-                  tag="li"
-                  :to="{ name: 'sms' }"
-                  class="nav-item zd-icon-item d-none d-lg-block"
-                  data-toggle="tooltip"
-                  data-placement="bottom"
-                  title="SMS"
-                  exact
-                >
-                  <i class="ficon bx bxs-message"></i>
-                  <span
-                    v-if="unReadSMS != 0"
-                    class="badge badge-pill badge-danger badge-up zd-count"
-                    >{{ unReadSMS }}</span
-                  >
-                </router-link>
-
-                <li
-                  class="nav-item zd-icon-item d-none d-lg-block"
-                  title="Calculator"
-                >
-                  <a
-                    type="button"
-                    data-toggle="modal"
-                    data-target="#universalCalculator"
-                    aria-label="Calculator"
-                  >
-                    <i class="ficon bx bxs-calculator"></i>
-                  </a>
-                </li>
-
-                <router-link
-                  tag="li"
-                  :to="{ name: 'voucher-list' }"
-                  class="nav-item zd-icon-item d-none d-lg-block"
-                  title="Vouchers"
-                  exact
-                >
-                  <i class="ficon bx bxs-coupon"></i>
-                </router-link>
-              </ul>
+              <h1 v-if="pageTitle" class="zd-topbar-page-title mb-0">{{ pageTitle }}</h1>
             </div>
             <ul class="nav navbar-nav float-right zd-actions">
               <li
@@ -102,6 +44,67 @@
                   <span>Overdue Invoice(s)</span>
                 </a>
               </li>
+
+              <!-- Right-aligned Utility Icons -->
+              <router-link
+                tag="li"
+                :to="{ name: 'calendar' }"
+                class="nav-item zd-icon-item d-none d-lg-inline-flex"
+                data-toggle="tooltip"
+                data-placement="bottom"
+                title="Calendar"
+                exact
+              >
+                <i class="ficon bx bx-calendar-alt"></i>
+                <span
+                  v-if="getTodayCount != 0"
+                  class="badge badge-pill badge-danger badge-up zd-count"
+                  >{{ getTodayCount }}</span
+                >
+              </router-link>
+
+              <router-link
+                tag="li"
+                :to="{ name: 'sms' }"
+                class="nav-item zd-icon-item d-none d-lg-inline-flex"
+                data-toggle="tooltip"
+                data-placement="bottom"
+                title="SMS"
+                exact
+              >
+                <i class="ficon bx bxs-message"></i>
+                <span
+                  v-if="unReadSMS != 0"
+                  class="badge badge-pill badge-danger badge-up zd-count"
+                  >{{ unReadSMS }}</span
+                >
+              </router-link>
+
+              <li
+                class="nav-item zd-icon-item d-none d-lg-inline-flex"
+                title="Calculator"
+              >
+                <a
+                  type="button"
+                  class="d-inline-flex align-items-center justify-content-center"
+                  data-toggle="modal"
+                  data-target="#universalCalculator"
+                  aria-label="Calculator"
+                >
+                  <i class="ficon bx bxs-calculator"></i>
+                </a>
+              </li>
+
+              <router-link
+                tag="li"
+                :to="{ name: 'voucher-list' }"
+                class="nav-item zd-icon-item d-none d-lg-inline-flex"
+                title="Vouchers"
+                exact
+              >
+                <i class="ficon bx bxs-coupon"></i>
+              </router-link>
+
               <!-- Call Icon Button Only -->
               <li
                 v-if="sms.sms_phone_number != null"
@@ -109,7 +112,7 @@
                 :title="`Call: ${formatNumber}`"
                 @click="copyPhoneNumber"
               >
-                <a class="nav-link p-0" type="button" aria-label="Call">
+                <a class="nav-link p-0 d-inline-flex align-items-center justify-content-center" type="button" aria-label="Call">
                   <i class="ficon bx bxs-phone"></i>
                 </a>
               </li>
@@ -1580,6 +1583,15 @@ export default {
     ...mapGetters("configuration", ["businessTaxSettings"]),
     ...mapGetters("calendarView", ["getTodayCount"]),
     ...mapGetters("leadResponseView", ["getLoadState"]),
+    pageTitle() {
+      if (this.$route && this.$route.name === "inventory-list") {
+        return "Inventory";
+      }
+      if (this.$route && this.$route.name === "inventory-update") {
+        return "Inventory Update";
+      }
+      return "";
+    },
     userInitials() {
       const name =
         this.global && this.global.user_metadata && this.global.user_metadata.name
@@ -2212,20 +2224,23 @@ export default {
 .zd-topbar .zd-icon-item > a,
 .zd-topbar a.zd-icon-item,
 .zd-topbar .zd-icon-item {
+  position: relative;
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  color: #4b5563;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: #475569;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .zd-topbar .zd-icon-item:hover,
 .zd-topbar .zd-icon-item.active {
-  background: #eef4ff;
-  color: #5a8dee;
+  background: #eff6ff;
+  border-color: #dbeafe;
+  color: #2563eb;
 }
 .zd-topbar .zd-icon-item .ficon {
   font-size: 1.3rem;
@@ -2257,9 +2272,19 @@ export default {
   border-radius: 999px;
 }
 
+.zd-topbar .zd-topbar-page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-left: 0.25rem;
+}
+
 /* Right: text actions */
 .zd-topbar .zd-actions {
-  gap: 0.25rem;
+  gap: 0.35rem;
+  align-items: center;
 }
 .zd-topbar .zd-actions > .nav-item {
   display: inline-flex;
@@ -2332,15 +2357,17 @@ export default {
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  color: #4b5563;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: #475569;
   cursor: pointer;
-  margin-right: 0.25rem;
-  transition: background 0.15s, color 0.15s;
+  margin-right: 0;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
   &:hover {
-    background: #eef4ff;
-    color: #5a8dee;
+    background: #eff6ff;
+    border-color: #dbeafe;
+    color: #2563eb;
   }
 
   i.ficon,
@@ -2357,7 +2384,7 @@ export default {
 .zd-topbar .zd-user-item {
   margin-left: 0.5rem;
   padding-left: 0.75rem;
-  border-left: 1px solid #e6eaf0;
+  border-left: 1px solid #e2e8f0;
   height: 28px;
 }
 .zd-topbar .zd-user.nav-link {
@@ -2365,16 +2392,19 @@ export default {
   align-items: center;
   gap: 0.5rem;
   height: 36px;
-  padding: 0 0.6rem 0 0.25rem !important;
+  padding: 0 0.7rem 0 0.25rem !important;
   border-radius: 999px;
-  color: #1f2937 !important;
-  font-size: 0.9rem;
-  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #0f172a !important;
+  font-size: 0.875rem;
+  font-weight: 600;
   text-transform: none;
-  transition: background 0.15s;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .zd-topbar .zd-user.nav-link:hover {
-  background: #f1f4f8;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 .zd-topbar .zd-user.dropdown-toggle::after {
   display: none;

@@ -20,14 +20,30 @@
         </li>
         <li class="nav-item nav-toggle">
           <a
-            class="nav-link modern-nav-toggle pr-0 active"
+            class="nav-link modern-nav-toggle zd-sidebar-toggle-btn pr-0 active"
             id="main-menu-toggle-btn"
             data-toggle="collapse"
+            data-tooltip="Hide Menu"
+            aria-label="Toggle Sidebar"
           >
-            <i
-              class="bx bx-radio-circle-marked bx-md text-white"
-              title="Pin Left Menu"
-            ></i>
+            <svg
+              class="zd-sidebar-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="zopToggleGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#00C4B4" />
+                  <stop offset="52%" stop-color="#F04B33" />
+                  <stop offset="100%" stop-color="#FBBF24" />
+                </linearGradient>
+              </defs>
+              <rect x="3" y="4" width="18" height="16" rx="4" stroke="url(#zopToggleGrad)" stroke-width="2" />
+              <line x1="9" y1="4.5" x2="9" y2="19.5" stroke="url(#zopToggleGrad)" stroke-width="2" />
+            </svg>
           </a>
         </li>
       </ul>
@@ -790,24 +806,10 @@
       </ul>
     </div>
 
-    <!-- User Profile Footer (Fixed at bottom of sidebar) -->
-    <div class="zd-sidebar-user-footer">
-      <div class="zd-sidebar-user-info">
-        <div class="zd-sidebar-user-avatar">
-          <img v-if="userPicture" :src="userPicture" alt="User Avatar" />
-          <span v-else class="zd-sidebar-user-initials">{{ userInitials }}</span>
-        </div>
-        <div class="zd-sidebar-user-details">
-          <span class="zd-sidebar-user-name" :title="userName">{{ userName }}</span>
-          <span class="zd-sidebar-user-role" :title="userRole">{{ userRole }}</span>
-        </div>
-      </div>
-
-      <a class="zd-sidebar-logout" href="api/admin/logout">
-        <i class="bx bx-log-out"></i>
-        <span>Log out</span>
-      </a>
-
+    <!-- Version Footer (Fixed at bottom of sidebar) -->
+    <div class="zd-sidebar-version-footer">
+      <span class="zd-sidebar-version-full">{{ getCurrentYear }} &copy; ZOPDEALER Ver. 31.14.2</span>
+      <span class="zd-sidebar-version-short">31.14.2</span>
     </div>
   </div>
   <!-- END: Main Menu-->
@@ -857,6 +859,9 @@ export default {
     },
     tenantApp() {
       return this.application == "tenant";
+    },
+    getCurrentYear() {
+      return new Date().getFullYear();
     },
     mainApp() {
       return this.application == "main";
@@ -913,6 +918,12 @@ export default {
   },
   methods: {
     ...mapActions("inventoryView", ["commitCurrentSyndicationViewStatus"]),
+    toggleSidebar() {
+      const btn = document.getElementById("main-menu-toggle-btn");
+      if (btn) {
+        btn.click();
+      }
+    },
     openInventoryPage() {
       this.commitCurrentSyndicationViewStatus(false);
       this.$router.push({
@@ -996,24 +1007,8 @@ export default {
       //  $("#main-menu-toggle-btn").trigger("click");
     });
 
-    $("#main-menu").hover(
-      function() {
-        if (!$("#main-menu-toggle-btn").hasClass("active")) {
-          $("#body").removeClass("menu-collapsed");
-          $(".nav-item.menu-collapsed-open")
-            .addClass("open")
-            .removeClass("menu-collapsed-open");
-        }
-      },
-      function() {
-        if (!$("#main-menu-toggle-btn").hasClass("active")) {
-          $("#body").addClass("menu-collapsed");
-          $(".nav-item.open")
-            .addClass("menu-collapsed-open")
-            .removeClass("open");
-        }
-      },
-    );
+    // Disable hover-expand so sidebar collapses/expands only via toggle button click
+    $(".navbar-header, .main-menu").off("mouseenter mouseleave");
 
     // Disable duplicate PerfectScrollbar on menu content so only 1 styled scrollbar is rendered
     if (window.$ && window.$.app && window.$.app.menu && window.$.app.menu.manualScroller) {
@@ -1101,11 +1096,22 @@ export default {
         display: block;
       }
     }
-    .modern-nav-toggle {
+    .zd-sidebar-toggle-btn {
+      position: relative;
       display: flex;
       align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
       padding: 0 !important;
       margin: 0 !important;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.16s ease, transform 0.16s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
     }
   }
   .shadow-bottom {
@@ -1387,39 +1393,117 @@ export default {
       }
     }
   }
-}
 
-/* Collapsed (icon-only) mode keeps the theme behaviour; just centre the icons */
-body.menu-collapsed #main-menu.zd-sidebar:not(:hover) {
-  .zd-sidebar-user-footer {
-    padding: 0.75rem 0.5rem;
-    align-items: center;
+  .zd-sidebar-version-footer {
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--sb-border, rgba(255, 255, 255, 0.08));
+    color: var(--sb-muted, #94a3b8);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
-    .zd-sidebar-user-details,
-    .zd-sidebar-logout span {
-      display: none !important;
-    }
-
-    .zd-sidebar-logout {
-      width: auto;
-      justify-content: center;
+    .zd-sidebar-version-short {
+      display: none;
     }
   }
-  /* show only the logo mark, centred */
+}
+
+/* Collapsed (icon-only) mode: stay collapsed on hover, expand/collapse only via header toggle */
+body.menu-collapsed #main-menu.zd-sidebar,
+body.menu-collapsed #main-menu.zd-sidebar:hover,
+body.menu-collapsed #main-menu.zd-sidebar.expanded {
+  width: 68px !important;
+  min-width: 68px !important;
+  max-width: 68px !important;
+  overflow: visible !important;
+
+  .zd-sidebar-version-footer {
+    padding: 0.75rem 0.25rem;
+    text-align: center;
+
+    .zd-sidebar-version-full {
+      display: none;
+    }
+
+    .zd-sidebar-version-short {
+      display: inline;
+      font-size: 0.68rem;
+    }
+  }
+  /* show only the logo mark centered; on header hover swap to Show Menu toggle icon + tooltip */
   .navbar-header {
     width: 100% !important;
     padding: 0 !important;
     justify-content: center;
+    position: relative;
     > ul.nav {
       justify-content: center;
       flex: 0 0 auto;
+      position: relative;
+      > li.nav-item.mr-auto {
+        margin-right: 0 !important;
+      }
       > li.nav-toggle {
-        display: none !important;
+        position: absolute;
+        inset: 0;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
       }
     }
     .navbar-brand {
       width: 46px;
       overflow: hidden;
+      transition: opacity 0.15s ease;
+      img {
+        width: 112px !important;
+        max-width: none !important;
+      }
+    }
+    .zd-sidebar-toggle-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      &::after {
+        content: "Show Menu";
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-25%);
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: #232838;
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 500;
+        white-space: nowrap;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+        z-index: 1080;
+      }
+      &:hover::after {
+        opacity: 1;
+      }
+    }
+  }
+  &:hover .navbar-header {
+    .navbar-brand {
+      opacity: 0;
+    }
+    > ul.nav > li.nav-toggle {
+      opacity: 1;
+      pointer-events: auto;
     }
   }
   .navigation > .navigation-header {
