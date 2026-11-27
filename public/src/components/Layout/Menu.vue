@@ -34,15 +34,8 @@
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <defs>
-                <linearGradient id="zopToggleGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stop-color="#00C4B4" />
-                  <stop offset="52%" stop-color="#F04B33" />
-                  <stop offset="100%" stop-color="#FBBF24" />
-                </linearGradient>
-              </defs>
-              <rect x="3" y="4" width="18" height="16" rx="4" stroke="url(#zopToggleGrad)" stroke-width="2" />
-              <line x1="9" y1="4.5" x2="9" y2="19.5" stroke="url(#zopToggleGrad)" stroke-width="2" />
+              <rect x="3" y="4" width="18" height="16" rx="4" stroke="#ffffff" stroke-width="2" />
+              <line x1="9" y1="4.5" x2="9" y2="19.5" stroke="#ffffff" stroke-width="2" />
             </svg>
           </a>
         </li>
@@ -1099,6 +1092,7 @@ export default {
     .zd-sidebar-toggle-btn {
       position: relative;
       display: flex;
+      position: relative;
       align-items: center;
       justify-content: center;
       width: 36px;
@@ -1109,8 +1103,31 @@ export default {
       cursor: pointer;
       transition: background-color 0.16s ease, transform 0.16s ease;
 
+      &::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: #232838;
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 500;
+        white-space: nowrap;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+        z-index: 1080;
+      }
+
       &:hover {
         background: rgba(255, 255, 255, 0.1);
+      }
+
+      &:hover::after {
+        opacity: 1;
       }
     }
   }
@@ -1478,6 +1495,7 @@ body.menu-collapsed #main-menu.zd-sidebar.expanded {
         position: absolute;
         top: calc(100% + 8px);
         left: 50%;
+        right: auto;
         transform: translateX(-25%);
         padding: 6px 12px;
         border-radius: 8px;

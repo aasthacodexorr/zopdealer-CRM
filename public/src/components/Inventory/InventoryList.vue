@@ -174,6 +174,16 @@
               </button>
             </div>
 
+            <button
+              v-if="hasActiveFilters"
+              type="button"
+              class="btn-reset-filters"
+              title="Clear all applied filters"
+              @click="resetAllFilters"
+            >
+              <i class="bx bx-x mr-25"></i> Clear
+            </button>
+
             <div class="tier3-filters-wrap">
               <div class="tier3-select-box">
                 <select
@@ -222,16 +232,6 @@
                 </select>
                 <i class="bx bx-chevron-down select-caret"></i>
               </div>
-
-              <button
-                v-if="hasActiveFilters"
-                type="button"
-                class="btn-reset-filters"
-                title="Clear all applied filters"
-                @click="resetAllFilters"
-              >
-                <i class="bx bx-x mr-25"></i> Clear
-              </button>
             </div>
 
             <!-- 5 Action Icons on Right: Filter, Grid, Expand, Syndication, Settings -->
@@ -470,22 +470,22 @@
                       <!-- 12. Website / VDP Column -->
                       <th class="th-website-vdp text-center">WEBSITE/ VDP</th>
 
+                      <!-- 15. Modified At Column with Sort -->
+                      <th class="th-modified-at th-sortable" @click="toggleSort('updated_at')">
+                        <span class="lr-sort">
+                          <span>MODIFIED AT</span>
+                          <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt sort-active"></i>
+                          <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt sort-active"></i>
+                          <span v-else class="sort-idle">⇅</span>
+                        </span>
+                      </th>
+
                       <!-- 9. Creation Date Column with Sort -->
                       <th class="th-creation-date th-sortable" @click="toggleSort('created_at')">
                         <span class="lr-sort">
                           <span>CREATION DATE</span>
                           <i v-if="isSortAsc('created_at')" class="bx bx-up-arrow-alt sort-active"></i>
                           <i v-else-if="isSortDesc('created_at')" class="bx bx-down-arrow-alt sort-active"></i>
-                          <span v-else class="sort-idle">⇅</span>
-                        </span>
-                      </th>
-
-                      <!-- 15. Modified At Column with Sort (Kept at last per instruction) -->
-                      <th class="th-modified-at th-sortable" @click="toggleSort('updated_at')">
-                        <span class="lr-sort">
-                          <span>MODIFIED AT</span>
-                          <i v-if="isSortAsc('updated_at')" class="bx bx-up-arrow-alt sort-active"></i>
-                          <i v-else-if="isSortDesc('updated_at')" class="bx bx-down-arrow-alt sort-active"></i>
                           <span v-else class="sort-idle">⇅</span>
                         </span>
                       </th>
@@ -2027,8 +2027,8 @@ export default {
     font-size: 14.5px;
     font-weight: 600;
     padding: 8px 16px;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+    border-top-left-radius: 0.267rem;
+    border-bottom-left-radius: 0.267rem;
     border: none;
     text-decoration: none;
     transition: background 0.15s ease;
@@ -2045,8 +2045,8 @@ export default {
     border-left: 1px solid rgba(255, 255, 255, 0.35);
     padding: 8px 12px;
     font-size: 14px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    border-top-right-radius: 0.267rem;
+    border-bottom-right-radius: 0.267rem;
     cursor: pointer;
     display: inline-flex;
     align-items: center;

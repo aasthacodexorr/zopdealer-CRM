@@ -3,6 +3,12 @@
 /* ==========================================================================
    Footer Action Bar - Fixed Dock with Sidebar Clearance
    ========================================================================== */
+.inventory-page-wrapper .btn,
+.inventory-page-wrapper .btn-tier2-icon,
+.inventory-page-wrapper .btn-reset-filters {
+  border-radius: 0.267rem !important;
+}
+
 .custom-footer-fixed-action-bar {
   position: fixed !important;
   bottom: 0 !important;
@@ -247,7 +253,7 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
   border-radius: 12px !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02) !important;
   background: #ffffff !important;
-  margin-bottom: 1.75rem !important;
+  margin-bottom: 1.15rem !important;
   transition: box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 
@@ -256,7 +262,7 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
 }
 
 #general-block-list .card-header.border-line-bottom-title {
-  padding: 1.25rem 1.75rem !important;
+  padding: 0.9rem 1.5rem !important;
   border-bottom: 1px solid #f1f5f9 !important;
   background: #fcfdfd !important;
   border-top-left-radius: 12px !important;
@@ -264,7 +270,7 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
 }
 
 #general-block-list .card-header.border-line-bottom-title .card-title {
-  font-size: 1.05rem !important;
+  font-size: 1rem !important;
   font-weight: 700 !important;
   color: #0f172a !important;
   letter-spacing: -0.01em !important;
@@ -272,7 +278,7 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
 }
 
 #general-block-list .card-body {
-  padding: 1.75rem !important;
+  padding: 1.25rem 1.5rem !important;
 }
 
 /* Strictly honor Vue v-show (display: none) */
@@ -289,10 +295,22 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
 
 /* Form Group & Row Center Alignment */
 #general-block-list .form-group:not([style*="display: none"]):not([style*="display:none"]) {
-  margin-bottom: 1.25rem !important;
+  margin-bottom: 0.85rem !important;
   display: flex !important;
   align-items: center !important;
-  min-height: 40px !important;
+  min-height: 38px !important;
+}
+
+@media (min-width: 768px) {
+  #general-block-list .row > .col-md-4:not(.form-group):has(+ .col-md-8) {
+    flex: 0 0 22% !important;
+    max-width: 22% !important;
+  }
+
+  #general-block-list .row > .col-md-4:not(.form-group) + .col-md-8 {
+    flex: 0 0 78% !important;
+    max-width: 78% !important;
+  }
 }
 
 #general-block-list .form-group > fieldset {
@@ -614,7 +632,7 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
 #general-block-list .text-right button,
 #general-block-list .text-right .btn {
   margin: 0 !important;
-  border-radius: 8px !important;
+  border-radius: 0.267rem !important;
   height: 38px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -641,7 +659,7 @@ body.menu-collapsed .custom-footer-fixed-action-bar,
 #general-block-list #button-addon2 .btn-primary {
   height: 40px !important;
   padding: 0 1.25rem !important;
-  border-radius: 8px !important;
+  border-radius: 0.267rem !important;
   font-weight: 600 !important;
   font-size: 0.875rem !important;
   background: #2563eb !important;

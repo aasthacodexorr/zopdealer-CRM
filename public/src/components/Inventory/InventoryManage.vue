@@ -1,33 +1,22 @@
 <template>
-  <div>
+  <div class="inventory-manage-root is-manage-mode" :class="{ 'is-update-mode': updateView }">
     <div
-      class="app-content content fixed-height-block"
+      class="app-content content inventory-manage-shell"
       style="overflow: visible"
     >
-      <div class="">
+      <div class="inventory-manage-shell__inner">
         <!-- Top Page Header: Create Mode -->
-        <div v-if="!updateView" class="inventory-manage-page-header">
+        <div v-if="!updateView" class="inventory-manage-page-header inventory-manage-page-header--create">
           <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div class="d-flex align-items-center">
+            <h2 class="inventory-manage-main-title mb-0">Add Inventory</h2>
+            <div class="inventory-header-actions d-flex align-items-center">
               <router-link
-                title="Back To Inventory"
-                tag="a"
                 to="/inventory"
-                aria-label="Back To Inventory"
-                class="btn btn-sm btn-outline-secondary btn-back-nav btn-back-nav--icon mr-1"
+                class="btn btn-outline-secondary zd-header-btn"
                 exact
               >
-                <i class="bx bx-arrow-back"></i>
+                Cancel
               </router-link>
-              <div>
-                <div class="d-flex align-items-center mb-0">
-                  <h2 class="inventory-manage-main-title mb-0">Add Vehicle</h2>
-                  <span class="badge badge-light-primary font-weight-bold ml-1 px-1 py-50">New Unit</span>
-                </div>
-                <p class="text-muted mb-0 font-small-3 mt-25">Enter vehicle specifications, pricing, details, and syndication settings</p>
-              </div>
-            </div>
-            <div class="inventory-header-actions d-flex align-items-center">
               <button
                 v-show="show_general_submit_button"
                 type="submit"
@@ -35,7 +24,7 @@
                 class="btn btn-primary zd-header-btn"
                 @click="createEvent"
               >
-                <i class="bx bx-check mr-50"></i> Save
+                Save
               </button>
             </div>
           </div>
@@ -129,282 +118,301 @@
               >
                 Create Deal
               </router-link>
-              <button
-                v-show="show_general_submit_button"
-                type="submit"
-                :disabled="!submit_button"
-                class="btn btn-sm btn-primary zd-header-btn"
-                @click="createEvent"
-              >
-                <i class="bx bx-check mr-50"></i> Save
-              </button>
-              <button
-                v-show="show_disclosures_submit_button"
-                type="submit"
-                :disabled="!submit_button"
-                class="btn btn-sm btn-primary zd-header-btn"
-                @click="createDisclosureEvent"
-              >
-                <i class="bx bx-check mr-50"></i> Save
-              </button>
-              <button
-                v-show="show_purchase_submit_button"
-                type="submit"
-                :disabled="!submit_button"
-                class="btn btn-sm btn-primary zd-header-btn"
-                @click="createPurchaseEvent"
-              >
-                <i class="bx bx-check mr-50"></i> Save
-              </button>
-              <button
-                v-show="show_digital_retailing_button"
-                type="submit"
-                :disabled="!submit_button"
-                class="btn btn-sm btn-primary zd-header-btn"
-                @click="createDigitalRetailEvent"
-              >
-                <i class="bx bx-check mr-50"></i> Save
-              </button>
             </div>
           </div>
         </div>
-
-        <ul
-          class="right-scroll-list nav nav-tabs"
-          :class="{ 'is-create-mode': !updateView }"
-          role="tablist"
-        >
-          <li class="nav-item">
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0 active"
-              @click="
-                show_general_submit_button = true;
-                show_disclosures_submit_button = false;
-                show_purchase_submit_button = false;
-                show_digital_retailing_button = false;
-              "
-              id="general-tab"
-              data-toggle="tab"
-              href="#general-block-list"
-              aria-controls="information"
-              role="tab"
-              aria-selected="true"
-            >
-              <span class="d-sm-block">General</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-show="updateView"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = true;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="disclosure-tab"
-              data-toggle="tab"
-              href="#disclosure-block-list"
-              aria-controls="Disclosure Tab"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Disclosures</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-show="updateView"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="information-tab"
-              data-toggle="tab"
-              href="#media-block-list"
-              aria-controls="information"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Media</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-if="updateView"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="attachment-tab"
-              data-toggle="tab"
-              href="#attachments-block-list"
-              aria-controls="information"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Attachments </span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-show="updateView"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="inventory-note-tab"
-              data-toggle="tab"
-              href="#inventory-notes"
-              aria-controls="Notes"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Notes</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-show="updateView"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="inventory-inspection-tab"
-              data-toggle="tab"
-              href="#inventory-inspection-panel"
-              aria-controls="Inventory Inspection Tab"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Inspection</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-if="updateView && isAuthorized"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = true;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="inventory-purchase-tab"
-              data-toggle="tab"
-              href="#inventory-purchase-panel"
-              aria-controls="information"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Purchase</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-if="updateView && isAuthorized"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="update-tab"
-              data-toggle="tab"
-              href="#expenses-block-list"
-              aria-controls="information"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Expenses</span>
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-if="updateView && isAuthorized"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = false;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="inventory-deals-tab"
-              data-toggle="tab"
-              href="#inventory-deals-panel"
-              aria-controls="Inventory Deals Panel"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">Deals</span>
-              <span
-                v-show="deal_count != '0'"
-                class="badge badge-light-primary badge-pill badge-round ml-50"
-                >{{ deal_count }}</span
+        <div class="content-overlay"></div>
+        <div class="content-body inventory-manage-content-body">
+          <div class="inventory-manage-workspace" :class="{ 'is-create-mode': !updateView }">
+            <aside v-if="updateView" class="inventory-side-nav" aria-label="Inventory sections">
+              <ul class="nav flex-column inventory-side-tabs" role="tablist">
+                <li class="nav-item">
+                  <a
+                    class="nav-link active"
+                    @click="
+                      show_general_submit_button = true;
+                      show_disclosures_submit_button = false;
+                      show_purchase_submit_button = false;
+                      show_digital_retailing_button = false;
+                    "
+                    id="general-tab"
+                    data-toggle="tab"
+                    href="#general-block-list"
+                    aria-controls="information"
+                    role="tab"
+                    aria-selected="true"
+                  >
+                    <i class="bx bx-car"></i>
+                    <span>General</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-show="updateView"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = true;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="disclosure-tab"
+                    data-toggle="tab"
+                    href="#disclosure-block-list"
+                    aria-controls="Disclosure Tab"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-file-blank"></i>
+                    <span>Disclosures</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-show="updateView"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="information-tab"
+                    data-toggle="tab"
+                    href="#media-block-list"
+                    aria-controls="information"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-images"></i>
+                    <span>Media</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-if="updateView"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="attachment-tab"
+                    data-toggle="tab"
+                    href="#attachments-block-list"
+                    aria-controls="information"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-paperclip"></i>
+                    <span>Attachments</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-show="updateView"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="inventory-note-tab"
+                    data-toggle="tab"
+                    href="#inventory-notes"
+                    aria-controls="Notes"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-note"></i>
+                    <span>Notes</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-show="updateView"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="inventory-inspection-tab"
+                    data-toggle="tab"
+                    href="#inventory-inspection-panel"
+                    aria-controls="Inventory Inspection Tab"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-check-shield"></i>
+                    <span>Inspection</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-if="updateView && isAuthorized"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = true;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="inventory-purchase-tab"
+                    data-toggle="tab"
+                    href="#inventory-purchase-panel"
+                    aria-controls="information"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-receipt"></i>
+                    <span>Purchase</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-if="updateView && isAuthorized"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="update-tab"
+                    data-toggle="tab"
+                    href="#expenses-block-list"
+                    aria-controls="information"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-dollar-circle"></i>
+                    <span>Expenses</span>
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-if="updateView && isAuthorized"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = false;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="inventory-deals-tab"
+                    data-toggle="tab"
+                    href="#inventory-deals-panel"
+                    aria-controls="Inventory Deals Panel"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-briefcase"></i>
+                    <span>Deals</span>
+                    <span
+                      v-show="deal_count != '0'"
+                      class="badge badge-light-primary badge-pill badge-round ml-auto"
+                      >{{ deal_count }}</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="nav-item"
+                  v-if="updateView"
+                  @click="
+                    show_general_submit_button = false;
+                    show_disclosures_submit_button = false;
+                    show_purchase_submit_button = false;
+                    show_digital_retailing_button = true;
+                  "
+                >
+                  <a
+                    class="nav-link"
+                    id="inventory-digital-retail-tab"
+                    data-toggle="tab"
+                    href="#inventory-digital-retail-panel"
+                    aria-controls="information"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <i class="bx bx-calculator"></i>
+                    <span>e-Quote</span>
+                  </a>
+                </li>
+              </ul>
+            </aside>
+            <div class="inventory-manage-main">
+              <div
+                v-if="
+                  updateView &&
+                  (show_general_submit_button ||
+                    show_disclosures_submit_button ||
+                    show_purchase_submit_button ||
+                    show_digital_retailing_button)
+                "
+                class="inventory-tab-toolbar"
               >
-            </a>
-          </li>
-          <li
-            class="nav-item"
-            v-if="updateView"
-            @click="
-              show_general_submit_button = false;
-              show_disclosures_submit_button = false;
-              show_purchase_submit_button = false;
-              show_digital_retailing_button = true;
-            "
-          >
-            <a
-              class="nav-link d-flex align-items-center pr-0 pl-0"
-              id="inventory-digital-retail-tab"
-              data-toggle="tab"
-              href="#inventory-digital-retail-panel"
-              aria-controls="information"
-              role="tab"
-              aria-selected="false"
-            >
-              <span class="d-sm-block">e-Quote</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="app-content content">
-      <div class="content-overlay"></div>
-      <div class="">
-        <div class="content-body mb-3">
-          <!-- form layout section start -->
-          <div class="tab-content">
+                <div class="inventory-tab-toolbar__title">{{ activeSectionTitle }}</div>
+                <div class="inventory-tab-toolbar__actions">
+                  <button
+                    v-show="show_general_submit_button"
+                    type="submit"
+                    :disabled="!submit_button"
+                    class="btn btn-sm btn-primary zd-header-btn"
+                    @click="createEvent"
+                  >
+                    Save
+                  </button>
+                  <button
+                    v-show="show_disclosures_submit_button"
+                    type="submit"
+                    :disabled="!submit_button"
+                    class="btn btn-sm btn-primary zd-header-btn"
+                    @click="createDisclosureEvent"
+                  >
+                    Save
+                  </button>
+                  <button
+                    v-show="show_purchase_submit_button"
+                    type="submit"
+                    :disabled="!submit_button"
+                    class="btn btn-sm btn-primary zd-header-btn"
+                    @click="createPurchaseEvent"
+                  >
+                    Save
+                  </button>
+                  <button
+                    v-show="show_digital_retailing_button"
+                    type="submit"
+                    :disabled="!submit_button"
+                    class="btn btn-sm btn-primary zd-header-btn"
+                    @click="createDigitalRetailEvent"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+              <!-- form layout section start -->
+              <div class="tab-content">
             <inventory-manage-general
               :key="viewKey"
               :app_metadata="app_metadata"
@@ -448,6 +456,8 @@
             <inventory-manage-digital-retail
               :app_metadata="app_metadata"
             ></inventory-manage-digital-retail>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -797,6 +807,12 @@ export default {
     },
     isAuthorized() {
       return this.$helpers.isAuthorized(this.app_metadata.role);
+    },
+    activeSectionTitle() {
+      if (this.show_disclosures_submit_button) return "Disclosures";
+      if (this.show_purchase_submit_button) return "Purchase Details";
+      if (this.show_digital_retailing_button) return "e-Quote";
+      return "General Information";
     },
   },
   methods: {
@@ -1257,8 +1273,313 @@ ul.nav.nav-tabs {
   }
 }
 
+.inventory-manage-root .btn,
+.inventory-manage-root .dc-btn,
+.inventory-manage-root .mg-btn,
+.inventory-manage-root .zd-header-btn,
+.inventory-manage-root .btn-back-nav.btn-back-nav--icon {
+  border-radius: 0.267rem !important;
+}
+
 @keyframes zd-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+.inventory-manage-workspace {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 18px 24px 32px;
+
+  &.is-create-mode {
+    display: block;
+    padding: 16px 24px 32px;
+  }
+
+  .inventory-side-nav {
+    width: 224px;
+    flex: 0 0 224px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 8px;
+    position: sticky;
+    top: 76px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 12px 10px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #64748b;
+
+      i {
+        font-size: 16px;
+        color: #94a3b8;
+      }
+    }
+
+    .inventory-side-tabs {
+      gap: 2px;
+
+      .nav-item {
+        width: 100%;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: #475569;
+        transition: background-color 0.15s ease, color 0.15s ease;
+        border: none;
+        background: transparent;
+
+        i {
+          font-size: 17px;
+          color: #94a3b8;
+          flex-shrink: 0;
+          transition: color 0.15s ease;
+        }
+
+        &:hover {
+          background: #f8fafc;
+          color: #0f172a;
+
+          i {
+            color: #475569;
+          }
+        }
+
+        &.active {
+          background: #eff6ff;
+          color: #2563eb;
+          font-weight: 600;
+
+          i {
+            color: #2563eb;
+          }
+        }
+      }
+    }
+  }
+
+  .inventory-manage-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .inventory-tab-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+
+    &__title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    &__actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      .zd-header-btn {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  .inventory-manage-root.is-manage-mode {
+    .app-content.content.inventory-manage-shell {
+      height: 100vh !important;
+      overflow: hidden !important;
+      display: flex;
+      flex-direction: column;
+      padding-top: 4rem !important;
+      padding-bottom: 0 !important;
+    }
+
+    .inventory-manage-shell__inner {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .inventory-manage-page-header {
+      flex: 0 0 auto;
+    }
+
+    .inventory-manage-content-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0 !important;
+    }
+
+    .inventory-manage-workspace {
+      flex: 1 1 auto;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      align-items: stretch;
+      gap: 0;
+      padding: 0;
+      background: #f8fafc;
+
+      &.is-create-mode {
+        display: flex;
+        padding: 16px 24px 0;
+      }
+    }
+
+    .inventory-side-nav {
+      position: static;
+      align-self: stretch;
+      width: 224px;
+      flex: 0 0 224px;
+      height: 100%;
+      max-height: 100%;
+      overflow-y: auto;
+      background: #ffffff;
+      border: none;
+      border-right: 1px solid #e2e8f0;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 16px 10px;
+    }
+
+    .inventory-manage-main {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      padding: 16px 24px 0;
+    }
+
+    .inventory-manage-workspace.is-create-mode .inventory-manage-main {
+      padding: 0;
+    }
+
+    .inventory-tab-toolbar {
+      flex: 0 0 auto;
+      margin-bottom: 14px;
+    }
+
+    .inventory-manage-main > .tab-content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-bottom: 48px;
+      padding-right: 0;
+
+      #general-block-list {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 0 2rem !important;
+      }
+
+      .at-page,
+      .dl-page,
+      .eq-page,
+      .dvi-page,
+      .dc-page,
+      .ex-page,
+      .mg-page,
+      .ins-page,
+      .nt-page,
+      .pu-page,
+      .wi-page {
+        padding-top: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      .nt-page {
+        background: transparent !important;
+        padding-bottom: 1.5rem !important;
+        min-height: 0 !important;
+      }
+
+      .m-width-s {
+        max-width: none !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 991.98px) {
+  .inventory-manage-workspace {
+    flex-direction: column;
+    padding: 12px 16px 24px;
+    gap: 14px;
+
+    .inventory-side-nav {
+      width: 100%;
+      flex: none;
+      position: static;
+      padding: 8px;
+
+      &__header {
+        display: none;
+      }
+
+      .inventory-side-tabs {
+        flex-direction: row !important;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 6px;
+
+        .nav-item {
+          width: auto;
+          flex: 0 0 auto;
+        }
+
+        .nav-link {
+          white-space: nowrap;
+          padding: 8px 12px;
+        }
+      }
+    }
+
+    .inventory-manage-main {
+      width: 100%;
+    }
+  }
 }
 </style>

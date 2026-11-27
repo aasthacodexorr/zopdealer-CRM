@@ -32258,7 +32258,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
   },
   data: function data() {
     return {
-      checkValue: "0"
+      checkValue: "0",
+      vdp_loading: false,
+      resolved_page_url: ""
     };
   },
   watch: {
@@ -32397,22 +32399,47 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       }
       return "—";
     },
-    formattedCreatedAt: function formattedCreatedAt() {
+    vdpHref: function vdpHref() {
+      return this.resolved_page_url || this.item && this.item.page_url || "";
+    },
+    formattedCreatedDate: function formattedCreatedDate() {
       var dt = this.item.created_at;
       if (!dt) return "—";
       try {
-        return moment(dt).format("MMM D, YYYY");
+        var m = moment(dt);
+        return m.isValid() ? m.format("MM/DD/YYYY") : dt;
       } catch (e) {
         return dt;
       }
     },
-    formattedModifiedAt: function formattedModifiedAt() {
+    formattedCreatedTime: function formattedCreatedTime() {
+      var dt = this.item.created_at;
+      if (!dt || !String(dt).includes(":")) return "";
+      try {
+        var m = moment(dt);
+        return m.isValid() ? m.format("hh:mm A") : "";
+      } catch (e) {
+        return "";
+      }
+    },
+    formattedModifiedDate: function formattedModifiedDate() {
       var dt = this.item.updated_at || this.item.modified_at;
       if (!dt) return "—";
       try {
-        return moment(dt).format("MMM D, YYYY");
+        var m = moment(dt);
+        return m.isValid() ? m.format("MM/DD/YYYY") : dt;
       } catch (e) {
         return dt;
+      }
+    },
+    formattedModifiedTime: function formattedModifiedTime() {
+      var dt = this.item.updated_at || this.item.modified_at;
+      if (!dt || !String(dt).includes(":")) return "";
+      try {
+        var m = moment(dt);
+        return m.isValid() ? m.format("hh:mm A") : "";
+      } catch (e) {
+        return "";
       }
     },
     lastSyncDate: function lastSyncDate() {
@@ -32468,6 +32495,11 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
         this.$helpers.doCopy(this, this.item.vin);
       }
     },
+    copyStockNo: function copyStockNo() {
+      if (this.item.stock_no) {
+        this.$helpers.doCopy(this, this.item.stock_no);
+      }
+    },
     onImageError: function onImageError(e) {
       var fallback = this.placeholder_image || "/app-assets/images/slider/01.jpg";
       var cdn = window.global && window.global.cdn ? window.global.cdn : "";
@@ -32511,51 +32543,112 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       });
       window.open(routeData.href, "_blank");
     },
-    openCarfax: function openCarfax() {
+    openWebsiteVdp: function openWebsiteVdp() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-        var _yield$axios$get, data, f, _t;
+        var directUrl, _yield$axios, data, toast, _t;
         return _regenerator().w(function (_context) {
           while (1) switch (_context.p = _context.n) {
             case 0:
-              if (!_this.item.carfax_url) {
+              directUrl = _this.vdpHref;
+              if (!directUrl) {
                 _context.n = 1;
                 break;
               }
-              window.open(_this.item.carfax_url, "_blank");
+              window.open(directUrl, "_blank", "noopener,noreferrer");
               return _context.a(2);
             case 1:
-              _context.p = 1;
-              _context.n = 2;
-              return axios.get("".concat(window.location.origin, "/api/business/inventory/file/").concat(_this.item.inventory_id), {
+              if (!(!_this.item || !_this.item.inventory_id || _this.vdp_loading)) {
+                _context.n = 2;
+                break;
+              }
+              return _context.a(2);
+            case 2:
+              _this.vdp_loading = true;
+              _context.p = 3;
+              _context.n = 4;
+              return axios({
+                method: "get",
+                url: "".concat(window.location.origin, "/api/business/inventory/show/").concat(_this.item.inventory_id),
+                headers: {
+                  Authorization: "Bearer " + window.$cookies.get("_token")
+                }
+              });
+            case 4:
+              _yield$axios = _context.v;
+              data = _yield$axios.data;
+              if (!(data && data.page_url)) {
+                _context.n = 5;
+                break;
+              }
+              _this.resolved_page_url = data.page_url;
+              window.open(data.page_url, "_blank", "noopener,noreferrer");
+              return _context.a(2);
+            case 5:
+              _context.n = 7;
+              break;
+            case 6:
+              _context.p = 6;
+              _t = _context.v;
+            case 7:
+              _context.p = 7;
+              _this.vdp_loading = false;
+              return _context.f(7);
+            case 8:
+              toast = new _library_Toast__WEBPACK_IMPORTED_MODULE_2__["default"]("Website URL is not available for this vehicle.");
+              toast.fail("Website URL is not available for this vehicle.");
+              toast.close();
+            case 9:
+              return _context.a(2);
+          }
+        }, _callee, null, [[3, 6, 7, 8]]);
+      }))();
+    },
+    openCarfax: function openCarfax() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+        var _yield$axios$get, data, f, _t2;
+        return _regenerator().w(function (_context2) {
+          while (1) switch (_context2.p = _context2.n) {
+            case 0:
+              if (!_this2.item.carfax_url) {
+                _context2.n = 1;
+                break;
+              }
+              window.open(_this2.item.carfax_url, "_blank");
+              return _context2.a(2);
+            case 1:
+              _context2.p = 1;
+              _context2.n = 2;
+              return axios.get("".concat(window.location.origin, "/api/business/inventory/file/").concat(_this2.item.inventory_id), {
                 headers: {
                   Authorization: "Bearer " + window.$cookies.get("_token")
                 }
               });
             case 2:
-              _yield$axios$get = _context.v;
+              _yield$axios$get = _context2.v;
               data = _yield$axios$get.data;
               if (!(data && data.files)) {
-                _context.n = 3;
+                _context2.n = 3;
                 break;
               }
               f = data.files.find(function (file) {
                 return file.header && (file.header.toLowerCase().includes("carfax") || file.header.toLowerCase().includes("history"));
               });
               if (!(f && f.file_url)) {
-                _context.n = 3;
+                _context2.n = 3;
                 break;
               }
-              window.open(_this.$helpers.parseAbsoluteOrRelativeUrl(window.global.cdn, f.file_url), "_blank");
-              return _context.a(2);
+              window.open(_this2.$helpers.parseAbsoluteOrRelativeUrl(window.global.cdn, f.file_url), "_blank");
+              return _context2.a(2);
             case 3:
-              _context.n = 5;
+              _context2.n = 5;
               break;
             case 4:
-              _context.p = 4;
-              _t = _context.v;
+              _context2.p = 4;
+              _t2 = _context2.v;
             case 5:
-              _this.$swal({
+              _this2.$swal({
                 showConfirmButton: false,
                 icon: "info",
                 toast: true,
@@ -32564,49 +32657,49 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
                 title: "No Carfax report document attached for this vehicle."
               });
             case 6:
-              return _context.a(2);
+              return _context2.a(2);
           }
-        }, _callee, null, [[1, 4]]);
+        }, _callee2, null, [[1, 4]]);
       }))();
     },
     openRepairReport: function openRepairReport() {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-        var _yield$axios$get2, data, f, _t2;
-        return _regenerator().w(function (_context2) {
-          while (1) switch (_context2.p = _context2.n) {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+        var _yield$axios$get2, data, f, _t3;
+        return _regenerator().w(function (_context3) {
+          while (1) switch (_context3.p = _context3.n) {
             case 0:
-              _context2.p = 0;
-              _context2.n = 1;
-              return axios.get("".concat(window.location.origin, "/api/business/inventory/file/").concat(_this2.item.inventory_id), {
+              _context3.p = 0;
+              _context3.n = 1;
+              return axios.get("".concat(window.location.origin, "/api/business/inventory/file/").concat(_this3.item.inventory_id), {
                 headers: {
                   Authorization: "Bearer " + window.$cookies.get("_token")
                 }
               });
             case 1:
-              _yield$axios$get2 = _context2.v;
+              _yield$axios$get2 = _context3.v;
               data = _yield$axios$get2.data;
               if (!(data && data.files)) {
-                _context2.n = 2;
+                _context3.n = 2;
                 break;
               }
               f = data.files.find(function (file) {
                 return file.header && (file.header.toLowerCase().includes("repair") || file.header.toLowerCase().includes("inspection"));
               });
               if (!(f && f.file_url)) {
-                _context2.n = 2;
+                _context3.n = 2;
                 break;
               }
-              window.open(_this2.$helpers.parseAbsoluteOrRelativeUrl(window.global.cdn, f.file_url), "_blank");
-              return _context2.a(2);
+              window.open(_this3.$helpers.parseAbsoluteOrRelativeUrl(window.global.cdn, f.file_url), "_blank");
+              return _context3.a(2);
             case 2:
-              _context2.n = 4;
+              _context3.n = 4;
               break;
             case 3:
-              _context2.p = 3;
-              _t2 = _context2.v;
+              _context3.p = 3;
+              _t3 = _context3.v;
             case 4:
-              _this2.$swal({
+              _this3.$swal({
                 showConfirmButton: false,
                 icon: "info",
                 toast: true,
@@ -32615,9 +32708,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
                 title: "No Repair Report document attached for this vehicle."
               });
             case 5:
-              return _context2.a(2);
+              return _context3.a(2);
           }
-        }, _callee2, null, [[0, 3]]);
+        }, _callee3, null, [[0, 3]]);
       }))();
     },
     windowSticker: function windowSticker(inventory_id) {
@@ -34020,6 +34113,12 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
     },
     isAuthorized: function isAuthorized() {
       return this.$helpers.isAuthorized(this.app_metadata.role);
+    },
+    activeSectionTitle: function activeSectionTitle() {
+      if (this.show_disclosures_submit_button) return "Disclosures";
+      if (this.show_purchase_submit_button) return "Purchase Details";
+      if (this.show_digital_retailing_button) return "e-Quote";
+      return "General Information";
     }
   }),
   methods: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapActions)("inventoryView", ["commitOnlyEntities", "commitCurrentEntity", "commitLoadState"])), (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapActions)("users", ["getAllUsers"])), (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapActions)("leadResponseView", {
@@ -39210,35 +39309,91 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       this.$helpers.doCopy(this, text);
     },
     openVdpInNewTab: function openVdpInNewTab() {
-      this.$emit("open-vdp", this.item.inventory_id);
-    },
-    openCarfaxReport: function openCarfaxReport() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-        var carfaxFile;
+        var directUrl, _yield$axios, data, _t;
         return _regenerator().w(function (_context) {
-          while (1) switch (_context.n) {
+          while (1) switch (_context.p = _context.n) {
             case 0:
-              // Find Carfax in files
-              carfaxFile = _this2.files.find(function (f) {
-                return f.header && (f.header.toLowerCase().includes("carfax") || f.header.toLowerCase().includes("history"));
-              });
-              if (!(carfaxFile && carfaxFile.file_url)) {
+              directUrl = _this2.formData && _this2.formData.page_url || _this2.item && _this2.item.page_url;
+              if (!directUrl) {
                 _context.n = 1;
                 break;
               }
-              window.open(_this2.parseAbsoluteOrRelativeUrl(carfaxFile.file_url), "_blank");
+              window.open(directUrl, "_blank", "noopener,noreferrer");
               return _context.a(2);
             case 1:
-              if (!_this2.item.carfax_url) {
-                _context.n = 2;
+              if (!(_this2.item && _this2.item.inventory_id)) {
+                _context.n = 6;
                 break;
               }
-              window.open(_this2.item.carfax_url, "_blank");
+              _context.p = 2;
+              _context.n = 3;
+              return axios({
+                method: "get",
+                url: "".concat(window.location.origin, "/api/business/inventory/show/").concat(_this2.item.inventory_id),
+                headers: {
+                  Authorization: "Bearer " + window.$cookies.get("_token")
+                }
+              });
+            case 3:
+              _yield$axios = _context.v;
+              data = _yield$axios.data;
+              if (!(data && data.page_url)) {
+                _context.n = 4;
+                break;
+              }
+              _this2.formData.page_url = data.page_url;
+              window.open(data.page_url, "_blank", "noopener,noreferrer");
               return _context.a(2);
+            case 4:
+              _context.n = 6;
+              break;
+            case 5:
+              _context.p = 5;
+              _t = _context.v;
+            case 6:
+              _this2.$swal({
+                showConfirmButton: false,
+                icon: "info",
+                toast: true,
+                position: "top-end",
+                timer: 3000,
+                title: "Website URL is not available for this vehicle."
+              });
+            case 7:
+              return _context.a(2);
+          }
+        }, _callee, null, [[2, 5]]);
+      }))();
+    },
+    openCarfaxReport: function openCarfaxReport() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+        var carfaxFile;
+        return _regenerator().w(function (_context2) {
+          while (1) switch (_context2.n) {
+            case 0:
+              // Find Carfax in files
+              carfaxFile = _this3.files.find(function (f) {
+                return f.header && (f.header.toLowerCase().includes("carfax") || f.header.toLowerCase().includes("history"));
+              });
+              if (!(carfaxFile && carfaxFile.file_url)) {
+                _context2.n = 1;
+                break;
+              }
+              window.open(_this3.parseAbsoluteOrRelativeUrl(carfaxFile.file_url), "_blank");
+              return _context2.a(2);
+            case 1:
+              if (!_this3.item.carfax_url) {
+                _context2.n = 2;
+                break;
+              }
+              window.open(_this3.item.carfax_url, "_blank");
+              return _context2.a(2);
             case 2:
               // Or show helpful notification
-              _this2.$swal({
+              _this3.$swal({
                 showConfirmButton: false,
                 icon: "info",
                 toast: true,
@@ -39247,29 +39402,29 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
                 title: "No Carfax report document attached for this vehicle."
               });
             case 3:
-              return _context.a(2);
+              return _context2.a(2);
           }
-        }, _callee);
+        }, _callee2);
       }))();
     },
     openRepairReport: function openRepairReport() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
         var repairFile;
-        return _regenerator().w(function (_context2) {
-          while (1) switch (_context2.n) {
+        return _regenerator().w(function (_context3) {
+          while (1) switch (_context3.n) {
             case 0:
-              repairFile = _this3.files.find(function (f) {
+              repairFile = _this4.files.find(function (f) {
                 return f.header && (f.header.toLowerCase().includes("repair") || f.header.toLowerCase().includes("inspection"));
               });
               if (!(repairFile && repairFile.file_url)) {
-                _context2.n = 1;
+                _context3.n = 1;
                 break;
               }
-              window.open(_this3.parseAbsoluteOrRelativeUrl(repairFile.file_url), "_blank");
-              return _context2.a(2);
+              window.open(_this4.parseAbsoluteOrRelativeUrl(repairFile.file_url), "_blank");
+              return _context3.a(2);
             case 1:
-              _this3.$swal({
+              _this4.$swal({
                 showConfirmButton: false,
                 icon: "info",
                 toast: true,
@@ -39278,9 +39433,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
                 title: "No Repair Report document attached for this vehicle."
               });
             case 2:
-              return _context2.a(2);
+              return _context3.a(2);
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
     downloadWindowSticker: function downloadWindowSticker() {
@@ -39326,13 +39481,13 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
       return "Customer";
     },
     loadAllVehicleDetails: function loadAllVehicleDetails(id) {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
         var token, authHeader;
-        return _regenerator().w(function (_context3) {
-          while (1) switch (_context3.n) {
+        return _regenerator().w(function (_context4) {
+          while (1) switch (_context4.n) {
             case 0:
-              _this4.loadingDetails = true;
+              _this5.loadingDetails = true;
               token = window.$cookies.get("_token");
               authHeader = {
                 Authorization: "Bearer " + token
@@ -39342,9 +39497,9 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
               }).then(function (_ref) {
                 var data = _ref.data;
                 if (data) {
-                  for (var key in _this4.formData) {
+                  for (var key in _this5.formData) {
                     if (data[key] !== undefined && data[key] !== null) {
-                      _this4.formData[key] = data[key];
+                      _this5.formData[key] = data[key];
                     }
                   }
                 }
@@ -39356,7 +39511,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
               }).then(function (_ref2) {
                 var data = _ref2.data;
                 if (data && data.gallery) {
-                  _this4.galleryList = data.gallery;
+                  _this5.galleryList = data.gallery;
                 }
               })["catch"](function () {});
 
@@ -39366,7 +39521,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
               }).then(function (_ref3) {
                 var data = _ref3.data;
                 if (data && data.files) {
-                  _this4.files = data.files;
+                  _this5.files = data.files;
                 }
               })["catch"](function () {});
 
@@ -39379,8 +39534,8 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
                   data.forEach(function (elem) {
                     if (elem && elem.question && elem.answer) {
                       var k = elem.question.toLowerCase().replace(/ /g, "_");
-                      if (_this4.disclosures[k] !== undefined) {
-                        _this4.disclosures[k] = elem.answer;
+                      if (_this5.disclosures[k] !== undefined) {
+                        _this5.disclosures[k] = elem.answer;
                       }
                     }
                   });
@@ -39393,7 +39548,7 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
               }).then(function (_ref5) {
                 var data = _ref5.data;
                 if (data && data.all_notes) {
-                  _this4.all_notes = data.all_notes;
+                  _this5.all_notes = data.all_notes;
                 }
               })["catch"](function () {});
 
@@ -39403,15 +39558,15 @@ var moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js"
               }).then(function (_ref6) {
                 var data = _ref6.data;
                 if (data && data.deals) {
-                  _this4.deals = data.deals;
+                  _this5.deals = data.deals;
                 }
               })["catch"](function () {})["finally"](function () {
-                _this4.loadingDetails = false;
+                _this5.loadingDetails = false;
               });
             case 1:
-              return _context3.a(2);
+              return _context4.a(2);
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     }
   }
@@ -46053,11 +46208,11 @@ function _toPrimitive(t, e) { if ("object" != _typeof(t) || !t) return t; var r;
   },
   computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("configuration", ["businessTaxSettings"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("calendarView", ["getTodayCount"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("leadResponseView", ["getLoadState"])), {}, {
     pageTitle: function pageTitle() {
-      if (this.$route && this.$route.name === "inventory-list") {
+      if (this.$route && (this.$route.name === "inventory-list" || this.$route.name === "inventory-update" || this.$route.name === "inventory-create")) {
         return "Inventory";
       }
-      if (this.$route && this.$route.name === "inventory-update") {
-        return "Inventory Update";
+      if (this.$route && this.$route.name === "inventory-settings") {
+        return "Inventory Settings";
       }
       return "";
     },
@@ -121044,23 +121199,45 @@ var _hoisted_8 = ["title"];
 var _hoisted_9 = {
   "class": "vehicle-sub-meta"
 };
-var _hoisted_10 = ["title"];
+var _hoisted_10 = {
+  "class": "vin-meta-wrap"
+};
 var _hoisted_11 = ["title"];
-var _hoisted_12 = ["title"];
-var _hoisted_13 = {
+var _hoisted_12 = {
+  "class": "stock-meta-wrap"
+};
+var _hoisted_13 = ["title"];
+var _hoisted_14 = ["title"];
+var _hoisted_15 = {
   "class": "col-dis text-left"
 };
-var _hoisted_14 = {
+var _hoisted_16 = {
   key: 1,
   "class": "text-muted font-weight-normal"
 };
-var _hoisted_15 = {
+var _hoisted_17 = {
   "class": "col-status text-center"
 };
-var _hoisted_16 = ["title"];
-var _hoisted_17 = ["title"];
-var _hoisted_18 = ["title", "onClick"];
-var _hoisted_19 = ["onClick", "title"];
+var _hoisted_18 = ["href"];
+var _hoisted_19 = ["disabled"];
+var _hoisted_20 = ["title"];
+var _hoisted_21 = {
+  "class": "zd-date-line"
+};
+var _hoisted_22 = {
+  key: 0,
+  "class": "zd-time-line"
+};
+var _hoisted_23 = ["title"];
+var _hoisted_24 = {
+  "class": "zd-date-line"
+};
+var _hoisted_25 = {
+  key: 0,
+  "class": "zd-time-line"
+};
+var _hoisted_26 = ["title", "onClick"];
+var _hoisted_27 = ["onClick", "title"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_inventory_item_odometer_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("inventory-item-odometer-component");
   var _component_inventory_item_currency_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("inventory-item-currency-component");
@@ -121070,7 +121247,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       'row-selected': $props.isSelected || $data.checkValue === '1',
       'row-compact': $props.isCompact
     }]),
-    onClick: _cache[14] || (_cache[14] = function () {
+    onClick: _cache[17] || (_cache[17] = function () {
       return $options.onRowClick && $options.onRowClick.apply($options, arguments);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 1. Selection Checkbox "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
@@ -121088,7 +121265,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "true-value": '1',
     "false-value": '0',
     data: $props.item.inventory_id
-  }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_3), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.checkValue]]), _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_3), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.checkValue]]), _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "custom-chk-box"
   }, null, -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 2. Vehicle Photo Thumbnail with Eye-Catching Magnifier Quick-View Icon "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "vehicle-thumbnail-wrapper",
@@ -121104,7 +121281,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onError: _cache[3] || (_cache[3] = function () {
       return $options.onImageError && $options.onImageError.apply($options, arguments);
     })
-  }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_5), $props.item.image_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_6, [_cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_5), $props.item.image_count > 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_6, [_cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-camera"
   }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.image_count), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "thumbnail-magnifier-btn",
@@ -121112,7 +121289,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.openPreview && $options.openPreview.apply($options, arguments);
     }, ["stop"])),
     title: "Quick Snapshot"
-  }, _toConsumableArray(_cache[17] || (_cache[17] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[20] || (_cache[20] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-search-alt"
   }, null, -1 /* CACHED */)])))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. Combined Vehicle Identity: Year Make Model Trim, VIN • Stock # "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "vehicle-primary-title",
@@ -121120,26 +121297,51 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $options.openInventoryDetail($props.item.inventory_id);
     }, ["stop"]))
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.vehicleFullTitle), 9 /* TEXT, PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.vehicleFullTitle), 9 /* TEXT, PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "vin-meta copyable-text",
     title: 'Click to copy VIN: ' + $props.item.vin,
     onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.copyVin && $options.copyVin.apply($options, arguments);
     }, ["stop"]))
-  }, " VIN " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.vin || '—'), 9 /* TEXT, PROPS */, _hoisted_10), _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, " VIN " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.vin || '—'), 9 /* TEXT, PROPS */, _hoisted_11), $props.item.vin ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
+    type: "button",
+    "class": "zd-inline-copy-btn",
+    title: "Copy VIN",
+    "aria-label": "Copy VIN",
+    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.copyVin && $options.copyVin.apply($options, arguments);
+    }, ["stop"]))
+  }, _toConsumableArray(_cache[21] || (_cache[21] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-copy"
+  }, null, -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), _cache[23] || (_cache[23] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "meta-dot"
-  }, "•", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "stock-meta",
-    title: 'Stock #: ' + $props.item.stock_no
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.stock_no || '—'), 9 /* TEXT, PROPS */, _hoisted_11)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Body Type (before DIS) "), !_ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
+  }, "•", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "stock-meta copyable-text",
+    title: 'Click to copy Stock #: ' + $props.item.stock_no,
+    onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.copyStockNo && $options.copyStockNo.apply($options, arguments);
+    }, ["stop"]))
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.stock_no || '—'), 9 /* TEXT, PROPS */, _hoisted_13), $props.item.stock_no ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
+    type: "button",
+    "class": "zd-inline-copy-btn",
+    title: "Copy Stock #",
+    "aria-label": "Copy Stock #",
+    onClick: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.copyStockNo && $options.copyStockNo.apply($options, arguments);
+    }, ["stop"]))
+  }, _toConsumableArray(_cache[22] || (_cache[22] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-copy"
+  }, null, -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Body Type (before DIS) "), !_ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
     key: 0,
     "class": "col-body-type text-left",
     title: $props.item.body_type || ''
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.body_type || '—'), 9 /* TEXT, PROPS */, _hoisted_12)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. DIS (Days In Stock) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedDis), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Regular columns: hidden while Syndication view is on (syndication columns then follow DIS) "), !_ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.body_type || '—'), 9 /* TEXT, PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. DIS (Days In Stock) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedDis), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Regular columns: hidden while Syndication view is on (syndication columns then follow DIS) "), !_ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. Odometer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-odometer text-left",
-    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+    onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_item_odometer_component, {
     distance: $props.item.odometer,
     metric: $props.item.km_miles || 'KM',
@@ -121147,46 +121349,65 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     stock_no: $props.item.stock_no
   }, null, 8 /* PROPS */, ["distance", "metric", "stock_no"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 6. Special Price "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-special-price text-left font-weight-bold",
-    onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+    onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
   }, [$props.item.special_price && Number($props.item.special_price) > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_inventory_item_currency_component, {
     key: 0,
     amount: $props.item.special_price,
     column: "special_price",
     stock_no: $props.item.stock_no
-  }, null, 8 /* PROPS */, ["amount", "stock_no"])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_14, "—"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. Price "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, null, 8 /* PROPS */, ["amount", "stock_no"])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_16, "—"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 7. Price "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-price text-left font-weight-bold",
-    onClick: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+    onClick: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_item_currency_component, {
     amount: $props.item.price || $props.item.selling_price || 0,
     column: "price",
     stock_no: $props.item.stock_no
-  }, null, 8 /* PROPS */, ["amount", "stock_no"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. Status Badge "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 8 /* PROPS */, ["amount", "stock_no"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 8. Status Badge "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['status-badge', $options.statusBadgeClass])
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusBadgeText), 3 /* TEXT, CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. Website / VDP Link (Opens in new tab) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.statusBadgeText), 3 /* TEXT, CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. Website / VDP Link (Opens dealer website VDP in new tab) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-action-btn text-center",
-    onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+  }, [$options.vdpHref ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    key: 0,
+    href: $options.vdpHref,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    "class": "table-icon-btn btn-vdp",
+    title: "View on Website"
+  }, _toConsumableArray(_cache[24] || (_cache[24] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-link-external"
+  }, null, -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_18)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 1,
     type: "button",
     "class": "table-icon-btn btn-vdp",
-    title: "Open VDP in new tab",
-    onClick: _cache[11] || (_cache[11] = function ($event) {
-      return $options.openInventoryNewTab($props.item.inventory_id);
+    disabled: $data.vdp_loading,
+    title: "View on Website",
+    onClick: _cache[14] || (_cache[14] = function () {
+      return $options.openWebsiteVdp && $options.openWebsiteVdp.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[19] || (_cache[19] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-link-external"
-  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. Creation Date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
-    "class": "col-creation-date",
-    title: $props.item.created_at || ''
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedCreatedAt), 9 /* TEXT, PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 15. Modified At (Preserved column not in image) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.vdp_loading ? 'bx bx-loader-alt bx-spin' : 'bx bx-link-external')
+  }, null, 2 /* CLASS */)], 8 /* PROPS */, _hoisted_19))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 15. Modified At "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     "class": "col-modified-at text-muted-sm",
     title: $props.item.updated_at || $props.item.modified_at || ''
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedModifiedAt), 9 /* TEXT, PROPS */, _hoisted_17)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 16. Dynamic Syndication Columns (Preserved if syndication view active) "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [$options.formattedModifiedDate !== '—' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedModifiedDate), 1 /* TEXT */), $options.formattedModifiedTime ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedModifiedTime), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("—")], 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. Creation Date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+    "class": "col-creation-date",
+    title: $props.item.created_at || ''
+  }, [$options.formattedCreatedDate !== '—' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedCreatedDate), 1 /* TEXT */), $options.formattedCreatedTime ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formattedCreatedTime), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("—")], 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_23)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 16. Dynamic Syndication Columns (Preserved if syndication view active) "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 2
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.getActiveSyndicationList, function (active_syndication) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
       "class": "text-center col-syndication-item",
       key: "inventory_".concat(active_syndication.slug, "_").concat($props.item.inventory_id),
-      onClick: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+      onClick: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
     }, [$options.isSyndicationActiveInInventory(active_syndication.slug) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
       key: 0,
       "class": "btn badge badge-light-success font-small-2",
@@ -121198,7 +121419,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $options.updateSyndication([active_syndication.slug], 'REMOVE');
       }
-    }, " ACTIVE ", 8 /* PROPS */, _hoisted_18)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    }, " ACTIVE ", 8 /* PROPS */, _hoisted_26)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
       key: 1,
       "class": "btn badge badge-light-danger font-small-2",
       style: {
@@ -121208,7 +121429,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.updateSyndication([active_syndication.slug], 'ADD');
       },
       title: "".concat(active_syndication.label, " is INACTIVE for #").concat($props.item.stock_no)
-    }, " INACTIVE ", 8 /* PROPS */, _hoisted_19))]);
+    }, " INACTIVE ", 8 /* PROPS */, _hoisted_27))]);
   }), 128 /* KEYED_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 10 /* CLASS, PROPS */, _hoisted_1);
 }
 
@@ -122001,77 +122222,77 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, _toConsumableArray(_cache[69] || (_cache[69] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
-  }, null, -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, null, -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */), $options.hasActiveFilters ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
+    type: "button",
+    "class": "btn-reset-filters",
+    title: "Clear all applied filters",
+    onClick: _cache[10] || (_cache[10] = function () {
+      return $options.resetAllFilters && $options.resetAllFilters.apply($options, arguments);
+    })
+  }, _toConsumableArray(_cache[70] || (_cache[70] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-x mr-25"
+  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Clear ", -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "tier3-select",
     value: $options.makeFilter,
-    onChange: _cache[10] || (_cache[10] = function ($event) {
+    onChange: _cache[11] || (_cache[11] = function ($event) {
       return $options.onToolbarFilterChange('make', $event.target.value);
     })
-  }, [_cache[70] || (_cache[70] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[71] || (_cache[71] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Makes", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getMakes, function (make) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: make,
       value: make
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(make), 9 /* TEXT, PROPS */, _hoisted_19);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_18), _cache[71] || (_cache[71] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_18), _cache[72] || (_cache[72] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-caret"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "tier3-select",
     value: $options.modelFilter,
-    onChange: _cache[11] || (_cache[11] = function ($event) {
+    onChange: _cache[12] || (_cache[12] = function ($event) {
       return $options.onToolbarFilterChange('model', $event.target.value);
     })
-  }, [_cache[72] || (_cache[72] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[73] || (_cache[73] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Models", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getModels, function (model) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: model,
       value: model
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(model), 9 /* TEXT, PROPS */, _hoisted_22);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_21), _cache[73] || (_cache[73] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_21), _cache[74] || (_cache[74] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-caret"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "tier3-select",
     value: $options.yearFilter,
-    onChange: _cache[12] || (_cache[12] = function ($event) {
+    onChange: _cache[13] || (_cache[13] = function ($event) {
       return $options.onToolbarFilterChange('year', $event.target.value);
     })
-  }, [_cache[74] || (_cache[74] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[75] || (_cache[75] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Years", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.getYears, function (year) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: year,
       value: year
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(year), 9 /* TEXT, PROPS */, _hoisted_25);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_24), _cache[75] || (_cache[75] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_24), _cache[76] || (_cache[76] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-caret"
   }, null, -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "class": "tier3-select",
     value: $options.statusFilter,
-    onChange: _cache[13] || (_cache[13] = function ($event) {
+    onChange: _cache[14] || (_cache[14] = function ($event) {
       return $options.onToolbarFilterChange('status', $event.target.value);
     })
-  }, [_cache[76] || (_cache[76] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, [_cache[77] || (_cache[77] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: ""
   }, "All Statuses", -1 /* CACHED */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.getStatuses, function (st) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: st,
       value: st
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(st), 9 /* TEXT, PROPS */, _hoisted_28);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_27), _cache[77] || (_cache[77] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, NEED_HYDRATION */, _hoisted_27), _cache[78] || (_cache[78] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-chevron-down select-caret"
-  }, null, -1 /* CACHED */))]), $options.hasActiveFilters ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-    key: 0,
-    type: "button",
-    "class": "btn-reset-filters",
-    title: "Clear all applied filters",
-    onClick: _cache[14] || (_cache[14] = function () {
-      return $options.resetAllFilters && $options.resetAllFilters.apply($options, arguments);
-    })
-  }, _toConsumableArray(_cache[78] || (_cache[78] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-x mr-25"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Clear ", -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5 Action Icons on Right: Filter, Grid, Expand, Syndication, Settings "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5 Action Icons on Right: Filter, Grid, Expand, Syndication, Settings "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["btn-tier2-icon", {
       active: _ctx.getFilterState
@@ -122229,17 +122450,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_67, [_cache[95] || (_cache[95] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "STATUS", -1 /* CACHED */)), $options.isSortAsc('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_68)) : $options.isSortDesc('status') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_69)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_70, "⇅"))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 12. Website / VDP Column "), _cache[98] || (_cache[98] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     "class": "th-website-vdp text-center"
-  }, "WEBSITE/ VDP", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. Creation Date Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
-    "class": "th-creation-date th-sortable",
-    onClick: _cache[27] || (_cache[27] = function ($event) {
-      return $options.toggleSort('created_at');
-    })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_71, [_cache[96] || (_cache[96] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "CREATION DATE", -1 /* CACHED */)), $options.isSortAsc('created_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_72)) : $options.isSortDesc('created_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_73)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_74, "⇅"))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 15. Modified At Column with Sort (Kept at last per instruction) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  }, "WEBSITE/ VDP", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 15. Modified At Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
     "class": "th-modified-at th-sortable",
-    onClick: _cache[28] || (_cache[28] = function ($event) {
+    onClick: _cache[27] || (_cache[27] = function ($event) {
       return $options.toggleSort('updated_at');
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_75, [_cache[97] || (_cache[97] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "MODIFIED AT", -1 /* CACHED */)), $options.isSortAsc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_76)) : $options.isSortDesc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_77)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_78, "⇅"))])])], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dynamic Syndication Headers "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_71, [_cache[96] || (_cache[96] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "MODIFIED AT", -1 /* CACHED */)), $options.isSortAsc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_72)) : $options.isSortDesc('updated_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_73)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_74, "⇅"))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 9. Creation Date Column with Sort "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+    "class": "th-creation-date th-sortable",
+    onClick: _cache[28] || (_cache[28] = function ($event) {
+      return $options.toggleSort('created_at');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_75, [_cache[97] || (_cache[97] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "CREATION DATE", -1 /* CACHED */)), $options.isSortAsc('created_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_76)) : $options.isSortDesc('created_at') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_77)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_78, "⇅"))])])], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Dynamic Syndication Headers "), _ctx.getCurrentSyndicationViewStatus ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 2
   }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.getActiveSyndicationList, function (active_syndication) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
@@ -122663,88 +122884,93 @@ function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(
 function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 
 var _hoisted_1 = {
-  "class": "app-content content fixed-height-block",
+  "class": "app-content content inventory-manage-shell",
   style: {
     "overflow": "visible"
   }
 };
 var _hoisted_2 = {
-  "class": ""
+  "class": "inventory-manage-shell__inner"
 };
 var _hoisted_3 = {
   key: 0,
-  "class": "inventory-manage-page-header"
+  "class": "inventory-manage-page-header inventory-manage-page-header--create"
 };
 var _hoisted_4 = {
   "class": "d-flex align-items-center justify-content-between flex-wrap gap-3"
 };
 var _hoisted_5 = {
-  "class": "d-flex align-items-center"
-};
-var _hoisted_6 = {
   "class": "inventory-header-actions d-flex align-items-center"
 };
-var _hoisted_7 = ["disabled"];
-var _hoisted_8 = {
+var _hoisted_6 = ["disabled"];
+var _hoisted_7 = {
   "class": "inventory-manage-page-header"
 };
-var _hoisted_9 = {
+var _hoisted_8 = {
   "class": "d-flex align-items-center justify-content-between flex-wrap"
 };
-var _hoisted_10 = {
+var _hoisted_9 = {
   "class": "d-flex align-items-center"
 };
-var _hoisted_11 = {
+var _hoisted_10 = {
   "class": "inventory-header-thumb mr-1"
 };
-var _hoisted_12 = ["src", "alt"];
-var _hoisted_13 = {
+var _hoisted_11 = ["src", "alt"];
+var _hoisted_12 = {
   "class": "d-flex align-items-center flex-wrap mb-0"
 };
-var _hoisted_14 = {
+var _hoisted_13 = {
   "class": "inventory-manage-main-title mb-0"
 };
-var _hoisted_15 = {
+var _hoisted_14 = {
   key: 0,
   "class": "badge badge-light-secondary font-weight-bold ml-1 px-1 py-50"
 };
-var _hoisted_16 = {
+var _hoisted_15 = {
   key: 1,
   "class": "text-muted font-small-3 ml-1"
 };
-var _hoisted_17 = {
+var _hoisted_16 = {
   key: 0,
   "class": "text-muted font-small-2 mt-25"
 };
-var _hoisted_18 = {
+var _hoisted_17 = {
   key: 0
 };
-var _hoisted_19 = {
+var _hoisted_18 = {
   key: 1,
   "class": "mx-50"
 };
-var _hoisted_20 = {
+var _hoisted_19 = {
   key: 2
 };
-var _hoisted_21 = {
+var _hoisted_20 = {
   "class": "inventory-header-actions d-flex align-items-center flex-wrap mt-50 mt-sm-0"
 };
-var _hoisted_22 = ["href"];
-var _hoisted_23 = {
+var _hoisted_21 = ["href"];
+var _hoisted_22 = {
   "class": "btn btn-sm btn-light-primary zd-header-btn"
 };
-var _hoisted_24 = {
+var _hoisted_23 = {
   "class": "badge badge-primary ml-50"
 };
-var _hoisted_25 = ["disabled"];
-var _hoisted_26 = ["disabled"];
-var _hoisted_27 = ["disabled"];
-var _hoisted_28 = ["disabled"];
-var _hoisted_29 = {
+var _hoisted_24 = {
+  "class": "content-body inventory-manage-content-body"
+};
+var _hoisted_25 = {
+  key: 0,
+  "class": "inventory-side-nav",
+  "aria-label": "Inventory sections"
+};
+var _hoisted_26 = {
+  "class": "nav flex-column inventory-side-tabs",
+  role: "tablist"
+};
+var _hoisted_27 = {
   "class": "nav-item"
 };
-var _hoisted_30 = {
-  "class": "nav-link d-flex align-items-center pr-0 pl-0",
+var _hoisted_28 = {
+  "class": "nav-link",
   id: "inventory-deals-tab",
   "data-toggle": "tab",
   href: "#inventory-deals-panel",
@@ -122752,19 +122978,27 @@ var _hoisted_30 = {
   role: "tab",
   "aria-selected": "false"
 };
+var _hoisted_29 = {
+  "class": "inventory-manage-main"
+};
+var _hoisted_30 = {
+  key: 0,
+  "class": "inventory-tab-toolbar"
+};
 var _hoisted_31 = {
-  "class": "app-content content"
+  "class": "inventory-tab-toolbar__title"
 };
 var _hoisted_32 = {
-  "class": ""
+  "class": "inventory-tab-toolbar__actions"
 };
-var _hoisted_33 = {
-  "class": "content-body mb-3"
-};
-var _hoisted_34 = {
+var _hoisted_33 = ["disabled"];
+var _hoisted_34 = ["disabled"];
+var _hoisted_35 = ["disabled"];
+var _hoisted_36 = ["disabled"];
+var _hoisted_37 = {
   "class": "tab-content"
 };
-var _hoisted_35 = {
+var _hoisted_38 = {
   "class": "modal fade text-left",
   id: "inventory-print-options",
   tabindex: "-1",
@@ -122772,56 +123006,47 @@ var _hoisted_35 = {
   "aria-labelledby": "Print Options",
   "aria-hidden": "true"
 };
-var _hoisted_36 = {
+var _hoisted_39 = {
   "class": "modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable",
   role: "document"
 };
-var _hoisted_37 = {
+var _hoisted_40 = {
   "class": "modal-content"
 };
-var _hoisted_38 = {
+var _hoisted_41 = {
   "class": "modal-body"
 };
-var _hoisted_39 = {
+var _hoisted_42 = {
   "class": "row"
 };
-var _hoisted_40 = {
+var _hoisted_43 = {
   "class": "col-6 list-group"
 };
-var _hoisted_41 = {
-  "class": "list-group-item"
-};
-var _hoisted_42 = {
-  "class": "checkbox"
-};
-var _hoisted_43 = {
-  "class": "list-group-item"
-};
 var _hoisted_44 = {
-  "class": "checkbox"
+  "class": "list-group-item"
 };
 var _hoisted_45 = {
+  "class": "checkbox"
+};
+var _hoisted_46 = {
+  "class": "list-group-item"
+};
+var _hoisted_47 = {
+  "class": "checkbox"
+};
+var _hoisted_48 = {
   key: 0,
   "class": "list-group-item"
 };
-var _hoisted_46 = {
+var _hoisted_49 = {
   "class": "checkbox"
 };
-var _hoisted_47 = {
+var _hoisted_50 = {
   key: 1,
   "class": "list-group-item"
 };
-var _hoisted_48 = {
-  "class": "checkbox"
-};
-var _hoisted_49 = {
-  "class": "list-group-item"
-};
-var _hoisted_50 = {
-  "class": "checkbox"
-};
 var _hoisted_51 = {
-  "class": "col-6 list-group"
+  "class": "checkbox"
 };
 var _hoisted_52 = {
   "class": "list-group-item"
@@ -122830,25 +123055,34 @@ var _hoisted_53 = {
   "class": "checkbox"
 };
 var _hoisted_54 = {
-  "class": "list-group-item"
+  "class": "col-6 list-group"
 };
 var _hoisted_55 = {
-  "class": "checkbox"
+  "class": "list-group-item"
 };
 var _hoisted_56 = {
+  "class": "checkbox"
+};
+var _hoisted_57 = {
+  "class": "list-group-item"
+};
+var _hoisted_58 = {
+  "class": "checkbox"
+};
+var _hoisted_59 = {
   key: 0,
   "class": "list-group-item"
 };
-var _hoisted_57 = {
+var _hoisted_60 = {
   "class": "checkbox"
 };
-var _hoisted_58 = {
+var _hoisted_61 = {
   "class": "list-group-item"
 };
-var _hoisted_59 = {
+var _hoisted_62 = {
   "class": "checkbox"
 };
-var _hoisted_60 = {
+var _hoisted_63 = {
   key: 0,
   "class": "col-sm-12 d-flex justify-content-left pb-1"
 };
@@ -122864,40 +123098,31 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_inventory_manage_note = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("inventory-manage-note");
   var _component_inventory_manage_deal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("inventory-manage-deal");
   var _component_inventory_manage_digital_retail = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("inventory-manage-digital-retail");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Top Page Header: Create Mode "), !$options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
-    title: "Back To Inventory",
-    tag: "a",
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["inventory-manage-root is-manage-mode", {
+      'is-update-mode': $options.updateView
+    }])
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Top Page Header: Create Mode "), !$options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [_cache[28] || (_cache[28] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
+    "class": "inventory-manage-main-title mb-0"
+  }, "Add Inventory", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     to: "/inventory",
-    "aria-label": "Back To Inventory",
-    "class": "btn btn-sm btn-outline-secondary btn-back-nav btn-back-nav--icon mr-1",
+    "class": "btn btn-outline-secondary zd-header-btn",
     exact: ""
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[27] || (_cache[27] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-        "class": "bx bx-arrow-back"
-      }, null, -1 /* CACHED */)]));
+      return _toConsumableArray(_cache[27] || (_cache[27] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Cancel ", -1 /* CACHED */)]));
     }),
     _: 1 /* STABLE */
-  }), _cache[28] || (_cache[28] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "d-flex align-items-center mb-0"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", {
-    "class": "inventory-manage-main-title mb-0"
-  }, "Add Vehicle"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "badge badge-light-primary font-weight-bold ml-1 px-1 py-50"
-  }, "New Unit")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-    "class": "text-muted mb-0 font-small-3 mt-25"
-  }, "Enter vehicle specifications, pricing, details, and syndication settings")], -1 /* CACHED */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "submit",
     disabled: !$data.submit_button,
     "class": "btn btn-primary zd-header-btn",
     onClick: _cache[0] || (_cache[0] = function () {
       return $options.createEvent && $options.createEvent.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[29] || (_cache[29] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-check mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Save ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_7), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_general_submit_button]])])])])) : $options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, " Save ", 8 /* PROPS */, _hoisted_6), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_general_submit_button]])])])])) : $options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Top Page Header: Update Mode "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Top Page Header: Update Mode "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     title: "Back To Inventory",
     tag: "a",
     to: "/inventory",
@@ -122906,36 +123131,36 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     exact: ""
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[30] || (_cache[30] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+      return _toConsumableArray(_cache[29] || (_cache[29] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
         "class": "bx bx-arrow-back"
       }, null, -1 /* CACHED */)]));
     }),
     _: 1 /* STABLE */
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     src: $options.headerThumbnailUrl,
     alt: "".concat($data.inventory.year, " ").concat($data.inventory.make, " ").concat($data.inventory.model),
     onError: _cache[1] || (_cache[1] = function () {
       return $options.onHeaderImageError && $options.onHeaderImageError.apply($options, arguments);
     })
-  }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_12)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [$data.inventory.year !== '' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_11)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [$data.inventory.year !== '' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.year) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.make) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.model), 1 /* TEXT */), $data.inventory.stock_no ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_15, "#" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.stock_no), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.inventory.vin ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_16, "(" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.vin) + ")", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.created_at || $data.updated_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_17, [$data.created_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_18, "Created: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.created_at), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.created_at && $data.updated_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_19, "•")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.updated_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_20, "Updated: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.updated_at), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.year) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.make) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.model), 1 /* TEXT */), $data.inventory.stock_no ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_14, "#" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.stock_no), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.inventory.vin ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_15, "(" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.inventory.vin) + ")", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.created_at || $data.updated_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, [$data.created_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_17, "Created: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.created_at), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.created_at && $data.updated_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_18, "•")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.updated_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_19, "Updated: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.updated_at), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
-  }, [_cache[31] || (_cache[31] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"d-flex align-items-center mb-50\" style=\"gap:8px;\"><span class=\"zd-skeleton zd-skeleton--title\"></span><span class=\"zd-skeleton zd-skeleton--badge\"></span><span class=\"zd-skeleton zd-skeleton--vin\"></span></div><span class=\"zd-skeleton zd-skeleton--meta\"></span>", 2))], 64 /* STABLE_FRAGMENT */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  }, [_cache[30] || (_cache[30] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"d-flex align-items-center mb-50\" style=\"gap:8px;\"><span class=\"zd-skeleton zd-skeleton--title\"></span><span class=\"zd-skeleton zd-skeleton--badge\"></span><span class=\"zd-skeleton zd-skeleton--vin\"></span></div><span class=\"zd-skeleton zd-skeleton--meta\"></span>", 2))], 64 /* STABLE_FRAGMENT */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     target: "_blank",
     href: $data.inventory.page_url,
     "class": "btn btn-sm btn-outline-primary zd-header-btn",
     title: "View on Website"
-  }, _toConsumableArray(_cache[32] || (_cache[32] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[31] || (_cache[31] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link-external mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View on Website ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_22), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.showVDPUrl]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View on Website ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_21), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.showVDPUrl]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "position-relative cursor-pointer",
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.searchLeadResponseByStockNumber && $options.searchLeadResponseByStockNumber.apply($options, arguments);
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_23, [_cache[33] || (_cache[33] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_22, [_cache[32] || (_cache[32] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-magnet mr-50"
-  }, null, -1 /* CACHED */)), _cache[34] || (_cache[34] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Leads ", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getLeadCount), 1 /* TEXT */)])], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.getLeadCount > 0]]), _cache[40] || (_cache[40] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, -1 /* CACHED */)), _cache[33] || (_cache[33] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Leads ", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getLeadCount), 1 /* TEXT */)])], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.getLeadCount > 0]]), _cache[35] || (_cache[35] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     id: "inventoryPrintDropDown",
     type: "button",
     "class": "btn btn-sm btn-outline-secondary zd-header-btn",
@@ -122954,53 +123179,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     exact: ""
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return _toConsumableArray(_cache[35] || (_cache[35] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Create Deal ", -1 /* CACHED */)]));
+      return _toConsumableArray(_cache[34] || (_cache[34] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Create Deal ", -1 /* CACHED */)]));
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["to"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "submit",
-    disabled: !$data.submit_button,
-    "class": "btn btn-sm btn-primary zd-header-btn",
-    onClick: _cache[3] || (_cache[3] = function () {
-      return $options.createEvent && $options.createEvent.apply($options, arguments);
-    })
-  }, _toConsumableArray(_cache[36] || (_cache[36] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-check mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Save ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_25), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_general_submit_button]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "submit",
-    disabled: !$data.submit_button,
-    "class": "btn btn-sm btn-primary zd-header-btn",
-    onClick: _cache[4] || (_cache[4] = function () {
-      return $options.createDisclosureEvent && $options.createDisclosureEvent.apply($options, arguments);
-    })
-  }, _toConsumableArray(_cache[37] || (_cache[37] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-check mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Save ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_26), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_disclosures_submit_button]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "submit",
-    disabled: !$data.submit_button,
-    "class": "btn btn-sm btn-primary zd-header-btn",
-    onClick: _cache[5] || (_cache[5] = function () {
-      return $options.createPurchaseEvent && $options.createPurchaseEvent.apply($options, arguments);
-    })
-  }, _toConsumableArray(_cache[38] || (_cache[38] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-check mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Save ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_27), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_purchase_submit_button]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "submit",
-    disabled: !$data.submit_button,
-    "class": "btn btn-sm btn-primary zd-header-btn",
-    onClick: _cache[6] || (_cache[6] = function () {
-      return $options.createDigitalRetailEvent && $options.createDigitalRetailEvent.apply($options, arguments);
-    })
-  }, _toConsumableArray(_cache[39] || (_cache[39] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bx bx-check mr-50"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Save ", -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_28), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_digital_retailing_button]])])])])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["right-scroll-list nav nav-tabs", {
+  }, 8 /* PROPS */, ["to"])])])])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _cache[47] || (_cache[47] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "content-overlay"
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["inventory-manage-workspace", {
       'is-create-mode': !$options.updateView
-    }]),
-    role: "tablist"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0 active",
-    onClick: _cache[7] || (_cache[7] = function ($event) {
+    }])
+  }, [$options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("aside", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link active",
+    onClick: _cache[3] || (_cache[3] = function ($event) {
       $data.show_general_submit_button = true;
       $data.show_disclosures_submit_button = false;
       $data.show_purchase_submit_button = false;
@@ -123012,46 +123202,120 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-controls": "information",
     role: "tab",
     "aria-selected": "true"
-  }, _toConsumableArray(_cache[41] || (_cache[41] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "General", -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  }, _toConsumableArray(_cache[36] || (_cache[36] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-car"
+  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "General", -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
     "class": "nav-item",
-    onClick: _cache[8] || (_cache[8] = function ($event) {
+    onClick: _cache[4] || (_cache[4] = function ($event) {
       $data.show_general_submit_button = false;
       $data.show_disclosures_submit_button = true;
       $data.show_purchase_submit_button = false;
       $data.show_digital_retailing_button = false;
     })
-  }, _toConsumableArray(_cache[42] || (_cache[42] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
+  }, _toConsumableArray(_cache[37] || (_cache[37] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
     id: "disclosure-tab",
     "data-toggle": "tab",
     href: "#disclosure-block-list",
     "aria-controls": "Disclosure Tab",
     role: "tab",
     "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Disclosures")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-file-blank"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Disclosures")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
     "class": "nav-item",
-    onClick: _cache[9] || (_cache[9] = function ($event) {
+    onClick: _cache[5] || (_cache[5] = function ($event) {
       $data.show_general_submit_button = false;
       $data.show_disclosures_submit_button = false;
       $data.show_purchase_submit_button = false;
       $data.show_digital_retailing_button = false;
     })
-  }, _toConsumableArray(_cache[43] || (_cache[43] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
+  }, _toConsumableArray(_cache[38] || (_cache[38] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
     id: "information-tab",
     "data-toggle": "tab",
     href: "#media-block-list",
     "aria-controls": "information",
     role: "tab",
     "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Media")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), $options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-images"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Media")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), $options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
     key: 0,
+    "class": "nav-item",
+    onClick: _cache[6] || (_cache[6] = function ($event) {
+      $data.show_general_submit_button = false;
+      $data.show_disclosures_submit_button = false;
+      $data.show_purchase_submit_button = false;
+      $data.show_digital_retailing_button = false;
+    })
+  }, _toConsumableArray(_cache[39] || (_cache[39] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
+    id: "attachment-tab",
+    "data-toggle": "tab",
+    href: "#attachments-block-list",
+    "aria-controls": "information",
+    role: "tab",
+    "aria-selected": "false"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-paperclip"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Attachments")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+    "class": "nav-item",
+    onClick: _cache[7] || (_cache[7] = function ($event) {
+      $data.show_general_submit_button = false;
+      $data.show_disclosures_submit_button = false;
+      $data.show_purchase_submit_button = false;
+      $data.show_digital_retailing_button = false;
+    })
+  }, _toConsumableArray(_cache[40] || (_cache[40] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
+    id: "inventory-note-tab",
+    "data-toggle": "tab",
+    href: "#inventory-notes",
+    "aria-controls": "Notes",
+    role: "tab",
+    "aria-selected": "false"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-note"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Notes")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+    "class": "nav-item",
+    onClick: _cache[8] || (_cache[8] = function ($event) {
+      $data.show_general_submit_button = false;
+      $data.show_disclosures_submit_button = false;
+      $data.show_purchase_submit_button = false;
+      $data.show_digital_retailing_button = false;
+    })
+  }, _toConsumableArray(_cache[41] || (_cache[41] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
+    id: "inventory-inspection-tab",
+    "data-toggle": "tab",
+    href: "#inventory-inspection-panel",
+    "aria-controls": "Inventory Inspection Tab",
+    role: "tab",
+    "aria-selected": "false"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-check-shield"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Inspection")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), $options.updateView && $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+    key: 1,
+    "class": "nav-item",
+    onClick: _cache[9] || (_cache[9] = function ($event) {
+      $data.show_general_submit_button = false;
+      $data.show_disclosures_submit_button = false;
+      $data.show_purchase_submit_button = true;
+      $data.show_digital_retailing_button = false;
+    })
+  }, _toConsumableArray(_cache[42] || (_cache[42] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
+    id: "inventory-purchase-tab",
+    "data-toggle": "tab",
+    href: "#inventory-purchase-panel",
+    "aria-controls": "information",
+    role: "tab",
+    "aria-selected": "false"
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-receipt"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Purchase")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.updateView && $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+    key: 2,
     "class": "nav-item",
     onClick: _cache[10] || (_cache[10] = function ($event) {
       $data.show_general_submit_button = false;
@@ -123059,17 +123323,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       $data.show_purchase_submit_button = false;
       $data.show_digital_retailing_button = false;
     })
-  }, _toConsumableArray(_cache[44] || (_cache[44] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
-    id: "attachment-tab",
+  }, _toConsumableArray(_cache[43] || (_cache[43] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
+    id: "update-tab",
     "data-toggle": "tab",
-    href: "#attachments-block-list",
+    href: "#expenses-block-list",
     "aria-controls": "information",
     role: "tab",
     "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Attachments ")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-dollar-circle"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Expenses")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.updateView && $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+    key: 3,
     "class": "nav-item",
     onClick: _cache[11] || (_cache[11] = function ($event) {
       $data.show_general_submit_button = false;
@@ -123077,107 +123342,58 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       $data.show_purchase_submit_button = false;
       $data.show_digital_retailing_button = false;
     })
-  }, _toConsumableArray(_cache[45] || (_cache[45] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
-    id: "inventory-note-tab",
-    "data-toggle": "tab",
-    href: "#inventory-notes",
-    "aria-controls": "Notes",
-    role: "tab",
-    "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Notes")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_28, [_cache[44] || (_cache[44] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-briefcase"
+  }, null, -1 /* CACHED */)), _cache[45] || (_cache[45] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Deals", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "badge badge-light-primary badge-pill badge-round ml-auto"
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.deal_count), 513 /* TEXT, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.deal_count != '0']])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+    key: 4,
     "class": "nav-item",
     onClick: _cache[12] || (_cache[12] = function ($event) {
       $data.show_general_submit_button = false;
       $data.show_disclosures_submit_button = false;
       $data.show_purchase_submit_button = false;
-      $data.show_digital_retailing_button = false;
-    })
-  }, _toConsumableArray(_cache[46] || (_cache[46] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
-    id: "inventory-inspection-tab",
-    "data-toggle": "tab",
-    href: "#inventory-inspection-panel",
-    "aria-controls": "Inventory Inspection Tab",
-    role: "tab",
-    "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Inspection")], -1 /* CACHED */)])), 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.updateView]]), $options.updateView && $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
-    key: 1,
-    "class": "nav-item",
-    onClick: _cache[13] || (_cache[13] = function ($event) {
-      $data.show_general_submit_button = false;
-      $data.show_disclosures_submit_button = false;
-      $data.show_purchase_submit_button = true;
-      $data.show_digital_retailing_button = false;
-    })
-  }, _toConsumableArray(_cache[47] || (_cache[47] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
-    id: "inventory-purchase-tab",
-    "data-toggle": "tab",
-    href: "#inventory-purchase-panel",
-    "aria-controls": "information",
-    role: "tab",
-    "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Purchase")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.updateView && $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
-    key: 2,
-    "class": "nav-item",
-    onClick: _cache[14] || (_cache[14] = function ($event) {
-      $data.show_general_submit_button = false;
-      $data.show_disclosures_submit_button = false;
-      $data.show_purchase_submit_button = false;
-      $data.show_digital_retailing_button = false;
-    })
-  }, _toConsumableArray(_cache[48] || (_cache[48] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
-    id: "update-tab",
-    "data-toggle": "tab",
-    href: "#expenses-block-list",
-    "aria-controls": "information",
-    role: "tab",
-    "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Expenses")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.updateView && $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
-    key: 3,
-    "class": "nav-item",
-    onClick: _cache[15] || (_cache[15] = function ($event) {
-      $data.show_general_submit_button = false;
-      $data.show_disclosures_submit_button = false;
-      $data.show_purchase_submit_button = false;
-      $data.show_digital_retailing_button = false;
-    })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_30, [_cache[49] || (_cache[49] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "Deals", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "badge badge-light-primary badge-pill badge-round ml-50"
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.deal_count), 513 /* TEXT, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.deal_count != '0']])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.updateView ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
-    key: 4,
-    "class": "nav-item",
-    onClick: _cache[16] || (_cache[16] = function ($event) {
-      $data.show_general_submit_button = false;
-      $data.show_disclosures_submit_button = false;
-      $data.show_purchase_submit_button = false;
       $data.show_digital_retailing_button = true;
     })
-  }, _toConsumableArray(_cache[50] || (_cache[50] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": "nav-link d-flex align-items-center pr-0 pl-0",
+  }, _toConsumableArray(_cache[46] || (_cache[46] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": "nav-link",
     id: "inventory-digital-retail-tab",
     "data-toggle": "tab",
     href: "#inventory-digital-retail-panel",
     "aria-controls": "information",
     role: "tab",
     "aria-selected": "false"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "d-sm-block"
-  }, "e-Quote")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [_cache[51] || (_cache[51] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "content-overlay"
-  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" form layout section start "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_inventory_manage_general, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-calculator"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "e-Quote")], -1 /* CACHED */)])))) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [$options.updateView && ($data.show_general_submit_button || $data.show_disclosures_submit_button || $data.show_purchase_submit_button || $data.show_digital_retailing_button) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.activeSectionTitle), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    disabled: !$data.submit_button,
+    "class": "btn btn-sm btn-primary zd-header-btn",
+    onClick: _cache[13] || (_cache[13] = function () {
+      return $options.createEvent && $options.createEvent.apply($options, arguments);
+    })
+  }, " Save ", 8 /* PROPS */, _hoisted_33), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_general_submit_button]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    disabled: !$data.submit_button,
+    "class": "btn btn-sm btn-primary zd-header-btn",
+    onClick: _cache[14] || (_cache[14] = function () {
+      return $options.createDisclosureEvent && $options.createDisclosureEvent.apply($options, arguments);
+    })
+  }, " Save ", 8 /* PROPS */, _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_disclosures_submit_button]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    disabled: !$data.submit_button,
+    "class": "btn btn-sm btn-primary zd-header-btn",
+    onClick: _cache[15] || (_cache[15] = function () {
+      return $options.createPurchaseEvent && $options.createPurchaseEvent.apply($options, arguments);
+    })
+  }, " Save ", 8 /* PROPS */, _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_purchase_submit_button]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "submit",
+    disabled: !$data.submit_button,
+    "class": "btn btn-sm btn-primary zd-header-btn",
+    onClick: _cache[16] || (_cache[16] = function () {
+      return $options.createDigitalRetailEvent && $options.createDigitalRetailEvent.apply($options, arguments);
+    })
+  }, " Save ", 8 /* PROPS */, _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.show_digital_retailing_button]])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" form layout section start "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_inventory_manage_general, {
     key: $options.viewKey,
     app_metadata: $props.app_metadata,
     time_zone: $options.timeZoneName
@@ -123210,7 +123426,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     app_metadata: $props.app_metadata
   }, null, 8 /* PROPS */, ["allUsers", "app_metadata"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_manage_digital_retail, {
     app_metadata: $props.app_metadata
-  }, null, 8 /* PROPS */, ["app_metadata"])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END: Content"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model for print : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [_cache[62] || (_cache[62] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["app_metadata"])])])], 2 /* CLASS */)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END: Content"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model for print : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_cache[58] || (_cache[58] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "modal-header pl-1 pr-1"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
     "class": "content-header-title",
@@ -123222,7 +123438,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "aria-label": "Close"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-x"
-  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  })])], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123230,10 +123446,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "window-sticker",
     id: 'inventory-window-sticker'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[52] || (_cache[52] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[48] || (_cache[48] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-window-sticker'
-  }, "Window Sticker", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Window Sticker", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123241,10 +123457,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "test-drive",
     id: 'inventory-test-drive'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[53] || (_cache[53] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[49] || (_cache[49] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-test-drive'
-  }, "Test Drive", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Test Drive", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123252,10 +123468,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "public-purchase",
     id: 'inventory-public-purchase'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[54] || (_cache[54] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[50] || (_cache[50] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-public-purchase'
-  }, "Public Purchase", -1 /* CACHED */))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Public Purchase", -1 /* CACHED */))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123263,10 +123479,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "dealer-purchase",
     id: 'inventory-dealer-purchase'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[55] || (_cache[55] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[51] || (_cache[51] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-dealer-purchase'
-  }, "Dealer Purchase", -1 /* CACHED */))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Dealer Purchase", -1 /* CACHED */))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123274,10 +123490,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "vehicle-disclosures",
     id: 'inventory-vehicle-disclosures'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[56] || (_cache[56] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[52] || (_cache[52] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-vehicle-disclosures'
-  }, "Vehicle Disclosures", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Vehicle Disclosures", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123285,10 +123501,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "internal-inspection",
     id: 'inventory-internal-inspection'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[57] || (_cache[57] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[53] || (_cache[53] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-internal-inspection'
-  }, "Internal Inspection", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Internal Inspection", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123296,10 +123512,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "buyers-guide",
     id: 'inventory-buyers-guide'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[58] || (_cache[58] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[54] || (_cache[54] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-buyers-guide'
-  }, "Buyers Guide", -1 /* CACHED */))])], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.enable_buyers_guide == '1']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Buyers Guide", -1 /* CACHED */))])], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.enable_buyers_guide == '1']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), $options.isAuthorized ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123307,10 +123523,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "inventory-recap",
     id: 'inventory-inventory-recap'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[59] || (_cache[59] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[55] || (_cache[55] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-inventory-recap'
-  }, "Inventory Recap", -1 /* CACHED */))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, "Inventory Recap", -1 /* CACHED */))])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : START "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
       return $data.inventory_print_pdfs = $event;
@@ -123318,10 +123534,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "checkbox-input",
     value: "download-images",
     id: 'inventory-download-images'
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[60] || (_cache[60] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.inventory_print_pdfs]]), _cache[56] || (_cache[56] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "pl-1",
     "for": 'inventory-download-images'
-  }, "Download Images", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END ")]), $data.inventory_print_pdfs.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Download Images", -1 /* CACHED */))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" list element : END ")]), $data.inventory_print_pdfs.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "close",
     "class": "btn btn-primary mr-1 mt-1",
     "data-dismiss": "modal",
@@ -123329,9 +123545,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[26] || (_cache[26] = function ($event) {
       return $options.unifiedDisclosureStatementWarning();
     })
-  }, _toConsumableArray(_cache[61] || (_cache[61] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[57] || (_cache[57] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-printer mr-1"
-  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Print ", -1 /* CACHED */)])))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model for print : END ")]);
+  }, null, -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Print ", -1 /* CACHED */)])))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" model for print : END ")], 2 /* CLASS */);
 }
 
 /***/ }),
@@ -125626,46 +125842,37 @@ var _hoisted_119 = {
   "class": "col-md-8 form-group"
 };
 var _hoisted_120 = {
-  id: "slider-input"
+  "class": "zd-slider-row"
 };
 var _hoisted_121 = {
-  "class": "input-group"
+  "class": "zd-slider-track"
 };
 var _hoisted_122 = {
-  "class": "col-4",
-  style: {
-    "margin-top": "0.5em"
-  }
+  "class": "zd-slider-input-wrap"
 };
 var _hoisted_123 = {
   "class": "col-md-8 form-group"
 };
 var _hoisted_124 = {
-  id: "slider-input"
+  "class": "zd-slider-row"
 };
 var _hoisted_125 = {
-  "class": "input-group"
+  "class": "zd-slider-track"
 };
 var _hoisted_126 = {
-  "class": "col-4",
-  style: {
-    "margin-top": "0.5em"
-  }
+  "class": "zd-slider-input-wrap"
 };
 var _hoisted_127 = {
   "class": "col-md-8 form-group"
 };
 var _hoisted_128 = {
-  id: "slider-input"
+  "class": "zd-slider-row"
 };
 var _hoisted_129 = {
-  "class": "input-group"
+  "class": "zd-slider-track"
 };
 var _hoisted_130 = {
-  "class": "col-4",
-  style: {
-    "margin-top": "0.5em"
-  }
+  "class": "zd-slider-input-wrap"
 };
 var _hoisted_131 = {
   "class": "col-md-8 form-group"
@@ -126962,20 +127169,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "col-md-4"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "text-muted"
-  }, "Downpayment")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_119, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_121, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"mr-1 slider-space-r\" id=\"slider-with-input\"></div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_slider, {
-    height: 10,
-    style: {
-      "padding-top": "3em"
-    },
+  }, "Downpayment")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_119, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_120, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_121, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_slider, {
+    height: 8,
+    width: "100%",
     interval: 0.01,
-    "class": "col-8",
     tooltip: 'always',
     "tooltip-formatter": '{value} %',
     modelValue: $data.form.downpayment,
     "onUpdate:modelValue": _cache[76] || (_cache[76] = function ($event) {
       return $data.form.downpayment = $event;
     })
-  }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_122, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_122, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     min: "0",
     max: "100",
     type: "number",
@@ -126983,33 +127187,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onKeyup: _cache[77] || (_cache[77] = function ($event) {
       return $options.changeDownpayment();
     }),
-    style: {
-      "width": "60%",
-      "display": "inline-block",
-      "margin-right": "1em"
-    },
     "onUpdate:modelValue": _cache[78] || (_cache[78] = function ($event) {
       return $data.form.downpayment = $event;
     }),
-    "class": "form-control"
-  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.downpayment]]), _cache[146] || (_cache[146] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("%", -1 /* CACHED */))])])])])]), _cache[151] || (_cache[151] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "form-control zd-slider-number-input"
+  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.downpayment]]), _cache[146] || (_cache[146] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "zd-slider-unit"
+  }, "%", -1 /* CACHED */))])])]), _cache[151] || (_cache[151] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-4"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "text-muted"
-  }, "Interest Rate")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_slider, {
-    height: 10,
-    style: {
-      "padding-top": "3em"
-    },
+  }, "Interest Rate")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_123, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_124, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_125, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_slider, {
+    height: 8,
+    width: "100%",
     interval: 0.01,
-    "class": "col-8",
     tooltip: 'always',
     "tooltip-formatter": '{value} %',
     modelValue: $data.form.interest_rate,
     "onUpdate:modelValue": _cache[79] || (_cache[79] = function ($event) {
       return $data.form.interest_rate = $event;
     })
-  }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_126, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_126, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     min: "0",
     max: "100",
     type: "number",
@@ -127017,33 +127215,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onKeyup: _cache[80] || (_cache[80] = function ($event) {
       return $options.changeInterestRate();
     }),
-    style: {
-      "width": "60%",
-      "display": "inline-block",
-      "margin-right": "1em"
-    },
     "onUpdate:modelValue": _cache[81] || (_cache[81] = function ($event) {
       return $data.form.interest_rate = $event;
     }),
-    "class": "form-control"
-  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.interest_rate]]), _cache[147] || (_cache[147] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("%", -1 /* CACHED */))])])])])]), _cache[152] || (_cache[152] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "form-control zd-slider-number-input"
+  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.interest_rate]]), _cache[147] || (_cache[147] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "zd-slider-unit"
+  }, "%", -1 /* CACHED */))])])]), _cache[152] || (_cache[152] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-4"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "text-muted"
-  }, "Term")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_127, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_128, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_slider, {
-    height: 10,
-    style: {
-      "padding-top": "3em"
-    },
+  }, "Term")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_127, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_128, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_129, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_vue_slider, {
+    height: 8,
+    width: "100%",
     max: 96,
-    "class": "col-8",
     tooltip: 'always',
     "tooltip-formatter": '{value} Months',
     modelValue: $data.form.term,
     "onUpdate:modelValue": _cache[82] || (_cache[82] = function ($event) {
       return $data.form.term = $event;
     })
-  }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, ["modelValue"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_130, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     min: "0",
     max: "100",
     type: "number",
@@ -127051,16 +127243,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onKeyup: _cache[83] || (_cache[83] = function ($event) {
       return $options.changeTerm();
     }),
-    style: {
-      "width": "60%",
-      "display": "inline-block",
-      "margin-right": "1em"
-    },
     "onUpdate:modelValue": _cache[84] || (_cache[84] = function ($event) {
       return $data.form.term = $event;
     }),
-    "class": "form-control"
-  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.term]]), _cache[148] || (_cache[148] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Month", -1 /* CACHED */))])])])])]), _cache[153] || (_cache[153] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "form-control zd-slider-number-input"
+  }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.term]]), _cache[148] || (_cache[148] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "zd-slider-unit"
+  }, "Months", -1 /* CACHED */))])])]), _cache[153] || (_cache[153] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "col-md-4"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "text-muted"
@@ -127668,7 +127857,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "form-control dc-textarea",
         rows: "2"
       }, null, 8 /* PROPS */, _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.internal_inspection_checkpoints[index].answer]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" textbox : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InputField : START "), checkpoint.type === "InputField" ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["dc-item dc-item--quarter", checkpoint.css_class]),
+        "class": "dc-item dc-item--quarter",
         key: "checkpoint_div_".concat(index)
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
         "class": "dc-label",
@@ -127680,8 +127869,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return $data.internal_inspection_checkpoints[index].answer = $event;
         },
         "class": "form-control dc-input"
-      }, null, 8 /* PROPS */, _hoisted_12), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.internal_inspection_checkpoints[index].answer]])], 2 /* CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InputField : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" button group : START "), checkpoint.type === "Switch" ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["dc-item dc-item--half dc-choice", checkpoint.css_class]),
+      }, null, 8 /* PROPS */, _hoisted_12), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.internal_inspection_checkpoints[index].answer]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InputField : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" button group : START "), checkpoint.type === "Switch" ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        "class": "dc-item dc-item--half dc-choice",
         key: "checkpoint_div_".concat(index)
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(checkpoint.question), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "dc-segmented",
@@ -127704,7 +127893,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         },
         placeholder: $data.internal_inspection_checkpoints[index].additional_information_placeholder,
         "class": "form-control dc-input dc-additional"
-      }, null, 8 /* PROPS */, _hoisted_18)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.internal_inspection_checkpoints[index].additional_information]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" button group : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" dropdown : START "), checkpoint.type === "Dropdown" ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      }, null, 8 /* PROPS */, _hoisted_18)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.internal_inspection_checkpoints[index].additional_information]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" button group : END "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" dropdown : START "), checkpoint.type === "Dropdown" ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         "class": "dc-item dc-item--half dc-choice",
         key: "checkpoint_div_".concat(index)
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(checkpoint.question), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
@@ -130047,9 +130236,7 @@ var _hoisted_93 = {
 var _hoisted_94 = {
   "class": "preview-doc-row"
 };
-var _hoisted_95 = {
-  "class": "preview-doc-row"
-};
+var _hoisted_95 = ["href"];
 var _hoisted_96 = {
   "class": "preview-doc-row"
 };
@@ -130057,30 +130244,33 @@ var _hoisted_97 = {
   "class": "preview-doc-row"
 };
 var _hoisted_98 = {
-  "class": "preview-section-card"
+  "class": "preview-doc-row"
 };
 var _hoisted_99 = {
-  "class": "preview-disclosure-row"
+  "class": "preview-section-card"
 };
 var _hoisted_100 = {
-  "class": "preview-disc-value"
+  "class": "preview-disclosure-row"
 };
 var _hoisted_101 = {
-  "class": "preview-disclosure-row"
+  "class": "preview-disc-value"
 };
 var _hoisted_102 = {
-  "class": "preview-disc-value"
+  "class": "preview-disclosure-row"
 };
 var _hoisted_103 = {
-  "class": "preview-disclosure-row"
-};
-var _hoisted_104 = {
   "class": "preview-disc-value"
 };
-var _hoisted_105 = {
+var _hoisted_104 = {
   "class": "preview-disclosure-row"
 };
+var _hoisted_105 = {
+  "class": "preview-disc-value"
+};
 var _hoisted_106 = {
+  "class": "preview-disclosure-row"
+};
+var _hoisted_107 = {
   "class": "preview-disc-value"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -130274,23 +130464,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: note.id,
       "class": "preview-history-card"
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_89, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(note.title), 1 /* TEXT */), note.description ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_90, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(note.description), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatDateTime(note.updated_at)), 1 /* TEXT */)])]);
-  }), 128 /* KEYED_FRAGMENT */))])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_92, _toConsumableArray(_cache[55] || (_cache[55] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "No notes for this vehicle.", -1 /* CACHED */)]))))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.activeTab === 'history']])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. Section: Documents & Links "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_cache[64] || (_cache[64] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
+  }), 128 /* KEYED_FRAGMENT */))])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_92, _toConsumableArray(_cache[55] || (_cache[55] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "No notes for this vehicle.", -1 /* CACHED */)]))))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.activeTab === 'history']])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 4. Section: Documents & Links "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_93, [_cache[65] || (_cache[65] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "preview-section-title"
-  }, "Documents & Links", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [_cache[57] || (_cache[57] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Documents & Links", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_94, [_cache[58] || (_cache[58] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-doc-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-globe preview-doc-icon text-primary"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "preview-doc-name"
-  }, "Website / VDP")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Website / VDP")], -1 /* CACHED */)), $data.formData.page_url || $props.item && $props.item.page_url ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    key: 0,
+    href: $data.formData.page_url || $props.item.page_url,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    "class": "preview-doc-view-link"
+  }, _toConsumableArray(_cache[56] || (_cache[56] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bx bx-link-external ml-50"
+  }, null, -1 /* CACHED */)])), 8 /* PROPS */, _hoisted_95)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 1,
     type: "button",
     "class": "preview-doc-view-link",
     onClick: _cache[13] || (_cache[13] = function () {
       return $options.openVdpInNewTab && $options.openVdpInNewTab.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[56] || (_cache[56] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[57] || (_cache[57] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link-external ml-50"
-  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_95, [_cache[59] || (_cache[59] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, -1 /* CACHED */)]))))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_96, [_cache[60] || (_cache[60] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-doc-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "preview-carfax-logo"
@@ -130302,9 +130501,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[14] || (_cache[14] = function () {
       return $options.openCarfaxReport && $options.openCarfaxReport.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[58] || (_cache[58] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[59] || (_cache[59] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link-external ml-50"
-  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_96, [_cache[61] || (_cache[61] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [_cache[62] || (_cache[62] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-doc-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-file-pdf preview-doc-icon text-danger"
@@ -130316,9 +130515,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[15] || (_cache[15] = function () {
       return $options.openRepairReport && $options.openRepairReport.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[60] || (_cache[60] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[61] || (_cache[61] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link-external ml-50"
-  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_97, [_cache[63] || (_cache[63] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, -1 /* CACHED */)])))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_cache[64] || (_cache[64] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-doc-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bxs-purchase-tag-alt preview-doc-icon text-warning"
@@ -130330,35 +130529,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[16] || (_cache[16] = function () {
       return $options.downloadWindowSticker && $options.downloadWindowSticker.apply($options, arguments);
     })
-  }, _toConsumableArray(_cache[62] || (_cache[62] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  }, _toConsumableArray(_cache[63] || (_cache[63] = [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" View ", -1 /* CACHED */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link-external ml-50"
-  }, null, -1 /* CACHED */)])))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. Section: Disclosures & Notes "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_98, [_cache[69] || (_cache[69] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
+  }, null, -1 /* CACHED */)])))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 5. Section: Disclosures & Notes "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [_cache[70] || (_cache[70] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
     "class": "preview-section-title"
-  }, "Disclosures & Notes", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_99, [_cache[65] || (_cache[65] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Disclosures & Notes", -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_100, [_cache[66] || (_cache[66] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-disclosure-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-shield-quarter text-secondary preview-disc-icon"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "preview-disc-label"
-  }, "Rebuilt Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_100, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.disclosures.rebuilt_status || 'No'), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_101, [_cache[66] || (_cache[66] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Rebuilt Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_101, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.disclosures.rebuilt_status || 'No'), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_102, [_cache[67] || (_cache[67] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-disclosure-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-file text-secondary preview-disc-icon"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "preview-disc-label"
-  }, "Accident History")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_102, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.disclosures.accident_history || 'No'), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_103, [_cache[67] || (_cache[67] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Accident History")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_103, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.disclosures.accident_history || 'No'), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_104, [_cache[68] || (_cache[68] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-disclosure-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-link text-secondary preview-disc-icon"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "preview-disc-label"
-  }, "Lien Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_104, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.disclosures.lien_status || 'Clear'), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [_cache[68] || (_cache[68] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, "Lien Status")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_105, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.disclosures.lien_status || 'Clear'), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_106, [_cache[69] || (_cache[69] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "preview-disclosure-left"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "bx bx-info-circle text-secondary preview-disc-icon"
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "preview-disc-label"
-  }, "Additional Notes")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_106, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.latestNotePreview), 1 /* TEXT */)])])])]);
+  }, "Additional Notes")], -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_107, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.latestNotePreview), 1 /* TEXT */)])])])]);
 }
 
 /***/ }),
@@ -131571,7 +131770,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "content-overlay"
   }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" form layout section start "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "app-content-overlay"
-  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_5, [_cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"sidebar-left border-right\"><div class=\"sidebar\"><div class=\"todo-sidebar d-flex\"><!-- todo app menu --><div class=\"todo-app-menu\"><div class=\"form-group text-center border-bottom mb-0\"><!-- new task button --><div class=\"row w-100 m-0\"><div class=\"col-md-12 col-12 p-0\"><h3 class=\"content-header-title mb-0\"> Inventory Settings </h3></div></div></div><!-- sidebar list start --><div class=\"sidebar-menu-list p-0\"><div class=\"list-grid\"><ul class=\"nav flex-column text-center text-md-left team-setting-tab\"><li class=\"nav-item m-0\"><a class=\"nav-link active\" id=\"team-pill-1\" data-toggle=\"pill\" href=\"#inventory-setting-file\" aria-expanded=\"true\"><i class=\"bx bx-slider-alt\"></i><span>Setting</span></a></li><li class=\"nav-item m-0\"><a class=\"nav-link\" id=\"team-pill-2\" data-toggle=\"pill\" href=\"#image-setting\" aria-expanded=\"false\"><i class=\"bx bx-image\"></i><span>Images</span></a></li><li class=\"nav-item m-0\"><a class=\"nav-link\" id=\"team-pill-2\" data-toggle=\"pill\" href=\"#syndication-setting\" aria-expanded=\"false\"><i class=\"bx bx-transfer\"></i><span>Syndication</span></a></li><li class=\"nav-item m-0\"><a class=\"nav-link\" id=\"team-pill-2\" data-toggle=\"pill\" href=\"#locations-setting\" aria-expanded=\"false\"><i class=\"bx bx-map-pin\"></i><span>Locations</span></a></li></ul></div></div><!-- sidebar list end --></div></div></div></div>", 1)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InventorySettingsGeneral "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_general), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" End InventorySettingsGeneral "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InventorySettingImage "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_image), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" End InventorySettingsImage "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InventorySettingSyndication "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_syndication), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" End InventorySettingSyndication "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_location)])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" form layout section end ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END: Content")], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */);
+  }, null, -1 /* CACHED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_5, [_cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"sidebar-left border-right\"><div class=\"sidebar\"><div class=\"todo-sidebar d-flex\"><!-- todo app menu --><div class=\"todo-app-menu\"><div class=\"zd-side-nav__header\"><span>Sections</span><i class=\"bx bx-list-ul\"></i></div><!-- sidebar list start --><div class=\"sidebar-menu-list p-0\"><div class=\"list-grid\"><ul class=\"nav flex-column text-center text-md-left team-setting-tab\"><li class=\"nav-item m-0\"><a class=\"nav-link active\" id=\"team-pill-1\" data-toggle=\"pill\" href=\"#inventory-setting-file\" aria-expanded=\"true\"><i class=\"bx bx-slider-alt\"></i><span>Setting</span></a></li><li class=\"nav-item m-0\"><a class=\"nav-link\" id=\"team-pill-2\" data-toggle=\"pill\" href=\"#image-setting\" aria-expanded=\"false\"><i class=\"bx bx-image\"></i><span>Images</span></a></li><li class=\"nav-item m-0\"><a class=\"nav-link\" id=\"team-pill-3\" data-toggle=\"pill\" href=\"#syndication-setting\" aria-expanded=\"false\"><i class=\"bx bx-transfer\"></i><span>Syndication</span></a></li><li class=\"nav-item m-0\"><a class=\"nav-link\" id=\"team-pill-4\" data-toggle=\"pill\" href=\"#locations-setting\" aria-expanded=\"false\"><i class=\"bx bx-map-pin\"></i><span>Locations</span></a></li></ul></div></div><!-- sidebar list end --></div></div></div></div>", 1)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InventorySettingsGeneral "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_general), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" End InventorySettingsGeneral "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InventorySettingImage "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_image), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" End InventorySettingsImage "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" InventorySettingSyndication "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_syndication), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" End InventorySettingSyndication "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_inventory_settings_location)])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" form layout section end ")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" END: Content")], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */);
 }
 
 /***/ }),
@@ -138983,7 +139182,7 @@ var _hoisted_34 = {
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" BEGIN: Main Menu"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [_cache[81] || (_cache[81] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"navbar-header\" data-v-c6dd3404><ul class=\"nav navbar-nav flex-row\" data-v-c6dd3404><li class=\"nav-item mr-auto\" data-v-c6dd3404><a class=\"navbar-brand\" data-v-c6dd3404><img src=\"/dist/assets/images/z-zop-white.png\" class=\"img-responsive\" style=\"width:125px;position:relative;left:-5px;\" alt=\"ZOP DEALER\" srcset data-v-c6dd3404></a></li><li class=\"nav-item nav-toggle\" data-v-c6dd3404><a class=\"nav-link modern-nav-toggle zd-sidebar-toggle-btn pr-0 active\" id=\"main-menu-toggle-btn\" data-toggle=\"collapse\" data-tooltip=\"Hide Menu\" aria-label=\"Toggle Sidebar\" data-v-c6dd3404><svg class=\"zd-sidebar-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" data-v-c6dd3404><defs data-v-c6dd3404><linearGradient id=\"zopToggleGrad\" x1=\"0\" y1=\"0\" x2=\"24\" y2=\"24\" gradientUnits=\"userSpaceOnUse\" data-v-c6dd3404><stop offset=\"0%\" stop-color=\"#00C4B4\" data-v-c6dd3404></stop><stop offset=\"52%\" stop-color=\"#F04B33\" data-v-c6dd3404></stop><stop offset=\"100%\" stop-color=\"#FBBF24\" data-v-c6dd3404></stop></linearGradient></defs><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"4\" stroke=\"url(#zopToggleGrad)\" stroke-width=\"2\" data-v-c6dd3404></rect><line x1=\"9\" y1=\"4.5\" x2=\"9\" y2=\"19.5\" stroke=\"url(#zopToggleGrad)\" stroke-width=\"2\" data-v-c6dd3404></line></svg></a></li></ul></div><div class=\"shadow-bottom\" data-v-c6dd3404></div>", 2)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" BEGIN: Main Menu"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [_cache[81] || (_cache[81] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"navbar-header\" data-v-c6dd3404><ul class=\"nav navbar-nav flex-row\" data-v-c6dd3404><li class=\"nav-item mr-auto\" data-v-c6dd3404><a class=\"navbar-brand\" data-v-c6dd3404><img src=\"/dist/assets/images/z-zop-white.png\" class=\"img-responsive\" style=\"width:125px;position:relative;left:-5px;\" alt=\"ZOP DEALER\" srcset data-v-c6dd3404></a></li><li class=\"nav-item nav-toggle\" data-v-c6dd3404><a class=\"nav-link modern-nav-toggle zd-sidebar-toggle-btn pr-0 active\" id=\"main-menu-toggle-btn\" data-toggle=\"collapse\" data-tooltip=\"Hide Menu\" aria-label=\"Toggle Sidebar\" data-v-c6dd3404><svg class=\"zd-sidebar-icon\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\" data-v-c6dd3404><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"4\" stroke=\"#ffffff\" stroke-width=\"2\" data-v-c6dd3404></rect><line x1=\"9\" y1=\"4.5\" x2=\"9\" y2=\"19.5\" stroke=\"#ffffff\" stroke-width=\"2\" data-v-c6dd3404></line></svg></a></li></ul></div><div class=\"shadow-bottom\" data-v-c6dd3404></div>", 2)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
     tag: "li",
     to: "/",
     "class": "nav-item",
@@ -207403,7 +207602,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".inventory-table-row[data-v-190dd694] {\n  cursor: pointer;\n  transition: background-color 0.15s ease;\n  background-color: #ffffff;\n  border-bottom: 1px solid #f1f5f9;\n}\n.inventory-table-row[data-v-190dd694]:hover {\n  background-color: #f8fafc;\n}\n.inventory-table-row.row-selected[data-v-190dd694] {\n  background-color: #eff6ff !important;\n}\n.inventory-table-row td[data-v-190dd694] {\n  padding: 0.25rem 0.5rem;\n  vertical-align: middle;\n  font-size: 0.8125rem;\n  line-height: 1.3;\n  white-space: nowrap;\n  border-bottom: 1px solid #f1f5f9;\n}\n\n/* Custom Checkbox */\n.col-checkbox[data-v-190dd694] {\n  width: 36px;\n  min-width: 36px;\n  max-width: 36px;\n  text-align: center;\n}\n.custom-chk-container[data-v-190dd694] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-190dd694] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694] {\n  position: relative;\n  display: inline-block;\n  height: 15px;\n  width: 15px;\n  background-color: #ffffff;\n  border: 1.5px solid #cbd5e1;\n  border-radius: 3px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 4.5px;\n  top: 1.5px;\n  width: 4px;\n  height: 8px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-190dd694] {\n  border-color: #94a3b8;\n}\n\n/* Vehicle Thumbnail */\n.col-photo[data-v-190dd694] {\n  width: 80px;\n  min-width: 80px;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694] {\n  position: relative;\n  width: 68px;\n  height: 46px;\n  border-radius: 8px;\n  overflow: hidden;\n  background: #f1f5f9;\n  border: 1px solid #e2e8f0;\n  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: border-color 0.2s ease, box-shadow 0.2s ease;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694]::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  background: rgba(15, 23, 42, 0.04);\n  transition: background 0.2s ease;\n  pointer-events: none;\n  z-index: 1;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694]:hover {\n  border-color: #2563eb;\n  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694]:hover::after {\n  background: rgba(15, 23, 42, 0.36);\n}\n.vehicle-thumbnail-wrapper:hover .vehicle-thumbnail[data-v-190dd694] {\n  transform: scale(1.06);\n}\n.vehicle-thumbnail-wrapper:hover .thumbnail-magnifier-btn[data-v-190dd694] {\n  opacity: 1;\n  pointer-events: auto;\n  transform: translate(-50%, -50%) scale(1);\n}\n.vehicle-thumbnail[data-v-190dd694] {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  display: block;\n  transition: transform 0.25s ease;\n}\n.thumbnail-count-badge[data-v-190dd694] {\n  position: absolute;\n  bottom: 3px;\n  right: 3px;\n  background: rgba(15, 23, 42, 0.82);\n  color: #ffffff;\n  font-size: 9.5px;\n  font-weight: 600;\n  padding: 2px 5px;\n  border-radius: 4px;\n  line-height: 1;\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  z-index: 3;\n}\n.thumbnail-count-badge i[data-v-190dd694] {\n  font-size: 8.5px;\n  vertical-align: middle;\n}\n.thumbnail-magnifier-btn[data-v-190dd694] {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  right: auto;\n  transform: translate(-50%, -50%) scale(0.75);\n  transform-origin: center center;\n  width: 26px;\n  height: 26px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);\n  border: 1.5px solid #ffffff;\n  color: #ffffff;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.55), 0 1px 3px rgba(0, 0, 0, 0.25);\n  cursor: pointer;\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.18s ease, box-shadow 0.18s ease;\n  z-index: 4;\n}\n.thumbnail-magnifier-btn i[data-v-190dd694] {\n  font-size: 13px;\n  line-height: 1;\n  color: #ffffff !important;\n  position: static !important;\n  top: 0 !important;\n}\n.thumbnail-magnifier-btn[data-v-190dd694]:hover {\n  transform: translate(-50%, -50%) scale(1.1);\n  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);\n  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.3);\n}\n\n/* Combined Vehicle Identity Column */\n.col-vehicle[data-v-190dd694] {\n  width: 300px;\n  min-width: 300px;\n  max-width: 300px;\n  padding: 8px 12px;\n}\n.col-vehicle .vehicle-primary-title[data-v-190dd694] {\n  font-size: 13.5px;\n  font-weight: 600;\n  color: #1e293b;\n  line-height: 1.3;\n  white-space: normal;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n  cursor: pointer;\n  transition: color 0.15s ease;\n}\n.col-vehicle .vehicle-primary-title[data-v-190dd694]:hover {\n  color: #2563eb;\n}\n.col-vehicle .vehicle-sub-meta[data-v-190dd694] {\n  font-size: 11.5px;\n  color: #64748b;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  margin-top: 2px;\n}\n.col-vehicle .meta-dot[data-v-190dd694] {\n  color: #94a3b8;\n  font-weight: bold;\n  margin: 0 2px;\n}\n.col-vehicle .vin-meta[data-v-190dd694] {\n  cursor: pointer;\n}\n.col-vehicle .vin-meta[data-v-190dd694]:hover {\n  color: #2563eb;\n  text-decoration: underline;\n}\n.col-vehicle .stock-meta[data-v-190dd694] {\n  color: #64748b;\n}\n.col-year[data-v-190dd694] {\n  width: 60px;\n  min-width: 60px;\n  font-size: 0.8125rem;\n}\n.col-body-type[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  max-width: 120px;\n  font-size: 12.5px;\n  color: #334155;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.col-dis[data-v-190dd694] {\n  width: 55px;\n  min-width: 55px;\n  font-size: 13px;\n  font-weight: 500;\n  color: #1e293b;\n  text-align: left;\n}\n.col-special-price[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 13px;\n  font-weight: 600;\n  color: #1e293b;\n  text-align: left;\n}\n.col-price[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 13px;\n  font-weight: 600;\n  color: #1e293b;\n  text-align: left;\n}\n.col-odometer[data-v-190dd694],\n.col-kms[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n  font-size: 13px;\n  color: #1e293b;\n  text-align: left;\n}\n.col-status[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n}\n.col-created-at[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 12.5px;\n  color: #334155;\n}\n.col-modified-at[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 12px;\n  color: #64748b;\n}\n.col-last-sync[data-v-190dd694] {\n  width: 100px;\n  min-width: 100px;\n}\n.col-last-sync .sync-date-line[data-v-190dd694] {\n  font-size: 12px;\n  color: #334155;\n  line-height: 1.25;\n}\n.col-last-sync .sync-time-line[data-v-190dd694] {\n  font-size: 11px;\n  color: #64748b;\n  line-height: 1.25;\n}\n.col-action-btn[data-v-190dd694] {\n  width: 52px;\n  min-width: 52px;\n  text-align: center;\n}\n.col-syndication-item[data-v-190dd694] {\n  min-width: 100px;\n}\n\n/* Status Badges */\n.status-badge[data-v-190dd694] {\n  font-size: 11px;\n  font-weight: 600;\n  padding: 3px 10px;\n  border-radius: 9999px;\n  display: inline-block;\n  white-space: nowrap;\n  line-height: 1.25;\n}\n.badge-price-change[data-v-190dd694] {\n  background: #fef3c7;\n  color: #92400e;\n  border: 1px solid #fde68a;\n}\n.badge-active[data-v-190dd694] {\n  background: #dcfce7;\n  color: #15803d;\n  border: 1px solid #bbf7d0;\n}\n.badge-sold[data-v-190dd694] {\n  background: #fee2e2;\n  color: #991b1b;\n  border: 1px solid #fecaca;\n}\n.badge-pending[data-v-190dd694] {\n  background: #fef9c3;\n  color: #854d0e;\n  border: 1px solid #fef08a;\n}\n.badge-not-advertised[data-v-190dd694] {\n  background: #f3e8ff;\n  color: #6b21a8;\n  border: 1px solid #e9d5ff;\n}\n\n/* Action Buttons */\n.table-icon-btn[data-v-190dd694] {\n  border-radius: 4px;\n  width: 28px;\n  height: 28px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  padding: 0;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694] {\n  color: #0284c7;\n  background: #f0f9ff;\n  border: 1px solid #bae6fd;\n  font-size: 15px;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694]:hover {\n  background: #e0f2fe;\n  border-color: #7dd3fc;\n  color: #0369a1;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694] {\n  color: #dc2626;\n  background: #fef2f2;\n  border: 1px solid #fecaca;\n  font-size: 15px;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694]:hover {\n  background: #fee2e2;\n  border-color: #fca5a5;\n  color: #b91c1c;\n}\n.carfax-pill-badge[data-v-190dd694] {\n  background: #ffffff;\n  color: #0f172a;\n  border: 1.5px solid #0f172a;\n  border-radius: 4px;\n  font-size: 10px;\n  font-weight: 800;\n  letter-spacing: 0.5px;\n  padding: 2px 6px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  display: inline-block;\n}\n.carfax-pill-badge[data-v-190dd694]:hover {\n  background: #0f172a;\n  color: #ffffff;\n}\n.dropdown-item[data-v-190dd694] {\n  font-size: 12.5px;\n  padding: 6px 12px;\n  color: #334155;\n}\n.dropdown-item[data-v-190dd694]:hover {\n  background-color: #f8fafc;\n  color: #0f172a;\n}\n\n/* Compact Row Density */\ntr.row-compact td[data-v-190dd694] {\n  padding: 0.15rem 0.4rem !important;\n  font-size: 0.775rem !important;\n  line-height: 1.2 !important;\n}\ntr.row-compact .vehicle-thumbnail-wrapper[data-v-190dd694] {\n  width: 48px !important;\n  height: 32px !important;\n  border-radius: 6px !important;\n}\ntr.row-compact .thumbnail-magnifier-btn[data-v-190dd694] {\n  width: 20px !important;\n  height: 20px !important;\n}\ntr.row-compact .thumbnail-magnifier-btn i[data-v-190dd694] {\n  font-size: 11px !important;\n}\ntr.row-compact .thumbnail-count-badge[data-v-190dd694] {\n  font-size: 7px !important;\n  padding: 0 2px !important;\n}\ntr.row-compact .col-make-model[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-make-model .vehicle-trim-subtext[data-v-190dd694] {\n  font-size: 0.675rem !important;\n}\ntr.row-compact .col-vin .vin-display-text[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .status-badge[data-v-190dd694] {\n  font-size: 9.5px !important;\n  padding: 1px 5px !important;\n}\ntr.row-compact .col-price[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-odometer[data-v-190dd694],\ntr.row-compact .col-kms[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-created-at[data-v-190dd694],\ntr.row-compact .col-modified-at[data-v-190dd694],\ntr.row-compact .col-last-sync[data-v-190dd694] {\n  font-size: 0.725rem !important;\n}\ntr.row-compact .table-icon-btn[data-v-190dd694] {\n  width: 24px !important;\n  height: 24px !important;\n  font-size: 13px !important;\n}\ntr.row-compact .carfax-pill-badge[data-v-190dd694] {\n  font-size: 8px !important;\n  padding: 1px 4px !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".inventory-table-row[data-v-190dd694] {\n  cursor: pointer;\n  transition: background-color 0.15s ease;\n  background-color: #ffffff;\n  border-bottom: 1px solid #f1f5f9;\n}\n.inventory-table-row[data-v-190dd694]:hover {\n  background-color: #f8fafc;\n}\n.inventory-table-row.row-selected[data-v-190dd694] {\n  background-color: #eff6ff !important;\n}\n.inventory-table-row td[data-v-190dd694] {\n  padding: 0.25rem 0.5rem;\n  vertical-align: middle;\n  font-size: 0.8125rem;\n  line-height: 1.3;\n  white-space: nowrap;\n  border-bottom: 1px solid #f1f5f9;\n}\n\n/* Custom Checkbox */\n.col-checkbox[data-v-190dd694] {\n  width: 36px;\n  min-width: 36px;\n  max-width: 36px;\n  text-align: center;\n}\n.custom-chk-container[data-v-190dd694] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-190dd694] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-190dd694]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694] {\n  position: relative;\n  display: inline-block;\n  height: 15px;\n  width: 15px;\n  background-color: #ffffff;\n  border: 1.5px solid #cbd5e1;\n  border-radius: 3px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-190dd694]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 4.5px;\n  top: 1.5px;\n  width: 4px;\n  height: 8px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-190dd694] {\n  border-color: #94a3b8;\n}\n.vin-meta-wrap[data-v-190dd694],\n.stock-meta-wrap[data-v-190dd694] {\n  display: inline-flex;\n  align-items: center;\n  gap: 3px;\n}\n.zd-inline-copy-btn[data-v-190dd694] {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 18px;\n  height: 18px;\n  padding: 0;\n  border: none;\n  border-radius: 4px;\n  background: transparent;\n  color: #94a3b8;\n  cursor: pointer;\n  line-height: 1;\n  transition: color 0.15s ease, background-color 0.15s ease;\n}\n.zd-inline-copy-btn i[data-v-190dd694] {\n  font-size: 12.5px;\n}\n.zd-inline-copy-btn[data-v-190dd694]:hover {\n  color: #2563eb;\n  background: #eff6ff;\n}\n\n/* Vehicle Thumbnail */\n.col-photo[data-v-190dd694] {\n  width: 80px;\n  min-width: 80px;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694] {\n  position: relative;\n  width: 68px;\n  height: 46px;\n  border-radius: 8px;\n  overflow: hidden;\n  background: #f1f5f9;\n  border: 1px solid #e2e8f0;\n  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  transition: border-color 0.2s ease, box-shadow 0.2s ease;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694]::after {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  background: rgba(15, 23, 42, 0.04);\n  transition: background 0.2s ease;\n  pointer-events: none;\n  z-index: 1;\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694]:hover {\n  border-color: #2563eb;\n  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);\n}\n.vehicle-thumbnail-wrapper[data-v-190dd694]:hover::after {\n  background: rgba(15, 23, 42, 0.36);\n}\n.vehicle-thumbnail-wrapper:hover .vehicle-thumbnail[data-v-190dd694] {\n  transform: scale(1.06);\n}\n.vehicle-thumbnail-wrapper:hover .thumbnail-magnifier-btn[data-v-190dd694] {\n  opacity: 1;\n  pointer-events: auto;\n  transform: translate(-50%, -50%) scale(1);\n}\n.vehicle-thumbnail[data-v-190dd694] {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  display: block;\n  transition: transform 0.25s ease;\n}\n.thumbnail-count-badge[data-v-190dd694] {\n  position: absolute;\n  bottom: 3px;\n  right: 3px;\n  background: rgba(15, 23, 42, 0.82);\n  color: #ffffff;\n  font-size: 9.5px;\n  font-weight: 600;\n  padding: 2px 5px;\n  border-radius: 4px;\n  line-height: 1;\n  display: inline-flex;\n  align-items: center;\n  gap: 2px;\n  z-index: 3;\n}\n.thumbnail-count-badge i[data-v-190dd694] {\n  font-size: 8.5px;\n  vertical-align: middle;\n}\n.thumbnail-magnifier-btn[data-v-190dd694] {\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  right: auto;\n  transform: translate(-50%, -50%) scale(0.75);\n  transform-origin: center center;\n  width: 26px;\n  height: 26px;\n  border-radius: 50%;\n  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);\n  border: 1.5px solid #ffffff;\n  color: #ffffff;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.55), 0 1px 3px rgba(0, 0, 0, 0.25);\n  cursor: pointer;\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.18s ease, box-shadow 0.18s ease;\n  z-index: 4;\n}\n.thumbnail-magnifier-btn i[data-v-190dd694] {\n  font-size: 13px;\n  line-height: 1;\n  color: #ffffff !important;\n  position: static !important;\n  top: 0 !important;\n}\n.thumbnail-magnifier-btn[data-v-190dd694]:hover {\n  transform: translate(-50%, -50%) scale(1.1);\n  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);\n  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.75), 0 1px 3px rgba(0, 0, 0, 0.3);\n}\n\n/* Combined Vehicle Identity Column */\n.col-vehicle[data-v-190dd694] {\n  width: 300px;\n  min-width: 300px;\n  max-width: 300px;\n  padding: 8px 12px;\n}\n.col-vehicle .vehicle-primary-title[data-v-190dd694] {\n  font-size: 13.5px;\n  font-weight: 600;\n  color: #1e293b;\n  line-height: 1.3;\n  white-space: normal;\n  display: -webkit-box;\n  -webkit-line-clamp: 2;\n  -webkit-box-orient: vertical;\n  overflow: hidden;\n  cursor: pointer;\n  transition: color 0.15s ease;\n}\n.col-vehicle .vehicle-primary-title[data-v-190dd694]:hover {\n  color: #2563eb;\n}\n.col-vehicle .vehicle-sub-meta[data-v-190dd694] {\n  font-size: 11.5px;\n  color: #64748b;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  margin-top: 2px;\n}\n.col-vehicle .meta-dot[data-v-190dd694] {\n  color: #94a3b8;\n  font-weight: bold;\n  margin: 0 2px;\n}\n.col-vehicle .vin-meta[data-v-190dd694] {\n  cursor: pointer;\n}\n.col-vehicle .vin-meta[data-v-190dd694]:hover {\n  color: #2563eb;\n  text-decoration: underline;\n}\n.col-vehicle .stock-meta[data-v-190dd694] {\n  color: #64748b;\n}\n.col-year[data-v-190dd694] {\n  width: 60px;\n  min-width: 60px;\n  font-size: 0.8125rem;\n}\n.col-body-type[data-v-190dd694] {\n  width: 95px;\n  min-width: 95px;\n  max-width: 120px;\n  font-size: 12.5px;\n  color: #334155;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.col-dis[data-v-190dd694] {\n  width: 55px;\n  min-width: 55px;\n  font-size: 13px;\n  font-weight: 500;\n  color: #1e293b;\n  text-align: left;\n}\n.col-special-price[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 13px;\n  font-weight: 600;\n  color: #1e293b;\n  text-align: left;\n}\n.col-price[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 13px;\n  font-weight: 600;\n  color: #1e293b;\n  text-align: left;\n}\n.col-odometer[data-v-190dd694],\n.col-kms[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n  font-size: 13px;\n  color: #1e293b;\n  text-align: left;\n}\n.col-status[data-v-190dd694] {\n  width: 110px;\n  min-width: 110px;\n}\n.col-created-at[data-v-190dd694],\n.col-creation-date[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 12.5px;\n  color: #334155;\n}\n.col-modified-at[data-v-190dd694] {\n  width: 105px;\n  min-width: 105px;\n  font-size: 12px;\n  color: #64748b;\n}\n.col-creation-date[data-v-190dd694],\n.col-modified-at[data-v-190dd694] {\n  line-height: 1.35;\n}\n.col-creation-date .zd-date-line[data-v-190dd694],\n.col-modified-at .zd-date-line[data-v-190dd694] {\n  font-size: 12.5px;\n  font-weight: 500;\n  color: #334155;\n  white-space: nowrap;\n}\n.col-creation-date .zd-time-line[data-v-190dd694],\n.col-modified-at .zd-time-line[data-v-190dd694] {\n  font-size: 11px;\n  color: #64748b;\n  white-space: nowrap;\n}\n.col-last-sync[data-v-190dd694] {\n  width: 100px;\n  min-width: 100px;\n}\n.col-last-sync .sync-date-line[data-v-190dd694] {\n  font-size: 12px;\n  color: #334155;\n  line-height: 1.25;\n}\n.col-last-sync .sync-time-line[data-v-190dd694] {\n  font-size: 11px;\n  color: #64748b;\n  line-height: 1.25;\n}\n.col-action-btn[data-v-190dd694] {\n  width: 52px;\n  min-width: 52px;\n  text-align: center;\n}\n.col-syndication-item[data-v-190dd694] {\n  min-width: 100px;\n}\n\n/* Status Badges */\n.status-badge[data-v-190dd694] {\n  font-size: 11px;\n  font-weight: 600;\n  padding: 3px 10px;\n  border-radius: 9999px;\n  display: inline-block;\n  white-space: nowrap;\n  line-height: 1.25;\n}\n.badge-price-change[data-v-190dd694] {\n  background: #fef3c7;\n  color: #92400e;\n  border: 1px solid #fde68a;\n}\n.badge-active[data-v-190dd694] {\n  background: #dcfce7;\n  color: #15803d;\n  border: 1px solid #bbf7d0;\n}\n.badge-sold[data-v-190dd694] {\n  background: #fee2e2;\n  color: #991b1b;\n  border: 1px solid #fecaca;\n}\n.badge-pending[data-v-190dd694] {\n  background: #fef9c3;\n  color: #854d0e;\n  border: 1px solid #fef08a;\n}\n.badge-not-advertised[data-v-190dd694] {\n  background: #f3e8ff;\n  color: #6b21a8;\n  border: 1px solid #e9d5ff;\n}\n\n/* Action Buttons */\n.table-icon-btn[data-v-190dd694] {\n  border-radius: 4px;\n  width: 28px;\n  height: 28px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  padding: 0;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694] {\n  color: #0284c7;\n  background: #f0f9ff;\n  border: 1px solid #bae6fd;\n  font-size: 15px;\n}\n.table-icon-btn.btn-vdp[data-v-190dd694]:hover {\n  background: #e0f2fe;\n  border-color: #7dd3fc;\n  color: #0369a1;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694] {\n  color: #dc2626;\n  background: #fef2f2;\n  border: 1px solid #fecaca;\n  font-size: 15px;\n}\n.table-icon-btn.btn-repair-report[data-v-190dd694]:hover {\n  background: #fee2e2;\n  border-color: #fca5a5;\n  color: #b91c1c;\n}\n.carfax-pill-badge[data-v-190dd694] {\n  background: #ffffff;\n  color: #0f172a;\n  border: 1.5px solid #0f172a;\n  border-radius: 4px;\n  font-size: 10px;\n  font-weight: 800;\n  letter-spacing: 0.5px;\n  padding: 2px 6px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  display: inline-block;\n}\n.carfax-pill-badge[data-v-190dd694]:hover {\n  background: #0f172a;\n  color: #ffffff;\n}\n.dropdown-item[data-v-190dd694] {\n  font-size: 12.5px;\n  padding: 6px 12px;\n  color: #334155;\n}\n.dropdown-item[data-v-190dd694]:hover {\n  background-color: #f8fafc;\n  color: #0f172a;\n}\n\n/* Compact Row Density */\ntr.row-compact td[data-v-190dd694] {\n  padding: 0.15rem 0.4rem !important;\n  font-size: 0.775rem !important;\n  line-height: 1.2 !important;\n}\ntr.row-compact .vehicle-thumbnail-wrapper[data-v-190dd694] {\n  width: 48px !important;\n  height: 32px !important;\n  border-radius: 6px !important;\n}\ntr.row-compact .thumbnail-magnifier-btn[data-v-190dd694] {\n  width: 20px !important;\n  height: 20px !important;\n}\ntr.row-compact .thumbnail-magnifier-btn i[data-v-190dd694] {\n  font-size: 11px !important;\n}\ntr.row-compact .thumbnail-count-badge[data-v-190dd694] {\n  font-size: 7px !important;\n  padding: 0 2px !important;\n}\ntr.row-compact .col-make-model[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-make-model .vehicle-trim-subtext[data-v-190dd694] {\n  font-size: 0.675rem !important;\n}\ntr.row-compact .col-vin .vin-display-text[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .status-badge[data-v-190dd694] {\n  font-size: 9.5px !important;\n  padding: 1px 5px !important;\n}\ntr.row-compact .col-price[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-odometer[data-v-190dd694],\ntr.row-compact .col-kms[data-v-190dd694] {\n  font-size: 0.775rem !important;\n}\ntr.row-compact .col-created-at[data-v-190dd694],\ntr.row-compact .col-modified-at[data-v-190dd694],\ntr.row-compact .col-last-sync[data-v-190dd694] {\n  font-size: 0.725rem !important;\n}\ntr.row-compact .table-icon-btn[data-v-190dd694] {\n  width: 24px !important;\n  height: 24px !important;\n  font-size: 13px !important;\n}\ntr.row-compact .carfax-pill-badge[data-v-190dd694] {\n  font-size: 8px !important;\n  padding: 1px 4px !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -207451,7 +207650,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "/* Page container inside CRM - matching Leads page spacing */\n.inventory-module-page[data-v-0502e67e] {\n  /* top padding clears the fixed theme navbar (~45px) */\n  /* bottom padding leaves room for the theme's fixed footer */\n  padding: 4rem 1.75rem 2.75rem;\n  background-color: #ffffff;\n  font-family: inherit;\n  height: 100vh;\n  box-sizing: border-box;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* 1. Header Section */\n.inventory-header[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 1rem;\n  margin-bottom: 0.85rem;\n  flex-shrink: 0;\n}\n.inventory-title-wrap[data-v-0502e67e] {\n  display: flex;\n  flex-direction: column;\n}\n.inventory-page-title[data-v-0502e67e] {\n  font-size: 1.65rem;\n  font-weight: 700;\n  color: #0f172a;\n  line-height: 1.2;\n  margin: 0;\n  letter-spacing: -0.02em;\n}\n.inventory-subtitle[data-v-0502e67e] {\n  font-size: 13.5px;\n  color: #64748b;\n  font-weight: 500;\n  margin-top: 2px;\n}\n\n/* Header Right Controls */\n.inventory-header-right[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n}\n.header-search-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-width: 280px;\n  max-width: 380px;\n}\n.header-search-wrapper .search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 10px;\n  font-size: 16px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 34px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 28px 0 32px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: all 0.15s ease;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.header-search-wrapper .clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 8px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 16px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.header-search-wrapper .clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.header-bulk-pill[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  background: #eff6ff;\n  border: 1px solid #bfdbfe;\n  border-radius: 6px;\n  padding: 3px 8px;\n}\n.header-bulk-pill .bulk-count-badge[data-v-0502e67e] {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1e40af;\n  display: inline-flex;\n  align-items: center;\n}\n.header-bulk-pill .btn-bulk-icon[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 4px;\n  width: 26px;\n  height: 26px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 14px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.header-bulk-pill .btn-bulk-icon[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  transform: scale(1.05);\n}\n.header-tools-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n.header-tools-group .btn-tool-icon[data-v-0502e67e] {\n  width: 34px;\n  height: 34px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.header-tools-group .btn-tool-icon[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.header-tools-group .btn-tool-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n.split-inventory-btn-group[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #2563eb;\n  color: #ffffff !important;\n  font-size: 14.5px;\n  font-weight: 600;\n  padding: 8px 16px;\n  border-top-left-radius: 8px;\n  border-bottom-left-radius: 8px;\n  border: none;\n  text-decoration: none;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e] {\n  background: #2563eb;\n  color: #ffffff;\n  border: none;\n  border-left: 1px solid rgba(255, 255, 255, 0.35);\n  padding: 8px 12px;\n  font-size: 14px;\n  border-top-right-radius: 8px;\n  border-bottom-right-radius: 8px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]::after {\n  display: none;\n  /* Hide default bootstrap caret, boxicons chevron is used */\n}\n.split-inventory-btn-group .dropdown-menu[data-v-0502e67e] {\n  position: absolute !important;\n  top: 100% !important;\n  right: 0 !important;\n  left: auto !important;\n  transform: none !important;\n  margin-top: 6px !important;\n  background: #ffffff !important;\n  border: 1px solid #e5e7eb !important;\n  border-radius: 8px !important;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;\n  min-width: 220px !important;\n  z-index: 1050 !important;\n  padding: 6px 0 !important;\n  display: none;\n}\n.split-inventory-btn-group .dropdown-menu.show[data-v-0502e67e] {\n  display: block !important;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e] {\n  padding: 9px 16px;\n  font-size: 13.5px;\n  color: #374151;\n  display: flex;\n  align-items: center;\n  transition: background-color 0.15s ease;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e]:hover {\n  background-color: #f3f4f6;\n  color: #111827;\n}\n\n/* 2. Subbar (Above Search Bar): Views Dropdown + Action Icons */\n.inventory-subbar[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin-bottom: 8px;\n}\n.btn-views-toggle[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  padding: 0 14px;\n  height: 34px;\n  border-radius: 6px;\n  font-size: 13px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n}\n.btn-views-toggle i[data-v-0502e67e] {\n  font-size: 16px;\n  margin-right: 8px !important;\n  display: inline-flex;\n  align-items: center;\n}\n.btn-views-toggle span[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  margin-right: 8px;\n}\n.btn-views-toggle[data-v-0502e67e]::after {\n  position: static !important;\n  left: auto !important;\n  right: auto !important;\n  top: auto !important;\n  margin: 0 !important;\n  padding: 0 !important;\n  font-size: 12px;\n  color: #64748b;\n  vertical-align: middle;\n}\n.btn-views-toggle[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n  background: #f8fafc;\n  color: #0f172a;\n}\n.inventory-views-menu[data-v-0502e67e] {\n  min-width: 270px;\n  padding: 8px;\n  margin-top: 6px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.inventory-views-menu .dropdown-header[data-v-0502e67e] {\n  padding: 6px 10px 4px;\n  margin: 0;\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.05em;\n  text-transform: uppercase;\n  color: #64748b;\n}\n.inventory-views-menu .dropdown-divider[data-v-0502e67e] {\n  margin: 6px 4px;\n  border-top: 1px solid #f1f5f9;\n}\n.inventory-views-menu .custom-views-scrollable[data-v-0502e67e] {\n  max-height: 210px;\n  overflow-y: auto;\n  padding-right: 2px;\n}\n.inventory-views-menu .inventory-view-item[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 10px;\n  padding: 7px 10px;\n  margin-bottom: 1px;\n  border-radius: 7px;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #1e293b;\n  background: transparent;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.inventory-views-menu .inventory-view-item[data-v-0502e67e]:hover, .inventory-views-menu .inventory-view-item[data-v-0502e67e]:focus {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.inventory-views-menu .inventory-view-item.is-active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  font-weight: 600;\n}\n.inventory-views-menu .view-item-label[data-v-0502e67e] {\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.inventory-views-menu .view-edit-link[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 26px;\n  height: 26px;\n  border-radius: 6px;\n  color: #64748b;\n  flex-shrink: 0;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.inventory-views-menu .view-edit-link i[data-v-0502e67e] {\n  font-size: 15px;\n}\n.inventory-views-menu .view-edit-link[data-v-0502e67e]:hover {\n  background: #e2e8f0;\n  color: #0f172a;\n}\n.inventory-views-menu .view-create-link[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 8px 10px;\n  border-radius: 7px;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: #2563eb;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.inventory-views-menu .view-create-link i[data-v-0502e67e] {\n  font-size: 16px;\n}\n.inventory-views-menu .view-create-link[data-v-0502e67e]:hover, .inventory-views-menu .view-create-link[data-v-0502e67e]:focus {\n  background: #eff6ff;\n  color: #1d4ed8;\n}\n.custom-views-scrollable[data-v-0502e67e] {\n  max-height: 200px;\n  overflow-y: auto;\n}\n\n/* Action Icons Toolbar with Tooltips */\n.inventory-actions-toolbar[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n\n/* Custom Tooltip Styling matching Screenshot */\n.custom-tooltip-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  width: 32px;\n  height: 32px;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  text-decoration: none;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n  background: #f8fafc;\n  color: #0f172a;\n}\n.custom-tooltip-wrapper .btn-action-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e] {\n  visibility: hidden;\n  opacity: 0;\n  position: absolute;\n  top: calc(100% + 7px);\n  left: 50%;\n  transform: translateX(-50%);\n  background-color: #1e293b;\n  color: #ffffff;\n  font-size: 12px;\n  font-weight: 500;\n  white-space: nowrap;\n  padding: 5px 9px;\n  border-radius: 6px;\n  z-index: 100;\n  transition: opacity 0.15s ease, transform 0.15s ease;\n  pointer-events: none;\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e]::after {\n  content: \"\";\n  position: absolute;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -4px;\n  border-width: 4px;\n  border-style: solid;\n  border-color: transparent transparent #1e293b transparent;\n}\n.custom-tooltip-wrapper:hover .custom-tooltip-text[data-v-0502e67e] {\n  visibility: visible;\n  opacity: 1;\n}\n\n/* 3. Toolbar Card (Normal Filters vs Bulk Actions) */\n.inventory-toolbar-card[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  padding: 6px 10px;\n  margin-bottom: 8px;\n  transition: all 0.2s ease;\n}\n\n/* State A: Bulk Mode */\n.toolbar-bulk-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n}\n.bulk-mode-left[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.bulk-count-pill[data-v-0502e67e] {\n  background: #eff6ff;\n  font-size: 12.5px;\n  font-weight: 600;\n  padding: 4px 10px;\n  border-radius: 6px;\n  border: 1px solid #bfdbfe;\n  display: inline-flex;\n  align-items: center;\n}\n.btn-bulk-item[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  font-weight: 500;\n  padding: 4px 10px;\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  border: 1px solid #e2e8f0;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #fca5a5;\n  color: #dc2626;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e]:hover {\n  background: #fee2e2;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #e2e8f0;\n  color: #475569;\n}\n.btn-bulk-item.btn-bulk-primary i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple i[data-v-0502e67e] {\n  color: #64748b;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e]:hover, .btn-bulk-item.btn-bulk-purple[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-item.btn-bulk-primary:hover i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.btn-bulk-cancel[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 12px;\n  font-weight: 500;\n  padding: 4px 10px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-bulk-cancel i[data-v-0502e67e] {\n  color: #64748b;\n}\n.btn-bulk-cancel[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-cancel:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n\n/* State B: Normal Filter Mode */\n.toolbar-filter-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 8px;\n  width: 100%;\n}\n.toolbar-search-wrapper[data-v-0502e67e] {\n  position: relative;\n  flex: 1;\n  min-width: 220px;\n  max-width: 360px;\n  display: flex;\n  align-items: center;\n}\n.search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 9px;\n  font-size: 15px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.toolbar-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 30px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 26px 0 30px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.toolbar-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.toolbar-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.toolbar-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 6px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 15px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.toolbar-filters-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 6px;\n}\n.filter-dropdown-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n}\n.toolbar-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 22px 0 9px;\n  height: 30px;\n  line-height: 28px;\n  font-size: 12px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  outline: none;\n  transition: border-color 0.15s ease;\n  min-width: 95px;\n}\n.toolbar-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.toolbar-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n.select-chevron[data-v-0502e67e] {\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  transform: translateY(-50%);\n  font-size: 13px;\n  line-height: 1;\n  color: #94a3b8;\n  pointer-events: none;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.btn-reset-filters[data-v-0502e67e] {\n  background: #f1f5f9;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 11.5px;\n  font-weight: 600;\n  height: 30px;\n  padding: 4px 9px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-reset-filters[data-v-0502e67e]:hover {\n  background: #e2e8f0;\n  color: #0f172a;\n}\n\n/* TIER 1: Header Row (Title & Add Inventory) */\n.inventory-tier1-row[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 12px;\n  flex-wrap: wrap;\n  gap: 10px;\n}\n.inventory-tier1-row .inventory-page-title[data-v-0502e67e] {\n  font-size: 1.65rem;\n  font-weight: 700;\n  color: #0f172a;\n  line-height: 1.2;\n  margin: 0;\n  letter-spacing: -0.02em;\n}\n\n/* TIER 2: Controls Row (Views Dropdown & Action Icons) */\n.inventory-tier1-row[data-v-0502e67e] {\n  position: relative;\n  z-index: 60;\n}\n.tier3-actions-divider[data-v-0502e67e] {\n  border-left: 1px solid #e2e8f0;\n  padding-left: 10px;\n}\n.inventory-tier2-row[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 10px;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.inventory-tier2-actions[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n.inventory-tier2-actions .btn-tier2-icon[data-v-0502e67e] {\n  width: 32px;\n  height: 32px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.inventory-tier2-actions .btn-tier2-icon[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.inventory-tier2-actions .btn-tier2-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n\n/* TIER 3: Card Box (Normal Filter Mode & Bulk Action Mode) */\n.inventory-tier3-card[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  padding: 8px 12px;\n  margin-bottom: 12px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);\n  position: relative;\n  z-index: 25;\n}\n.tier3-normal-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n}\n.tier3-search-wrap[data-v-0502e67e] {\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-width: 220px;\n  max-width: none;\n  flex: 1 1 240px;\n}\n.tier3-search-wrap .search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 10px;\n  font-size: 15px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 32px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 28px 0 32px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: all 0.15s ease;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.tier3-search-wrap .clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 8px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 15px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.tier3-search-wrap .clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.tier3-filters-wrap[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.tier3-select-box[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n}\n.tier3-select-box .tier3-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 24px 0 10px;\n  height: 32px;\n  line-height: 30px;\n  font-size: 12.5px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  outline: none;\n  transition: border-color 0.15s ease;\n  min-width: 105px;\n}\n.tier3-select-box .tier3-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.tier3-select-box .tier3-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n.tier3-select-box .select-caret[data-v-0502e67e] {\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  transform: translateY(-50%);\n  font-size: 14px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n\n/* Bulk Selection Mode in Tier 3 */\n.tier3-bulk-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n  min-height: 34px;\n}\n.bulk-selection-summary[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 10px;\n  margin-right: 4px;\n  font-size: 13.5px;\n  color: #1e293b;\n}\n.bulk-selection-count strong[data-v-0502e67e] {\n  font-weight: 700;\n  color: #0f172a;\n}\n.btn-bulk-clear[data-v-0502e67e] {\n  background: transparent;\n  border: none;\n  padding: 0;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #334155;\n  text-decoration: underline;\n  text-underline-offset: 3px;\n  cursor: pointer;\n}\n.btn-bulk-clear[data-v-0502e67e]:hover {\n  color: #0f172a;\n}\n.btn-bulk-text.btn-bulk-more[data-v-0502e67e] {\n  padding: 5px 10px;\n  min-width: 36px;\n  justify-content: center;\n}\n.btn-bulk-text.btn-bulk-more i[data-v-0502e67e] {\n  font-size: 18px;\n  color: #334155;\n}\n.bulk-more-dropdown[data-v-0502e67e] {\n  position: relative;\n}\n.bulk-more-menu[data-v-0502e67e] {\n  min-width: 210px;\n  padding: 6px;\n  margin-top: 6px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.bulk-more-item[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  padding: 8px 12px;\n  border-radius: 7px;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #1e293b;\n  background: transparent;\n  border: 0;\n  cursor: pointer;\n}\n.bulk-more-item i[data-v-0502e67e] {\n  font-size: 15px;\n  color: #64748b;\n}\n.bulk-more-item[data-v-0502e67e]:hover, .bulk-more-item[data-v-0502e67e]:focus {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.bulk-more-item:hover i[data-v-0502e67e], .bulk-more-item:focus i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.bulk-more-item.is-danger[data-v-0502e67e] {\n  color: #dc2626;\n}\n.bulk-more-item.is-danger i[data-v-0502e67e] {\n  color: #dc2626;\n}\n.bulk-more-item.is-danger[data-v-0502e67e]:hover, .bulk-more-item.is-danger[data-v-0502e67e]:focus {\n  background: #fef2f2;\n  color: #b91c1c;\n}\n.bulk-more-item.is-danger:hover i[data-v-0502e67e], .bulk-more-item.is-danger:focus i[data-v-0502e67e] {\n  color: #b91c1c;\n}\n.btn-bulk-text[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 5px;\n  padding: 5px 12px;\n  border-radius: 6px;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  transition: all 0.15s ease;\n}\n.btn-bulk-text i[data-v-0502e67e] {\n  font-size: 14px;\n  color: #64748b;\n}\n.btn-bulk-text[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-text:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.btn-bulk-text.btn-bulk-delete[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #fecaca;\n  color: #ef4444;\n}\n.btn-bulk-text.btn-bulk-delete i[data-v-0502e67e] {\n  color: #ef4444;\n}\n.btn-bulk-text.btn-bulk-delete[data-v-0502e67e]:hover {\n  background: #fef2f2;\n  border-color: #f87171;\n}\n\n/* 4. Main Workspace: Table + Preview Panel */\n.inventory-main-layout[data-v-0502e67e] {\n  display: flex;\n  gap: 16px;\n  align-items: stretch;\n  width: 100%;\n  flex: 1 1 auto;\n  min-height: 0;\n  overflow: hidden;\n}\n.inventory-table-container[data-v-0502e67e] {\n  flex: 1;\n  min-width: 0;\n  width: 100%;\n  display: flex;\n  flex-direction: column;\n  min-height: 0;\n  height: 100%;\n}\n.inventory-table-card[data-v-0502e67e] {\n  position: relative;\n  background: #ffffff;\n  border: 1px solid #e6eaf0;\n  border-radius: 12px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  min-height: 0;\n  height: 100%;\n  margin-bottom: 0;\n}\n\n/* Loading Overlay for Inventory Table */\n.zd-inventory-loading-overlay[data-v-0502e67e] {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: rgba(255, 255, 255, 0.76);\n  backdrop-filter: blur(2px);\n  z-index: 50;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n  pointer-events: all;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.65rem;\n  padding: 0.85rem 1.6rem;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);\n  color: #374151;\n  font-size: 0.95rem;\n  font-weight: 600;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card i[data-v-0502e67e] {\n  font-size: 1.45rem;\n  color: #5a8dee;\n}\n.inventory-table-responsive[data-v-0502e67e] {\n  flex: 1 1 auto;\n  width: 100%;\n  overflow-x: auto;\n  overflow-y: auto;\n  min-height: 200px;\n  /* Custom slim scrollbar */\n}\n.inventory-table-responsive.compact .inventory-table-head-row th[data-v-0502e67e] {\n  padding: 0.35rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive.compact .inventory-table-row td[data-v-0502e67e] {\n  padding: 0.15rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-thumb {\n  background: #d1d5db;\n  border-radius: 3px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-track {\n  background: transparent;\n}\n.inventory-main-table[data-v-0502e67e] {\n  width: 100%;\n  min-width: 1150px;\n  border-collapse: separate;\n  border-spacing: 0;\n  margin: 0;\n  font-size: 0.8125rem;\n  color: #1e293b;\n  background: #ffffff;\n}\n.inventory-table-head-row[data-v-0502e67e] {\n  background: #f8fafc;\n  position: sticky;\n  top: 0;\n  z-index: 20;\n}\n.inventory-table-head-row th[data-v-0502e67e] {\n  position: sticky;\n  top: 0;\n  z-index: 20;\n  padding: 0.6rem 0.55rem;\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  color: #475569;\n  border-top: 1px solid #e2e8f0;\n  border-bottom: 1px solid #e2e8f0;\n  white-space: nowrap;\n  background: #f8fafc;\n  text-transform: uppercase;\n}\n.inventory-table-head-row .th-checkbox[data-v-0502e67e] {\n  width: 36px;\n  min-width: 36px;\n  text-align: center;\n}\n.inventory-table-head-row .th-photo[data-v-0502e67e] {\n  width: 56px;\n  min-width: 56px;\n  text-align: center;\n}\n.inventory-table-head-row .th-vehicle[data-v-0502e67e] {\n  width: 300px;\n  min-width: 300px;\n  max-width: 300px;\n}\n.inventory-table-head-row .th-dis[data-v-0502e67e] {\n  width: 55px;\n  min-width: 55px;\n  text-align: left;\n}\n.inventory-table-head-row .th-odometer[data-v-0502e67e] {\n  width: 110px;\n  min-width: 110px;\n  text-align: left;\n}\n.inventory-table-head-row .th-special-price[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n  text-align: left;\n}\n.inventory-table-head-row .th-price[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n  text-align: left;\n}\n.inventory-table-head-row .th-status[data-v-0502e67e] {\n  width: 110px;\n  min-width: 110px;\n  text-align: center;\n}\n.inventory-table-head-row .th-creation-date[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n}\n.inventory-table-head-row .th-body-type[data-v-0502e67e] {\n  width: 85px;\n  min-width: 85px;\n}\n.inventory-table-head-row .th-last-sync[data-v-0502e67e] {\n  width: 100px;\n  min-width: 100px;\n}\n.inventory-table-head-row .th-website-vdp[data-v-0502e67e],\n.inventory-table-head-row .th-repair-report[data-v-0502e67e],\n.inventory-table-head-row .th-action[data-v-0502e67e] {\n  width: 65px;\n  min-width: 65px;\n  text-align: center;\n}\n.inventory-table-head-row .th-modified-at[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n}\n.inventory-table-head-row .th-syndication-header[data-v-0502e67e] {\n  min-width: 100px;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e] {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  transition: color 0.15s ease;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e]:hover {\n  color: #0f172a;\n}\n.inventory-table-head-row .lr-sort[data-v-0502e67e] {\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  gap: 0.25rem;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  font-weight: 700;\n  font-size: 11px;\n  letter-spacing: 0.04em;\n  color: #475569;\n}\n.inventory-table-head-row .lr-sort > span[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n}\n.inventory-table-head-row .lr-sort .vehicle-th-labels[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 12px;\n}\n.inventory-table-head-row .lr-sort .sort-active[data-v-0502e67e] {\n  font-size: 14px;\n  color: #2563eb;\n  font-weight: 800;\n}\n.inventory-table-head-row .lr-sort .sort-idle[data-v-0502e67e] {\n  color: #94a3b8;\n  font-size: 12px;\n  margin-left: 2px;\n}\n.inventory-table-head-row .lr-sort:hover .sort-idle[data-v-0502e67e] {\n  color: #0f172a;\n}\n\n/* Custom Checkbox */\n.custom-chk-container[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-0502e67e] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e] {\n  position: relative;\n  display: inline-block;\n  height: 15px;\n  width: 15px;\n  background-color: #ffffff;\n  border: 1.5px solid #cbd5e1;\n  border-radius: 3px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 4.5px;\n  top: 1.5px;\n  width: 4px;\n  height: 8px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-0502e67e] {\n  border-color: #94a3b8;\n}\n\n/* 5. Pagination Footer */\n.inventory-pagination-footer[data-v-0502e67e] {\n  flex-shrink: 0;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n  padding: 5px 14px;\n  border-top: 1px solid #f1f5f9;\n  background: #ffffff;\n  z-index: 5;\n}\n.pagination-info[data-v-0502e67e] {\n  font-size: 12.5px;\n  color: #475569;\n  font-weight: 500;\n}\n.pagination-right-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n.pagination-controls[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 5px;\n}\n.pagination-nav-btn[data-v-0502e67e] {\n  height: 28px;\n  padding: 0 10px;\n  border-radius: 6px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #334155;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 12.5px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.pagination-nav-btn[data-v-0502e67e]:hover:not(:disabled) {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.pagination-nav-btn[data-v-0502e67e]:disabled {\n  color: #94a3b8;\n  border-color: #f1f5f9;\n  background: #ffffff;\n  cursor: not-allowed;\n}\n.pagination-current-page[data-v-0502e67e] {\n  min-width: 28px;\n  height: 28px;\n  padding: 0 7px;\n  border-radius: 6px;\n  background: #ffffff;\n  border: 1px solid #60a5fa;\n  color: #2563eb;\n  font-size: 12.5px;\n  font-weight: 600;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.page-size-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 22px 0 9px;\n  font-size: 12.5px;\n  font-weight: 500;\n  height: 28px;\n  color: #334155;\n  outline: none;\n  background: #ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\") no-repeat right 7px center;\n  cursor: pointer;\n  transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.page-size-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.page-size-select[data-v-0502e67e]:focus {\n  border-color: #60a5fa;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);\n}\n\n/* Transitions for Right Preview Panel (Sidebar to whole page) */\n.slide-panel-enter-active[data-v-0502e67e],\n.slide-panel-leave-active[data-v-0502e67e] {\n  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;\n}\n.slide-panel-enter-from[data-v-0502e67e],\n.slide-panel-leave-to[data-v-0502e67e] {\n  opacity: 0;\n  transform: translateX(100%);\n}\n@media (max-width: 1200px) {\n.inventory-main-layout[data-v-0502e67e] {\n    flex-direction: column;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "/* Page container inside CRM - matching Leads page spacing */\n.inventory-module-page[data-v-0502e67e] {\n  /* top padding clears the fixed theme navbar (~45px) */\n  /* bottom padding leaves room for the theme's fixed footer */\n  padding: 4rem 1.75rem 2.75rem;\n  background-color: #ffffff;\n  font-family: inherit;\n  height: 100vh;\n  box-sizing: border-box;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* 1. Header Section */\n.inventory-header[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 1rem;\n  margin-bottom: 0.85rem;\n  flex-shrink: 0;\n}\n.inventory-title-wrap[data-v-0502e67e] {\n  display: flex;\n  flex-direction: column;\n}\n.inventory-page-title[data-v-0502e67e] {\n  font-size: 1.65rem;\n  font-weight: 700;\n  color: #0f172a;\n  line-height: 1.2;\n  margin: 0;\n  letter-spacing: -0.02em;\n}\n.inventory-subtitle[data-v-0502e67e] {\n  font-size: 13.5px;\n  color: #64748b;\n  font-weight: 500;\n  margin-top: 2px;\n}\n\n/* Header Right Controls */\n.inventory-header-right[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n}\n.header-search-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-width: 280px;\n  max-width: 380px;\n}\n.header-search-wrapper .search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 10px;\n  font-size: 16px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 34px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 28px 0 32px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: all 0.15s ease;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.header-search-wrapper .header-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.header-search-wrapper .clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 8px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 16px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.header-search-wrapper .clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.header-bulk-pill[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  background: #eff6ff;\n  border: 1px solid #bfdbfe;\n  border-radius: 6px;\n  padding: 3px 8px;\n}\n.header-bulk-pill .bulk-count-badge[data-v-0502e67e] {\n  font-size: 12px;\n  font-weight: 600;\n  color: #1e40af;\n  display: inline-flex;\n  align-items: center;\n}\n.header-bulk-pill .btn-bulk-icon[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 4px;\n  width: 26px;\n  height: 26px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 14px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.header-bulk-pill .btn-bulk-icon[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  transform: scale(1.05);\n}\n.header-tools-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n.header-tools-group .btn-tool-icon[data-v-0502e67e] {\n  width: 34px;\n  height: 34px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.header-tools-group .btn-tool-icon[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.header-tools-group .btn-tool-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n.split-inventory-btn-group[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #2563eb;\n  color: #ffffff !important;\n  font-size: 14.5px;\n  font-weight: 600;\n  padding: 8px 16px;\n  border-top-left-radius: 0.267rem;\n  border-bottom-left-radius: 0.267rem;\n  border: none;\n  text-decoration: none;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-main[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e] {\n  background: #2563eb;\n  color: #ffffff;\n  border: none;\n  border-left: 1px solid rgba(255, 255, 255, 0.35);\n  padding: 8px 12px;\n  font-size: 14px;\n  border-top-right-radius: 0.267rem;\n  border-bottom-right-radius: 0.267rem;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  transition: background 0.15s ease;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]:hover {\n  background: #1d4ed8;\n}\n.split-inventory-btn-group .btn-split-toggle[data-v-0502e67e]::after {\n  display: none;\n  /* Hide default bootstrap caret, boxicons chevron is used */\n}\n.split-inventory-btn-group .dropdown-menu[data-v-0502e67e] {\n  position: absolute !important;\n  top: 100% !important;\n  right: 0 !important;\n  left: auto !important;\n  transform: none !important;\n  margin-top: 6px !important;\n  background: #ffffff !important;\n  border: 1px solid #e5e7eb !important;\n  border-radius: 8px !important;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;\n  min-width: 220px !important;\n  z-index: 1050 !important;\n  padding: 6px 0 !important;\n  display: none;\n}\n.split-inventory-btn-group .dropdown-menu.show[data-v-0502e67e] {\n  display: block !important;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e] {\n  padding: 9px 16px;\n  font-size: 13.5px;\n  color: #374151;\n  display: flex;\n  align-items: center;\n  transition: background-color 0.15s ease;\n}\n.split-inventory-btn-group .dropdown-menu .dropdown-item[data-v-0502e67e]:hover {\n  background-color: #f3f4f6;\n  color: #111827;\n}\n\n/* 2. Subbar (Above Search Bar): Views Dropdown + Action Icons */\n.inventory-subbar[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n  margin-bottom: 8px;\n}\n.btn-views-toggle[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  padding: 0 14px;\n  height: 34px;\n  border-radius: 6px;\n  font-size: 13px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n}\n.btn-views-toggle i[data-v-0502e67e] {\n  font-size: 16px;\n  margin-right: 8px !important;\n  display: inline-flex;\n  align-items: center;\n}\n.btn-views-toggle span[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  margin-right: 8px;\n}\n.btn-views-toggle[data-v-0502e67e]::after {\n  position: static !important;\n  left: auto !important;\n  right: auto !important;\n  top: auto !important;\n  margin: 0 !important;\n  padding: 0 !important;\n  font-size: 12px;\n  color: #64748b;\n  vertical-align: middle;\n}\n.btn-views-toggle[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n  background: #f8fafc;\n  color: #0f172a;\n}\n.inventory-views-menu[data-v-0502e67e] {\n  min-width: 270px;\n  padding: 8px;\n  margin-top: 6px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.inventory-views-menu .dropdown-header[data-v-0502e67e] {\n  padding: 6px 10px 4px;\n  margin: 0;\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.05em;\n  text-transform: uppercase;\n  color: #64748b;\n}\n.inventory-views-menu .dropdown-divider[data-v-0502e67e] {\n  margin: 6px 4px;\n  border-top: 1px solid #f1f5f9;\n}\n.inventory-views-menu .custom-views-scrollable[data-v-0502e67e] {\n  max-height: 210px;\n  overflow-y: auto;\n  padding-right: 2px;\n}\n.inventory-views-menu .inventory-view-item[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 10px;\n  padding: 7px 10px;\n  margin-bottom: 1px;\n  border-radius: 7px;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #1e293b;\n  background: transparent;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.inventory-views-menu .inventory-view-item[data-v-0502e67e]:hover, .inventory-views-menu .inventory-view-item[data-v-0502e67e]:focus {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.inventory-views-menu .inventory-view-item.is-active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  font-weight: 600;\n}\n.inventory-views-menu .view-item-label[data-v-0502e67e] {\n  min-width: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.inventory-views-menu .view-edit-link[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 26px;\n  height: 26px;\n  border-radius: 6px;\n  color: #64748b;\n  flex-shrink: 0;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.inventory-views-menu .view-edit-link i[data-v-0502e67e] {\n  font-size: 15px;\n}\n.inventory-views-menu .view-edit-link[data-v-0502e67e]:hover {\n  background: #e2e8f0;\n  color: #0f172a;\n}\n.inventory-views-menu .view-create-link[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  padding: 8px 10px;\n  border-radius: 7px;\n  font-size: 13.5px;\n  font-weight: 600;\n  color: #2563eb;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.inventory-views-menu .view-create-link i[data-v-0502e67e] {\n  font-size: 16px;\n}\n.inventory-views-menu .view-create-link[data-v-0502e67e]:hover, .inventory-views-menu .view-create-link[data-v-0502e67e]:focus {\n  background: #eff6ff;\n  color: #1d4ed8;\n}\n.custom-views-scrollable[data-v-0502e67e] {\n  max-height: 200px;\n  overflow-y: auto;\n}\n\n/* Action Icons Toolbar with Tooltips */\n.inventory-actions-toolbar[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n\n/* Custom Tooltip Styling matching Screenshot */\n.custom-tooltip-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  width: 32px;\n  height: 32px;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  text-decoration: none;\n}\n.custom-tooltip-wrapper .btn-action-icon[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n  background: #f8fafc;\n  color: #0f172a;\n}\n.custom-tooltip-wrapper .btn-action-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e] {\n  visibility: hidden;\n  opacity: 0;\n  position: absolute;\n  top: calc(100% + 7px);\n  left: 50%;\n  transform: translateX(-50%);\n  background-color: #1e293b;\n  color: #ffffff;\n  font-size: 12px;\n  font-weight: 500;\n  white-space: nowrap;\n  padding: 5px 9px;\n  border-radius: 6px;\n  z-index: 100;\n  transition: opacity 0.15s ease, transform 0.15s ease;\n  pointer-events: none;\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);\n}\n.custom-tooltip-wrapper .custom-tooltip-text[data-v-0502e67e]::after {\n  content: \"\";\n  position: absolute;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -4px;\n  border-width: 4px;\n  border-style: solid;\n  border-color: transparent transparent #1e293b transparent;\n}\n.custom-tooltip-wrapper:hover .custom-tooltip-text[data-v-0502e67e] {\n  visibility: visible;\n  opacity: 1;\n}\n\n/* 3. Toolbar Card (Normal Filters vs Bulk Actions) */\n.inventory-toolbar-card[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  padding: 6px 10px;\n  margin-bottom: 8px;\n  transition: all 0.2s ease;\n}\n\n/* State A: Bulk Mode */\n.toolbar-bulk-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n}\n.bulk-mode-left[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.bulk-count-pill[data-v-0502e67e] {\n  background: #eff6ff;\n  font-size: 12.5px;\n  font-weight: 600;\n  padding: 4px 10px;\n  border-radius: 6px;\n  border: 1px solid #bfdbfe;\n  display: inline-flex;\n  align-items: center;\n}\n.btn-bulk-item[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  font-weight: 500;\n  padding: 4px 10px;\n  border-radius: 6px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n  border: 1px solid #e2e8f0;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #fca5a5;\n  color: #dc2626;\n}\n.btn-bulk-item.btn-bulk-danger[data-v-0502e67e]:hover {\n  background: #fee2e2;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple[data-v-0502e67e] {\n  background: #ffffff;\n  border-color: #e2e8f0;\n  color: #475569;\n}\n.btn-bulk-item.btn-bulk-primary i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple i[data-v-0502e67e] {\n  color: #64748b;\n}\n.btn-bulk-item.btn-bulk-primary[data-v-0502e67e]:hover, .btn-bulk-item.btn-bulk-purple[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-item.btn-bulk-primary:hover i[data-v-0502e67e], .btn-bulk-item.btn-bulk-purple:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.btn-bulk-cancel[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 12px;\n  font-weight: 500;\n  padding: 4px 10px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-bulk-cancel i[data-v-0502e67e] {\n  color: #64748b;\n}\n.btn-bulk-cancel[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-cancel:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n\n/* State B: Normal Filter Mode */\n.toolbar-filter-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 8px;\n  width: 100%;\n}\n.toolbar-search-wrapper[data-v-0502e67e] {\n  position: relative;\n  flex: 1;\n  min-width: 220px;\n  max-width: 360px;\n  display: flex;\n  align-items: center;\n}\n.search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 9px;\n  font-size: 15px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.toolbar-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 30px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 26px 0 30px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.toolbar-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.toolbar-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.toolbar-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 6px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 15px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.toolbar-filters-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 6px;\n}\n.filter-dropdown-wrapper[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n}\n.toolbar-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 22px 0 9px;\n  height: 30px;\n  line-height: 28px;\n  font-size: 12px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  outline: none;\n  transition: border-color 0.15s ease;\n  min-width: 95px;\n}\n.toolbar-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.toolbar-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n.select-chevron[data-v-0502e67e] {\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  transform: translateY(-50%);\n  font-size: 13px;\n  line-height: 1;\n  color: #94a3b8;\n  pointer-events: none;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.btn-reset-filters[data-v-0502e67e] {\n  background: #f1f5f9;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  font-size: 11.5px;\n  font-weight: 600;\n  height: 30px;\n  padding: 4px 9px;\n  border-radius: 6px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  transition: all 0.15s ease;\n}\n.btn-reset-filters[data-v-0502e67e]:hover {\n  background: #e2e8f0;\n  color: #0f172a;\n}\n\n/* TIER 1: Header Row (Title & Add Inventory) */\n.inventory-tier1-row[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 12px;\n  flex-wrap: wrap;\n  gap: 10px;\n}\n.inventory-tier1-row .inventory-page-title[data-v-0502e67e] {\n  font-size: 1.65rem;\n  font-weight: 700;\n  color: #0f172a;\n  line-height: 1.2;\n  margin: 0;\n  letter-spacing: -0.02em;\n}\n\n/* TIER 2: Controls Row (Views Dropdown & Action Icons) */\n.inventory-tier1-row[data-v-0502e67e] {\n  position: relative;\n  z-index: 60;\n}\n.tier3-actions-divider[data-v-0502e67e] {\n  border-left: 1px solid #e2e8f0;\n  padding-left: 10px;\n}\n.inventory-tier2-row[data-v-0502e67e] {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 10px;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.inventory-tier2-actions[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n.inventory-tier2-actions .btn-tier2-icon[data-v-0502e67e] {\n  width: 32px;\n  height: 32px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  color: #475569;\n  font-size: 16px;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.inventory-tier2-actions .btn-tier2-icon[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.inventory-tier2-actions .btn-tier2-icon.active[data-v-0502e67e] {\n  background: #eff6ff;\n  color: #2563eb;\n  border-color: #bfdbfe;\n}\n\n/* TIER 3: Card Box (Normal Filter Mode & Bulk Action Mode) */\n.inventory-tier3-card[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  padding: 8px 12px;\n  margin-bottom: 12px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);\n  position: relative;\n  z-index: 25;\n}\n.tier3-normal-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n}\n.tier3-search-wrap[data-v-0502e67e] {\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-width: 220px;\n  max-width: none;\n  flex: 1 1 240px;\n}\n.tier3-search-wrap .search-icon[data-v-0502e67e] {\n  position: absolute;\n  left: 10px;\n  font-size: 15px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e] {\n  width: 100%;\n  height: 32px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 28px 0 32px;\n  font-size: 12.5px;\n  color: #1e293b;\n  outline: none;\n  transition: all 0.15s ease;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e]::-moz-placeholder {\n  color: #94a3b8;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e]::placeholder {\n  color: #94a3b8;\n}\n.tier3-search-wrap .tier3-search-input[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);\n}\n.tier3-search-wrap .clear-search-btn[data-v-0502e67e] {\n  position: absolute;\n  right: 8px;\n  background: none;\n  border: none;\n  color: #94a3b8;\n  font-size: 15px;\n  cursor: pointer;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n.tier3-search-wrap .clear-search-btn[data-v-0502e67e]:hover {\n  color: #475569;\n}\n.tier3-filters-wrap[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 8px;\n}\n.tier3-select-box[data-v-0502e67e] {\n  position: relative;\n  display: inline-flex;\n  align-items: center;\n}\n.tier3-select-box .tier3-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 24px 0 10px;\n  height: 32px;\n  line-height: 30px;\n  font-size: 12.5px;\n  font-weight: 500;\n  color: #334155;\n  cursor: pointer;\n  outline: none;\n  transition: border-color 0.15s ease;\n  min-width: 105px;\n}\n.tier3-select-box .tier3-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.tier3-select-box .tier3-select[data-v-0502e67e]:focus {\n  border-color: #2563eb;\n}\n.tier3-select-box .select-caret[data-v-0502e67e] {\n  position: absolute;\n  right: 7px;\n  top: 50%;\n  transform: translateY(-50%);\n  font-size: 14px;\n  color: #94a3b8;\n  pointer-events: none;\n}\n\n/* Bulk Selection Mode in Tier 3 */\n.tier3-bulk-mode[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 100%;\n  min-height: 34px;\n}\n.bulk-selection-summary[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 10px;\n  margin-right: 4px;\n  font-size: 13.5px;\n  color: #1e293b;\n}\n.bulk-selection-count strong[data-v-0502e67e] {\n  font-weight: 700;\n  color: #0f172a;\n}\n.btn-bulk-clear[data-v-0502e67e] {\n  background: transparent;\n  border: none;\n  padding: 0;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #334155;\n  text-decoration: underline;\n  text-underline-offset: 3px;\n  cursor: pointer;\n}\n.btn-bulk-clear[data-v-0502e67e]:hover {\n  color: #0f172a;\n}\n.btn-bulk-text.btn-bulk-more[data-v-0502e67e] {\n  padding: 5px 10px;\n  min-width: 36px;\n  justify-content: center;\n}\n.btn-bulk-text.btn-bulk-more i[data-v-0502e67e] {\n  font-size: 18px;\n  color: #334155;\n}\n.bulk-more-dropdown[data-v-0502e67e] {\n  position: relative;\n}\n.bulk-more-menu[data-v-0502e67e] {\n  min-width: 210px;\n  padding: 6px;\n  margin-top: 6px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);\n}\n.bulk-more-item[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  padding: 8px 12px;\n  border-radius: 7px;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #1e293b;\n  background: transparent;\n  border: 0;\n  cursor: pointer;\n}\n.bulk-more-item i[data-v-0502e67e] {\n  font-size: 15px;\n  color: #64748b;\n}\n.bulk-more-item[data-v-0502e67e]:hover, .bulk-more-item[data-v-0502e67e]:focus {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.bulk-more-item:hover i[data-v-0502e67e], .bulk-more-item:focus i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.bulk-more-item.is-danger[data-v-0502e67e] {\n  color: #dc2626;\n}\n.bulk-more-item.is-danger i[data-v-0502e67e] {\n  color: #dc2626;\n}\n.bulk-more-item.is-danger[data-v-0502e67e]:hover, .bulk-more-item.is-danger[data-v-0502e67e]:focus {\n  background: #fef2f2;\n  color: #b91c1c;\n}\n.bulk-more-item.is-danger:hover i[data-v-0502e67e], .bulk-more-item.is-danger:focus i[data-v-0502e67e] {\n  color: #b91c1c;\n}\n.btn-bulk-text[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 5px;\n  padding: 5px 12px;\n  border-radius: 6px;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  transition: all 0.15s ease;\n}\n.btn-bulk-text i[data-v-0502e67e] {\n  font-size: 14px;\n  color: #64748b;\n}\n.btn-bulk-text[data-v-0502e67e]:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.btn-bulk-text:hover i[data-v-0502e67e] {\n  color: #0f172a;\n}\n.btn-bulk-text.btn-bulk-delete[data-v-0502e67e] {\n  background: #ffffff;\n  border: 1px solid #fecaca;\n  color: #ef4444;\n}\n.btn-bulk-text.btn-bulk-delete i[data-v-0502e67e] {\n  color: #ef4444;\n}\n.btn-bulk-text.btn-bulk-delete[data-v-0502e67e]:hover {\n  background: #fef2f2;\n  border-color: #f87171;\n}\n\n/* 4. Main Workspace: Table + Preview Panel */\n.inventory-main-layout[data-v-0502e67e] {\n  display: flex;\n  gap: 16px;\n  align-items: stretch;\n  width: 100%;\n  flex: 1 1 auto;\n  min-height: 0;\n  overflow: hidden;\n}\n.inventory-table-container[data-v-0502e67e] {\n  flex: 1;\n  min-width: 0;\n  width: 100%;\n  display: flex;\n  flex-direction: column;\n  min-height: 0;\n  height: 100%;\n}\n.inventory-table-card[data-v-0502e67e] {\n  position: relative;\n  background: #ffffff;\n  border: 1px solid #e6eaf0;\n  border-radius: 12px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 auto;\n  min-height: 0;\n  height: 100%;\n  margin-bottom: 0;\n}\n\n/* Loading Overlay for Inventory Table */\n.zd-inventory-loading-overlay[data-v-0502e67e] {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  background: rgba(255, 255, 255, 0.76);\n  backdrop-filter: blur(2px);\n  z-index: 50;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 12px;\n  pointer-events: all;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.65rem;\n  padding: 0.85rem 1.6rem;\n  background: #ffffff;\n  border: 1px solid #e5e7eb;\n  border-radius: 10px;\n  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);\n  color: #374151;\n  font-size: 0.95rem;\n  font-weight: 600;\n}\n.zd-inventory-loading-overlay .zd-loading-indicator-card i[data-v-0502e67e] {\n  font-size: 1.45rem;\n  color: #5a8dee;\n}\n.inventory-table-responsive[data-v-0502e67e] {\n  flex: 1 1 auto;\n  width: 100%;\n  overflow-x: auto;\n  overflow-y: auto;\n  min-height: 200px;\n  /* Custom slim scrollbar */\n}\n.inventory-table-responsive.compact .inventory-table-head-row th[data-v-0502e67e] {\n  padding: 0.35rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive.compact .inventory-table-row td[data-v-0502e67e] {\n  padding: 0.15rem 0.65rem !important;\n  font-size: 0.825rem !important;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-thumb {\n  background: #d1d5db;\n  border-radius: 3px;\n}\n.inventory-table-responsive[data-v-0502e67e]::-webkit-scrollbar-track {\n  background: transparent;\n}\n.inventory-main-table[data-v-0502e67e] {\n  width: 100%;\n  min-width: 1150px;\n  border-collapse: separate;\n  border-spacing: 0;\n  margin: 0;\n  font-size: 0.8125rem;\n  color: #1e293b;\n  background: #ffffff;\n}\n.inventory-table-head-row[data-v-0502e67e] {\n  background: #f8fafc;\n  position: sticky;\n  top: 0;\n  z-index: 20;\n}\n.inventory-table-head-row th[data-v-0502e67e] {\n  position: sticky;\n  top: 0;\n  z-index: 20;\n  padding: 0.6rem 0.55rem;\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  color: #475569;\n  border-top: 1px solid #e2e8f0;\n  border-bottom: 1px solid #e2e8f0;\n  white-space: nowrap;\n  background: #f8fafc;\n  text-transform: uppercase;\n}\n.inventory-table-head-row .th-checkbox[data-v-0502e67e] {\n  width: 36px;\n  min-width: 36px;\n  text-align: center;\n}\n.inventory-table-head-row .th-photo[data-v-0502e67e] {\n  width: 56px;\n  min-width: 56px;\n  text-align: center;\n}\n.inventory-table-head-row .th-vehicle[data-v-0502e67e] {\n  width: 300px;\n  min-width: 300px;\n  max-width: 300px;\n}\n.inventory-table-head-row .th-dis[data-v-0502e67e] {\n  width: 55px;\n  min-width: 55px;\n  text-align: left;\n}\n.inventory-table-head-row .th-odometer[data-v-0502e67e] {\n  width: 110px;\n  min-width: 110px;\n  text-align: left;\n}\n.inventory-table-head-row .th-special-price[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n  text-align: left;\n}\n.inventory-table-head-row .th-price[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n  text-align: left;\n}\n.inventory-table-head-row .th-status[data-v-0502e67e] {\n  width: 110px;\n  min-width: 110px;\n  text-align: center;\n}\n.inventory-table-head-row .th-creation-date[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n}\n.inventory-table-head-row .th-body-type[data-v-0502e67e] {\n  width: 85px;\n  min-width: 85px;\n}\n.inventory-table-head-row .th-last-sync[data-v-0502e67e] {\n  width: 100px;\n  min-width: 100px;\n}\n.inventory-table-head-row .th-website-vdp[data-v-0502e67e],\n.inventory-table-head-row .th-repair-report[data-v-0502e67e],\n.inventory-table-head-row .th-action[data-v-0502e67e] {\n  width: 65px;\n  min-width: 65px;\n  text-align: center;\n}\n.inventory-table-head-row .th-modified-at[data-v-0502e67e] {\n  width: 105px;\n  min-width: 105px;\n}\n.inventory-table-head-row .th-syndication-header[data-v-0502e67e] {\n  min-width: 100px;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e] {\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  transition: color 0.15s ease;\n}\n.inventory-table-head-row .th-sortable[data-v-0502e67e]:hover {\n  color: #0f172a;\n}\n.inventory-table-head-row .lr-sort[data-v-0502e67e] {\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  gap: 0.25rem;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  font-weight: 700;\n  font-size: 11px;\n  letter-spacing: 0.04em;\n  color: #475569;\n}\n.inventory-table-head-row .lr-sort > span[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n}\n.inventory-table-head-row .lr-sort .vehicle-th-labels[data-v-0502e67e] {\n  display: inline-flex;\n  align-items: center;\n  gap: 12px;\n}\n.inventory-table-head-row .lr-sort .sort-active[data-v-0502e67e] {\n  font-size: 14px;\n  color: #2563eb;\n  font-weight: 800;\n}\n.inventory-table-head-row .lr-sort .sort-idle[data-v-0502e67e] {\n  color: #94a3b8;\n  font-size: 12px;\n  margin-left: 2px;\n}\n.inventory-table-head-row .lr-sort:hover .sort-idle[data-v-0502e67e] {\n  color: #0f172a;\n}\n\n/* Custom Checkbox */\n.custom-chk-container[data-v-0502e67e] {\n  display: inline-flex;\n  position: relative;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n          user-select: none;\n  margin: 0;\n}\n.custom-chk-container .custom-chk-input[data-v-0502e67e] {\n  position: absolute;\n  opacity: 0;\n  cursor: pointer;\n  height: 0;\n  width: 0;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e] {\n  background-color: #2563eb;\n  border-color: #2563eb;\n}\n.custom-chk-container .custom-chk-input:checked ~ .custom-chk-box[data-v-0502e67e]:after {\n  display: block;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e] {\n  position: relative;\n  display: inline-block;\n  height: 15px;\n  width: 15px;\n  background-color: #ffffff;\n  border: 1.5px solid #cbd5e1;\n  border-radius: 3px;\n  transition: all 0.15s ease;\n}\n.custom-chk-container .custom-chk-box[data-v-0502e67e]:after {\n  content: \"\";\n  position: absolute;\n  display: none;\n  left: 4.5px;\n  top: 1.5px;\n  width: 4px;\n  height: 8px;\n  border: solid white;\n  border-width: 0 2px 2px 0;\n  transform: rotate(45deg);\n}\n.custom-chk-container:hover .custom-chk-box[data-v-0502e67e] {\n  border-color: #94a3b8;\n}\n\n/* 5. Pagination Footer */\n.inventory-pagination-footer[data-v-0502e67e] {\n  flex-shrink: 0;\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  flex-wrap: wrap;\n  gap: 10px;\n  padding: 5px 14px;\n  border-top: 1px solid #f1f5f9;\n  background: #ffffff;\n  z-index: 5;\n}\n.pagination-info[data-v-0502e67e] {\n  font-size: 12.5px;\n  color: #475569;\n  font-weight: 500;\n}\n.pagination-right-group[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n}\n.pagination-controls[data-v-0502e67e] {\n  display: flex;\n  align-items: center;\n  gap: 5px;\n}\n.pagination-nav-btn[data-v-0502e67e] {\n  height: 28px;\n  padding: 0 10px;\n  border-radius: 6px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #334155;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 12.5px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: all 0.15s ease;\n}\n.pagination-nav-btn[data-v-0502e67e]:hover:not(:disabled) {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.pagination-nav-btn[data-v-0502e67e]:disabled {\n  color: #94a3b8;\n  border-color: #f1f5f9;\n  background: #ffffff;\n  cursor: not-allowed;\n}\n.pagination-current-page[data-v-0502e67e] {\n  min-width: 28px;\n  height: 28px;\n  padding: 0 7px;\n  border-radius: 6px;\n  background: #ffffff;\n  border: 1px solid #60a5fa;\n  color: #2563eb;\n  font-size: 12.5px;\n  font-weight: 600;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.page-size-select[data-v-0502e67e] {\n  -moz-appearance: none;\n       appearance: none;\n  -webkit-appearance: none;\n  border: 1px solid #e2e8f0;\n  border-radius: 6px;\n  padding: 0 22px 0 9px;\n  font-size: 12.5px;\n  font-weight: 500;\n  height: 28px;\n  color: #334155;\n  outline: none;\n  background: #ffffff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\") no-repeat right 7px center;\n  cursor: pointer;\n  transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.page-size-select[data-v-0502e67e]:hover {\n  border-color: #cbd5e1;\n}\n.page-size-select[data-v-0502e67e]:focus {\n  border-color: #60a5fa;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);\n}\n\n/* Transitions for Right Preview Panel (Sidebar to whole page) */\n.slide-panel-enter-active[data-v-0502e67e],\n.slide-panel-leave-active[data-v-0502e67e] {\n  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;\n}\n.slide-panel-enter-from[data-v-0502e67e],\n.slide-panel-leave-to[data-v-0502e67e] {\n  opacity: 0;\n  transform: translateX(100%);\n}\n@media (max-width: 1200px) {\n.inventory-main-layout[data-v-0502e67e] {\n    flex-direction: column;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -207499,7 +207698,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "ul.nav.nav-tabs {\n  border-bottom: 1px solid #dfe3e7;\n}\n.inventory-manage-page-header {\n  background: #ffffff !important;\n  border-bottom: 1px solid #f1f5f9 !important;\n  padding: 1rem 1.75rem !important;\n  margin-bottom: 0 !important;\n  box-shadow: none !important;\n}\n.inventory-manage-page-header .btn-back-nav.btn-back-nav--icon {\n  width: 36px;\n  height: 36px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 8px;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  background: #ffffff;\n  flex-shrink: 0;\n}\n.inventory-manage-page-header .btn-back-nav.btn-back-nav--icon:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.inventory-manage-page-header .inventory-header-thumb {\n  width: 68px;\n  height: 50px;\n  border-radius: 8px;\n  overflow: hidden;\n  border: 1px solid #e2e8f0;\n  background: #f8fafc;\n  flex-shrink: 0;\n}\n.inventory-manage-page-header .inventory-header-thumb img {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  display: block;\n}\n.inventory-manage-page-header .zd-skeleton {\n  display: inline-block;\n  border-radius: 6px;\n  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);\n  background-size: 200% 100%;\n  animation: zd-shimmer 1.4s ease-in-out infinite;\n}\n.inventory-manage-page-header .zd-skeleton--title {\n  width: 200px;\n  height: 22px;\n}\n.inventory-manage-page-header .zd-skeleton--badge {\n  width: 72px;\n  height: 22px;\n}\n.inventory-manage-page-header .zd-skeleton--vin {\n  width: 130px;\n  height: 16px;\n}\n.inventory-manage-page-header .zd-skeleton--meta {\n  width: 220px;\n  height: 13px;\n  display: block;\n}\n.inventory-manage-page-header .inventory-header-actions {\n  gap: 8px;\n}\n.inventory-manage-page-header .inventory-header-actions .zd-header-btn {\n  height: 36px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  white-space: nowrap;\n  margin: 0 !important;\n}\n@keyframes zd-shimmer {\n0% {\n    background-position: 200% 0;\n}\n100% {\n    background-position: -200% 0;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "ul.nav.nav-tabs {\n  border-bottom: 1px solid #dfe3e7;\n}\n.inventory-manage-page-header {\n  background: #ffffff !important;\n  border-bottom: 1px solid #f1f5f9 !important;\n  padding: 1rem 1.75rem !important;\n  margin-bottom: 0 !important;\n  box-shadow: none !important;\n}\n.inventory-manage-page-header .btn-back-nav.btn-back-nav--icon {\n  width: 36px;\n  height: 36px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  border-radius: 8px;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n  background: #ffffff;\n  flex-shrink: 0;\n}\n.inventory-manage-page-header .btn-back-nav.btn-back-nav--icon:hover {\n  background: #f8fafc;\n  border-color: #cbd5e1;\n  color: #0f172a;\n}\n.inventory-manage-page-header .inventory-header-thumb {\n  width: 68px;\n  height: 50px;\n  border-radius: 8px;\n  overflow: hidden;\n  border: 1px solid #e2e8f0;\n  background: #f8fafc;\n  flex-shrink: 0;\n}\n.inventory-manage-page-header .inventory-header-thumb img {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n  display: block;\n}\n.inventory-manage-page-header .zd-skeleton {\n  display: inline-block;\n  border-radius: 6px;\n  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);\n  background-size: 200% 100%;\n  animation: zd-shimmer 1.4s ease-in-out infinite;\n}\n.inventory-manage-page-header .zd-skeleton--title {\n  width: 200px;\n  height: 22px;\n}\n.inventory-manage-page-header .zd-skeleton--badge {\n  width: 72px;\n  height: 22px;\n}\n.inventory-manage-page-header .zd-skeleton--vin {\n  width: 130px;\n  height: 16px;\n}\n.inventory-manage-page-header .zd-skeleton--meta {\n  width: 220px;\n  height: 13px;\n  display: block;\n}\n.inventory-manage-page-header .inventory-header-actions {\n  gap: 8px;\n}\n.inventory-manage-page-header .inventory-header-actions .zd-header-btn {\n  height: 36px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  white-space: nowrap;\n  margin: 0 !important;\n}\n.inventory-manage-root .btn,\n.inventory-manage-root .dc-btn,\n.inventory-manage-root .mg-btn,\n.inventory-manage-root .zd-header-btn,\n.inventory-manage-root .btn-back-nav.btn-back-nav--icon {\n  border-radius: 0.267rem !important;\n}\n@keyframes zd-shimmer {\n0% {\n    background-position: 200% 0;\n}\n100% {\n    background-position: -200% 0;\n}\n}\n.inventory-manage-workspace {\n  display: flex;\n  align-items: flex-start;\n  gap: 20px;\n  padding: 18px 24px 32px;\n}\n.inventory-manage-workspace.is-create-mode {\n  display: block;\n  padding: 16px 24px 32px;\n}\n.inventory-manage-workspace .inventory-side-nav {\n  width: 224px;\n  flex: 0 0 224px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 12px;\n  padding: 12px 8px;\n  position: sticky;\n  top: 76px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);\n}\n.inventory-manage-workspace .inventory-side-nav__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 4px 12px 10px;\n  margin-bottom: 6px;\n  border-bottom: 1px solid #f1f5f9;\n  font-size: 12px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  color: #64748b;\n}\n.inventory-manage-workspace .inventory-side-nav__header i {\n  font-size: 16px;\n  color: #94a3b8;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs {\n  gap: 2px;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-item {\n  width: 100%;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 9px 12px;\n  border-radius: 8px;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #475569;\n  transition: background-color 0.15s ease, color 0.15s ease;\n  border: none;\n  background: transparent;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link i {\n  font-size: 17px;\n  color: #94a3b8;\n  flex-shrink: 0;\n  transition: color 0.15s ease;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link:hover {\n  background: #f8fafc;\n  color: #0f172a;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link:hover i {\n  color: #475569;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link.active {\n  background: #eff6ff;\n  color: #2563eb;\n  font-weight: 600;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link.active i {\n  color: #2563eb;\n}\n.inventory-manage-workspace .inventory-manage-main {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n.inventory-manage-workspace .inventory-tab-toolbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 12px;\n  padding: 8px 18px;\n  margin-bottom: 14px;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);\n}\n.inventory-manage-workspace .inventory-tab-toolbar__title {\n  font-size: 14.5px;\n  font-weight: 600;\n  color: #0f172a;\n}\n.inventory-manage-workspace .inventory-tab-toolbar__actions {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n}\n.inventory-manage-workspace .inventory-tab-toolbar__actions .zd-header-btn {\n  height: 32px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n@media (min-width: 992px) {\n.inventory-manage-root.is-manage-mode .app-content.content.inventory-manage-shell {\n    height: 100vh !important;\n    overflow: hidden !important;\n    display: flex;\n    flex-direction: column;\n    padding-top: 4rem !important;\n    padding-bottom: 0 !important;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-shell__inner {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 auto;\n    min-height: 0;\n    overflow: hidden;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-page-header {\n    flex: 0 0 auto;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-content-body {\n    flex: 1 1 auto;\n    min-height: 0;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n    margin-bottom: 0 !important;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-workspace {\n    flex: 1 1 auto;\n    min-height: 0;\n    height: 100%;\n    overflow: hidden;\n    align-items: stretch;\n    gap: 0;\n    padding: 0;\n    background: #f8fafc;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-workspace.is-create-mode {\n    display: flex;\n    padding: 16px 24px 0;\n}\n.inventory-manage-root.is-manage-mode .inventory-side-nav {\n    position: static;\n    align-self: stretch;\n    width: 224px;\n    flex: 0 0 224px;\n    height: 100%;\n    max-height: 100%;\n    overflow-y: auto;\n    background: #ffffff;\n    border: none;\n    border-right: 1px solid #e2e8f0;\n    border-radius: 0;\n    box-shadow: none;\n    padding: 16px 10px;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-main {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    min-height: 0;\n    overflow: hidden;\n    padding: 16px 24px 0;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-workspace.is-create-mode .inventory-manage-main {\n    padding: 0;\n}\n.inventory-manage-root.is-manage-mode .inventory-tab-toolbar {\n    flex: 0 0 auto;\n    margin-bottom: 14px;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content {\n    flex: 1 1 auto;\n    min-height: 0;\n    overflow-y: auto;\n    overflow-x: hidden;\n    padding-bottom: 48px;\n    padding-right: 0;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content #general-block-list {\n    max-width: none !important;\n    margin: 0 !important;\n    padding: 0 0 2rem !important;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .at-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .dl-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .eq-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .dvi-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .dc-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .ex-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .mg-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .ins-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .nt-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .pu-page,\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .wi-page {\n    padding-top: 0 !important;\n    padding-left: 0 !important;\n    padding-right: 0 !important;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .nt-page {\n    background: transparent !important;\n    padding-bottom: 1.5rem !important;\n    min-height: 0 !important;\n}\n.inventory-manage-root.is-manage-mode .inventory-manage-main > .tab-content .m-width-s {\n    max-width: none !important;\n}\n}\n@media (max-width: 991.98px) {\n.inventory-manage-workspace {\n    flex-direction: column;\n    padding: 12px 16px 24px;\n    gap: 14px;\n}\n.inventory-manage-workspace .inventory-side-nav {\n    width: 100%;\n    flex: none;\n    position: static;\n    padding: 8px;\n}\n.inventory-manage-workspace .inventory-side-nav__header {\n    display: none;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs {\n    flex-direction: row !important;\n    flex-wrap: nowrap;\n    overflow-x: auto;\n    gap: 6px;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-item {\n    width: auto;\n    flex: 0 0 auto;\n}\n.inventory-manage-workspace .inventory-side-nav .inventory-side-tabs .nav-link {\n    white-space: nowrap;\n    padding: 8px 12px;\n}\n.inventory-manage-workspace .inventory-manage-main {\n    width: 100%;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -207619,7 +207818,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n/* ==========================================================================\n   Inventory — Disclosures tab. Scoped to #disclosure-block-list.\n   Shared checklist design lives in assets/scss/_checklist-form.scss.\n   ========================================================================== */\n#disclosure-block-list .dc-page {\n  padding: 8px 20px 96px;\n  color: #0f172a;\n}\n#disclosure-block-list .dc-header {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 16px;\n  flex-wrap: wrap;\n  margin-bottom: 16px;\n}\n#disclosure-block-list .dc-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  height: 36px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n}\n#disclosure-block-list .dc-btn i {\n  font-size: 16px;\n  position: static;\n  top: 0;\n}\n#disclosure-block-list .dc-btn-ghost {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n}\n#disclosure-block-list .dc-btn-ghost:hover {\n  background: #f8fafc;\n  color: #0f172a;\n  border-color: #cbd5e1;\n}\n#disclosure-block-list .dc-card {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 12px;\n  padding: 16px 18px 18px;\n  margin-bottom: 16px;\n}\n#disclosure-block-list .dc-card-head {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  margin-bottom: 14px;\n  padding-bottom: 12px;\n  border-bottom: 1px solid #f1f5f9;\n}\n#disclosure-block-list .dc-card-icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 8px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 17px;\n}\n#disclosure-block-list .dc-card-icon--0 {\n  background: #eff6ff;\n  color: #2563eb;\n}\n#disclosure-block-list .dc-card-icon--1 {\n  background: #f5f3ff;\n  color: #7c3aed;\n}\n#disclosure-block-list .dc-card-icon--2 {\n  background: #ecfdf5;\n  color: #059669;\n}\n#disclosure-block-list .dc-card-icon--3 {\n  background: #fff7ed;\n  color: #ea580c;\n}\n#disclosure-block-list .dc-card-title {\n  font-size: 15px;\n  font-weight: 600;\n  margin: 0;\n  color: #0f172a;\n}\n#disclosure-block-list .dc-grid {\n  display: grid;\n  grid-template-columns: repeat(12, minmax(0, 1fr));\n  gap: 12px 16px;\n  align-items: start;\n}\n#disclosure-block-list .dc-item {\n  min-width: 0;\n  width: 100%;\n  max-width: 100%;\n  flex: none;\n  padding-left: 0;\n  padding-right: 0;\n}\n#disclosure-block-list .dc-item--full {\n  grid-column: span 12;\n}\n#disclosure-block-list .dc-item--half {\n  grid-column: span 6;\n}\n#disclosure-block-list .dc-item--quarter {\n  grid-column: span 3;\n}\n@media (max-width: 1199px) {\n#disclosure-block-list .dc-item--quarter {\n    grid-column: span 6;\n}\n}\n@media (max-width: 767px) {\n#disclosure-block-list .dc-item--half,\n#disclosure-block-list .dc-item--quarter {\n    grid-column: span 12;\n}\n}\n#disclosure-block-list .dc-label {\n  display: block;\n  font-size: 12px;\n  font-weight: 500;\n  color: #475569;\n  margin-bottom: 6px;\n}\n#disclosure-block-list .dc-input,\n#disclosure-block-list .dc-select,\n#disclosure-block-list .dc-textarea {\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  font-size: 13px;\n  color: #0f172a;\n  background: #ffffff;\n  box-shadow: none;\n}\n#disclosure-block-list .dc-input:focus,\n#disclosure-block-list .dc-select:focus,\n#disclosure-block-list .dc-textarea:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n}\n#disclosure-block-list .dc-input,\n#disclosure-block-list .dc-select {\n  height: 36px;\n}\n#disclosure-block-list .dc-textarea {\n  min-height: 104px;\n  line-height: 1.55;\n  padding: 10px 12px;\n  resize: vertical;\n}\n#disclosure-block-list .dc-statement-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n#disclosure-block-list .dc-statement-actions {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  flex-wrap: wrap;\n}\n#disclosure-block-list .dc-btn-sm {\n  height: 32px;\n  padding: 0 12px;\n  font-size: 12px;\n}\n#disclosure-block-list .dc-btn-sm i {\n  font-size: 15px;\n}\n#disclosure-block-list .dc-template-cta .btn {\n  height: 32px;\n  padding: 0 12px;\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  border-radius: 8px;\n  background: #eff6ff !important;\n  border: 1px solid #bfdbfe !important;\n  color: #2563eb !important;\n  box-shadow: none !important;\n}\n#disclosure-block-list .dc-template-cta .btn i {\n  position: static;\n  top: 0;\n  font-size: 16px;\n}\n#disclosure-block-list .dc-template-cta .btn:hover {\n  background: #dbeafe !important;\n}\n#disclosure-block-list .dc-choice {\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  padding: 10px 12px;\n  background: #f8fafc;\n  transition: border-color 0.15s, background 0.15s;\n}\n#disclosure-block-list .dc-choice-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  flex-wrap: wrap;\n}\n#disclosure-block-list .dc-choice-text {\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 180px;\n  min-width: 0;\n}\n#disclosure-block-list .dc-question {\n  font-size: 13px;\n  font-weight: 500;\n  color: #1e293b;\n}\n#disclosure-block-list .dc-choice .dc-select {\n  width: 180px;\n  flex-shrink: 0;\n}\n#disclosure-block-list .dc-segmented {\n  display: inline-flex;\n  flex-shrink: 0;\n  padding: 3px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  gap: 2px;\n}\n#disclosure-block-list .dc-seg-btn {\n  min-width: 46px;\n  height: 28px;\n  padding: 0 10px;\n  border: 0;\n  border-radius: 6px;\n  background: transparent;\n  color: #64748b;\n  font-size: 12px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: background 0.15s, color 0.15s;\n}\n#disclosure-block-list .dc-seg-btn:hover {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n#disclosure-block-list .dc-seg-btn:focus {\n  outline: none;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);\n}\n#disclosure-block-list .dc-seg-btn.is-active {\n  color: #ffffff;\n}\n#disclosure-block-list .dc-seg-btn.is-yes {\n  background: #2563eb;\n}\n#disclosure-block-list .dc-seg-btn.is-no {\n  background: #334155;\n}\n#disclosure-block-list .dc-seg-btn.is-na {\n  background: #94a3b8;\n}\n#disclosure-block-list .dc-additional {\n  margin-top: 10px;\n  background: #ffffff;\n}\n#disclosure-block-list .dc-btn-primary {\n  background: #2563eb;\n  border: 1px solid #2563eb;\n  color: #ffffff;\n}\n#disclosure-block-list .dc-btn-primary:hover {\n  background: #1d4ed8;\n  border-color: #1d4ed8;\n  color: #ffffff;\n}\n#disclosure-block-list .dc-header--split {\n  justify-content: space-between;\n  align-items: flex-start;\n}\n#disclosure-block-list .dc-header-actions {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-shrink: 0;\n}\n#disclosure-block-list .dc-notice {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  margin: 0;\n  padding: 10px 14px;\n  border: 1px solid #fecaca;\n  border-radius: 10px;\n  background: #fef2f2;\n  color: #b91c1c;\n  font-size: 13px;\n  line-height: 1.5;\n}\n#disclosure-block-list .dc-notice i {\n  font-size: 17px;\n  margin-top: 1px;\n}\n#disclosure-block-list .dc-notice strong {\n  font-weight: 500;\n}\n#disclosure-block-list .dc-choice-stack {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n/* ==========================================================================\n   Inventory — Disclosures tab. Scoped to #disclosure-block-list.\n   Shared checklist design lives in assets/scss/_checklist-form.scss.\n   ========================================================================== */\n#disclosure-block-list .dc-page {\n  padding: 8px 20px 96px;\n  color: #0f172a;\n}\n#disclosure-block-list .dc-header {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 16px;\n  flex-wrap: wrap;\n  margin-bottom: 16px;\n}\n#disclosure-block-list .dc-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  height: 36px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n}\n#disclosure-block-list .dc-btn i {\n  font-size: 16px;\n  position: static;\n  top: 0;\n}\n#disclosure-block-list .dc-btn-ghost {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n}\n#disclosure-block-list .dc-btn-ghost:hover {\n  background: #f8fafc;\n  color: #0f172a;\n  border-color: #cbd5e1;\n}\n#disclosure-block-list .dc-card {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 12px;\n  padding: 16px 18px 18px;\n  margin-bottom: 16px;\n}\n#disclosure-block-list .dc-card-head {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  margin-bottom: 14px;\n  padding-bottom: 12px;\n  border-bottom: 1px solid #f1f5f9;\n}\n#disclosure-block-list .dc-card-icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 8px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 17px;\n}\n#disclosure-block-list .dc-card-icon--0 {\n  background: #eff6ff;\n  color: #2563eb;\n}\n#disclosure-block-list .dc-card-icon--1 {\n  background: #f5f3ff;\n  color: #7c3aed;\n}\n#disclosure-block-list .dc-card-icon--2 {\n  background: #ecfdf5;\n  color: #059669;\n}\n#disclosure-block-list .dc-card-icon--3 {\n  background: #fff7ed;\n  color: #ea580c;\n}\n#disclosure-block-list .dc-card-title {\n  font-size: 15px;\n  font-weight: 600;\n  margin: 0;\n  color: #0f172a;\n}\n#disclosure-block-list .dc-grid {\n  display: grid;\n  grid-template-columns: repeat(12, minmax(0, 1fr));\n  gap: 12px 16px;\n  align-items: start;\n}\n#disclosure-block-list .dc-item {\n  min-width: 0;\n  width: 100%;\n  max-width: 100%;\n  flex: none;\n  margin: 0 !important;\n  padding-left: 0;\n  padding-right: 0;\n  overflow: hidden;\n}\n#disclosure-block-list .dc-item--full {\n  grid-column: span 12;\n}\n#disclosure-block-list .dc-item--half {\n  grid-column: span 6;\n}\n#disclosure-block-list .dc-item--quarter {\n  grid-column: span 3;\n}\n@media (max-width: 1199px) {\n#disclosure-block-list .dc-item--quarter {\n    grid-column: span 6;\n}\n}\n@media (max-width: 767px) {\n#disclosure-block-list .dc-item--half,\n#disclosure-block-list .dc-item--quarter {\n    grid-column: span 12;\n}\n}\n#disclosure-block-list .dc-label {\n  display: block;\n  font-size: 12px;\n  font-weight: 500;\n  color: #475569;\n  margin-bottom: 6px;\n}\n#disclosure-block-list .dc-input,\n#disclosure-block-list .dc-select,\n#disclosure-block-list .dc-textarea {\n  width: 100%;\n  min-width: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  font-size: 13px;\n  color: #0f172a;\n  background: #ffffff;\n  box-shadow: none;\n}\n#disclosure-block-list .dc-input:focus,\n#disclosure-block-list .dc-select:focus,\n#disclosure-block-list .dc-textarea:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n}\n#disclosure-block-list .dc-input,\n#disclosure-block-list .dc-select {\n  height: 36px;\n}\n#disclosure-block-list .dc-textarea {\n  min-height: 104px;\n  line-height: 1.55;\n  padding: 10px 12px;\n  resize: vertical;\n}\n#disclosure-block-list .dc-statement-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n#disclosure-block-list .dc-statement-actions {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  flex-wrap: wrap;\n}\n#disclosure-block-list .dc-btn-sm {\n  height: 32px;\n  padding: 0 12px;\n  font-size: 12px;\n}\n#disclosure-block-list .dc-btn-sm i {\n  font-size: 15px;\n}\n#disclosure-block-list .dc-template-cta .btn {\n  height: 32px;\n  padding: 0 12px;\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  border-radius: 8px;\n  background: #eff6ff !important;\n  border: 1px solid #bfdbfe !important;\n  color: #2563eb !important;\n  box-shadow: none !important;\n}\n#disclosure-block-list .dc-template-cta .btn i {\n  position: static;\n  top: 0;\n  font-size: 16px;\n}\n#disclosure-block-list .dc-template-cta .btn:hover {\n  background: #dbeafe !important;\n}\n#disclosure-block-list .dc-choice {\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  padding: 10px 12px;\n  background: #f8fafc;\n  transition: border-color 0.15s, background 0.15s;\n}\n#disclosure-block-list .dc-choice-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  flex-wrap: wrap;\n}\n#disclosure-block-list .dc-choice-text {\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 180px;\n  min-width: 0;\n}\n#disclosure-block-list .dc-question {\n  font-size: 13px;\n  font-weight: 500;\n  color: #1e293b;\n}\n#disclosure-block-list .dc-choice .dc-select {\n  width: 180px;\n  flex-shrink: 0;\n}\n#disclosure-block-list .dc-segmented {\n  display: inline-flex;\n  flex-shrink: 0;\n  padding: 3px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  gap: 2px;\n}\n#disclosure-block-list .dc-seg-btn {\n  min-width: 46px;\n  height: 28px;\n  padding: 0 10px;\n  border: 0;\n  border-radius: 6px;\n  background: transparent;\n  color: #64748b;\n  font-size: 12px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: background 0.15s, color 0.15s;\n}\n#disclosure-block-list .dc-seg-btn:hover {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n#disclosure-block-list .dc-seg-btn:focus {\n  outline: none;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);\n}\n#disclosure-block-list .dc-seg-btn.is-active {\n  color: #ffffff;\n}\n#disclosure-block-list .dc-seg-btn.is-yes {\n  background: #2563eb;\n}\n#disclosure-block-list .dc-seg-btn.is-no {\n  background: #334155;\n}\n#disclosure-block-list .dc-seg-btn.is-na {\n  background: #94a3b8;\n}\n#disclosure-block-list .dc-additional {\n  margin-top: 10px;\n  background: #ffffff;\n}\n#disclosure-block-list .dc-btn-primary {\n  background: #2563eb;\n  border: 1px solid #2563eb;\n  color: #ffffff;\n}\n#disclosure-block-list .dc-btn-primary:hover {\n  background: #1d4ed8;\n  border-color: #1d4ed8;\n  color: #ffffff;\n}\n#disclosure-block-list .dc-header--split {\n  justify-content: space-between;\n  align-items: flex-start;\n}\n#disclosure-block-list .dc-header-actions {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-shrink: 0;\n}\n#disclosure-block-list .dc-notice {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  margin: 0;\n  padding: 10px 14px;\n  border: 1px solid #fecaca;\n  border-radius: 10px;\n  background: #fef2f2;\n  color: #b91c1c;\n  font-size: 13px;\n  line-height: 1.5;\n}\n#disclosure-block-list .dc-notice i {\n  font-size: 17px;\n  margin-top: 1px;\n}\n#disclosure-block-list .dc-notice strong {\n  font-weight: 500;\n}\n#disclosure-block-list .dc-choice-stack {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -207715,7 +207914,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --vs-colors--lightest: rgba(60, 60, 60, 0.26);\n  --vs-colors--light: rgba(60, 60, 60, 0.5);\n  --vs-colors--dark: #333;\n  --vs-colors--darkest: rgba(0, 0, 0, 0.15);\n  --vs-search-input-color: inherit;\n  --vs-search-input-placeholder-color: inherit;\n  --vs-font-size: 1rem;\n  --vs-line-height: 1.4;\n  --vs-state-disabled-bg: rgb(248, 248, 248);\n  --vs-state-disabled-color: var(--vs-colors--light);\n  --vs-state-disabled-controls-color: var(--vs-colors--light);\n  --vs-state-disabled-cursor: not-allowed;\n  --vs-border-color: var(--vs-colors--lightest);\n  --vs-border-width: 1px;\n  --vs-border-style: solid;\n  --vs-border-radius: 4px;\n  --vs-actions-padding: 4px 6px 0 3px;\n  --vs-controls-color: var(--vs-colors--light);\n  --vs-controls-size: 1;\n  --vs-controls--deselect-text-shadow: 0 1px 0 #fff;\n  --vs-selected-bg: #f0f0f0;\n  --vs-selected-color: var(--vs-colors--dark);\n  --vs-selected-border-color: var(--vs-border-color);\n  --vs-selected-border-style: var(--vs-border-style);\n  --vs-selected-border-width: var(--vs-border-width);\n  --vs-dropdown-bg: #fff;\n  --vs-dropdown-color: inherit;\n  --vs-dropdown-z-index: 1000;\n  --vs-dropdown-min-width: 160px;\n  --vs-dropdown-max-height: 350px;\n  --vs-dropdown-box-shadow: 0px 3px 6px 0px var(--vs-colors--darkest);\n  --vs-dropdown-option-bg: #000;\n  --vs-dropdown-option-color: var(--vs-dropdown-color);\n  --vs-dropdown-option-padding: 3px 20px;\n  --vs-dropdown-option--active-bg: #5897fb;\n  --vs-dropdown-option--active-color: #fff;\n  --vs-dropdown-option--deselect-bg: #fb5858;\n  --vs-dropdown-option--deselect-color: #fff;\n  --vs-transition-timing-function: cubic-bezier(1, -0.115, 0.975, 0.855);\n  --vs-transition-duration: 0.15s;\n}\n.v-select {\n  position: relative;\n  font-family: inherit;\n}\n.v-select,\n.v-select * {\n  box-sizing: border-box;\n}\n:root {\n  --vs-transition-timing-function: cubic-bezier(1, 0.5, 0.8, 1);\n  --vs-transition-duration: 0.15s;\n}\n@keyframes vSelectSpinner {\n0% {\n    transform: rotate(0);\n}\nto {\n    transform: rotate(360deg);\n}\n}\n.vs__fade-enter-active,\n.vs__fade-leave-active {\n  pointer-events: none;\n  transition: opacity var(--vs-transition-duration) var(--vs-transition-timing-function);\n}\n.vs__fade-enter,\n.vs__fade-leave-to {\n  opacity: 0;\n}\n:root {\n  --vs-disabled-bg: var(--vs-state-disabled-bg);\n  --vs-disabled-color: var(--vs-state-disabled-color);\n  --vs-disabled-cursor: var(--vs-state-disabled-cursor);\n}\n.vs--disabled .vs__dropdown-toggle,\n.vs--disabled .vs__clear,\n.vs--disabled .vs__search,\n.vs--disabled .vs__selected,\n.vs--disabled .vs__open-indicator {\n  cursor: var(--vs-disabled-cursor);\n  background-color: var(--vs-disabled-bg);\n}\n.v-select[dir=rtl] .vs__actions {\n  padding: 0 3px 0 6px;\n}\n.v-select[dir=rtl] .vs__clear {\n  margin-left: 6px;\n  margin-right: 0;\n}\n.v-select[dir=rtl] .vs__deselect {\n  margin-left: 0;\n  margin-right: 2px;\n}\n.v-select[dir=rtl] .vs__dropdown-menu {\n  text-align: right;\n}\n.vs__dropdown-toggle {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  display: flex;\n  padding: 0 0 4px;\n  background: none;\n  border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);\n  border-radius: var(--vs-border-radius);\n  white-space: normal;\n}\n.vs__selected-options {\n  display: flex;\n  flex-basis: 100%;\n  flex-grow: 1;\n  flex-wrap: wrap;\n  padding: 0 2px;\n  position: relative;\n}\n.vs__actions {\n  display: flex;\n  align-items: center;\n  padding: var(--vs-actions-padding);\n}\n.vs--searchable .vs__dropdown-toggle {\n  cursor: text;\n}\n.vs--unsearchable .vs__dropdown-toggle {\n  cursor: pointer;\n}\n.vs--open .vs__dropdown-toggle {\n  border-bottom-color: transparent;\n  border-bottom-left-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.vs__open-indicator {\n  fill: var(--vs-controls-color);\n  transform: scale(var(--vs-controls-size));\n  transition: transform var(--vs-transition-duration) var(--vs-transition-timing-function);\n  transition-timing-function: var(--vs-transition-timing-function);\n}\n.vs--open .vs__open-indicator {\n  transform: rotate(180deg) scale(var(--vs-controls-size));\n}\n.vs--loading .vs__open-indicator {\n  opacity: 0;\n}\n.vs__clear {\n  fill: var(--vs-controls-color);\n  padding: 0;\n  border: 0;\n  background-color: transparent;\n  cursor: pointer;\n  margin-right: 8px;\n}\n.vs__dropdown-menu {\n  display: block;\n  box-sizing: border-box;\n  position: absolute;\n  top: calc(100% - var(--vs-border-width));\n  left: 0;\n  z-index: var(--vs-dropdown-z-index);\n  padding: 5px 0;\n  margin: 0;\n  width: 100%;\n  max-height: var(--vs-dropdown-max-height);\n  min-width: var(--vs-dropdown-min-width);\n  overflow-y: auto;\n  box-shadow: var(--vs-dropdown-box-shadow);\n  border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);\n  border-top-style: none;\n  border-radius: 0 0 var(--vs-border-radius) var(--vs-border-radius);\n  text-align: left;\n  list-style: none;\n  background: var(--vs-dropdown-bg);\n  color: var(--vs-dropdown-color);\n}\n.vs__no-options {\n  text-align: center;\n}\n.vs__dropdown-option {\n  line-height: 1.42857143;\n  display: block;\n  padding: var(--vs-dropdown-option-padding);\n  clear: both;\n  color: var(--vs-dropdown-option-color);\n  white-space: nowrap;\n  cursor: pointer;\n}\n.vs__dropdown-option--highlight {\n  background: var(--vs-dropdown-option--active-bg);\n  color: var(--vs-dropdown-option--active-color);\n}\n.vs__dropdown-option--deselect {\n  background: var(--vs-dropdown-option--deselect-bg);\n  color: var(--vs-dropdown-option--deselect-color);\n}\n.vs__dropdown-option--disabled {\n  background: var(--vs-state-disabled-bg);\n  color: var(--vs-state-disabled-color);\n  cursor: var(--vs-state-disabled-cursor);\n}\n.vs__selected {\n  display: flex;\n  align-items: center;\n  background-color: var(--vs-selected-bg);\n  border: var(--vs-selected-border-width) var(--vs-selected-border-style) var(--vs-selected-border-color);\n  border-radius: var(--vs-border-radius);\n  color: var(--vs-selected-color);\n  line-height: var(--vs-line-height);\n  margin: 4px 2px 0;\n  padding: 0 0.25em;\n  z-index: 0;\n}\n.vs__deselect {\n  display: inline-flex;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  margin-left: 4px;\n  padding: 0;\n  border: 0;\n  cursor: pointer;\n  background: none;\n  fill: var(--vs-controls-color);\n  text-shadow: var(--vs-controls--deselect-text-shadow);\n}\n.vs--single .vs__selected {\n  background-color: transparent;\n  border-color: transparent;\n}\n.vs--single.vs--open .vs__selected,\n.vs--single.vs--loading .vs__selected {\n  position: absolute;\n  opacity: 0.4;\n}\n.vs--single.vs--searching .vs__selected {\n  display: none;\n}\n.vs__search::-webkit-search-cancel-button {\n  display: none;\n}\n.vs__search::-webkit-search-decoration,\n.vs__search::-webkit-search-results-button,\n.vs__search::-webkit-search-results-decoration,\n.vs__search::-ms-clear {\n  display: none;\n}\n.vs__search,\n.vs__search:focus {\n  color: var(--vs-search-input-color);\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  line-height: var(--vs-line-height);\n  font-size: var(--vs-font-size);\n  border: 1px solid transparent;\n  border-left: none;\n  outline: none;\n  margin: 4px 0 0;\n  padding: 0 7px;\n  background: none;\n  box-shadow: none;\n  width: 0;\n  max-width: 100%;\n  flex-grow: 1;\n  z-index: 1;\n}\n.vs__search::-moz-placeholder {\n  color: var(--vs-search-input-placeholder-color);\n}\n.vs__search::placeholder {\n  color: var(--vs-search-input-placeholder-color);\n}\n.vs--unsearchable .vs__search {\n  opacity: 1;\n}\n.vs--unsearchable:not(.vs--disabled) .vs__search {\n  cursor: pointer;\n}\n.vs--single.vs--searching:not(.vs--open):not(.vs--loading) .vs__search {\n  opacity: 0.2;\n}\n.vs__spinner {\n  align-self: center;\n  opacity: 0;\n  font-size: 5px;\n  text-indent: -9999em;\n  overflow: hidden;\n  border-top: 0.9em solid rgba(100, 100, 100, 0.1);\n  border-right: 0.9em solid rgba(100, 100, 100, 0.1);\n  border-bottom: 0.9em solid rgba(100, 100, 100, 0.1);\n  border-left: 0.9em solid rgba(60, 60, 60, 0.45);\n  transform: translateZ(0) scale(var(--vs-controls--spinner-size, var(--vs-controls-size)));\n  animation: vSelectSpinner 1.1s infinite linear;\n  transition: opacity 0.1s;\n}\n.vs__spinner,\n.vs__spinner:after {\n  border-radius: 50%;\n  width: 5em;\n  height: 5em;\n  transform: scale(var(--vs-controls--spinner-size, var(--vs-controls-size)));\n}\n.vs--loading .vs__spinner {\n  opacity: 1;\n}\n\n/* component style */\n.vue-slider-disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n}\n\n/* rail style */\n.vue-slider-rail {\n  background-color: #ccc;\n  border-radius: 15px;\n}\n\n/* process style */\n.vue-slider-process {\n  background-color: #3498db;\n  border-radius: 15px;\n}\n\n/* mark style */\n.vue-slider-mark {\n  z-index: 4;\n}\n.vue-slider-mark:first-child .vue-slider-mark-step, .vue-slider-mark:last-child .vue-slider-mark-step {\n  display: none;\n}\n.vue-slider-mark-step {\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  background-color: rgba(0, 0, 0, 0.16);\n}\n.vue-slider-mark-label {\n  font-size: 14px;\n  white-space: nowrap;\n}\n/* dot style */\n.vue-slider-dot-handle {\n  cursor: pointer;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  background-color: #fff;\n  box-sizing: border-box;\n  box-shadow: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0.32);\n}\n.vue-slider-dot-handle-focus {\n  box-shadow: 0px 0px 1px 2px rgba(52, 152, 219, 0.36);\n}\n.vue-slider-dot-handle-disabled {\n  cursor: not-allowed;\n  background-color: #ccc;\n}\n.vue-slider-dot-tooltip-inner {\n  font-size: 14px;\n  white-space: nowrap;\n  padding: 2px 5px;\n  min-width: 20px;\n  text-align: center;\n  color: #fff;\n  border-radius: 5px;\n  border-color: #3498db;\n  background-color: #3498db;\n  box-sizing: content-box;\n}\n.vue-slider-dot-tooltip-inner::after {\n  content: \"\";\n  position: absolute;\n}\n.vue-slider-dot-tooltip-inner-top::after {\n  top: 100%;\n  left: 50%;\n  transform: translate(-50%, 0);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-top-color: inherit;\n}\n.vue-slider-dot-tooltip-inner-bottom::after {\n  bottom: 100%;\n  left: 50%;\n  transform: translate(-50%, 0);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-bottom-color: inherit;\n}\n.vue-slider-dot-tooltip-inner-left::after {\n  left: 100%;\n  top: 50%;\n  transform: translate(0, -50%);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-left-color: inherit;\n}\n.vue-slider-dot-tooltip-inner-right::after {\n  right: 100%;\n  top: 50%;\n  transform: translate(0, -50%);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-right-color: inherit;\n}\n.vue-slider-dot-tooltip-wrapper {\n  opacity: 0;\n  transition: all 0.3s;\n}\n.vue-slider-dot-tooltip-wrapper-show {\n  opacity: 1;\n}\n#general-block-list .vs__selected {\n  background-color: #5a8dee !important;\n  border-color: transparent !important;\n  color: #ffffff !important;\n  padding: 0.2rem 0.6rem 0.2rem 0.6rem !important;\n  height: 2em;\n}\n#general-block-list .vs__deselect {\n  fill: #000000 !important;\n  color: #000000 !important;\n}\n#general-block-list .vs__dropdown-option--selected {\n  color: #727e8c;\n  background: #ddd;\n}\n#general-block-list .vs__dropdown-menu {\n  height: 200px;\n}\n#general-block-list .webapp-form .form-group .vdpComponent input {\n  padding-left: 2.2em !important;\n  line-height: 1.4;\n  color: #475f7b;\n  background-color: #ffffff;\n  background-clip: padding-box;\n  border: 1px solid #dfe3e7;\n  border-radius: 0.267rem;\n}\n#general-block-list .vdpArrowPrev:after {\n  border-right-color: green;\n}\n#general-block-list .vdpArrowNext:after {\n  border-left-color: green;\n}\n#general-block-list .vdpCell.selectable:hover .vdpCellContent,\n#general-block-list .vdpCell.selected .vdpCellContent {\n  background: green;\n}\n#general-block-list .vdpCell.today {\n  color: green;\n}\n#general-block-list .vdpTimeUnit > input:hover,\n#general-block-list .vdpTimeUnit > input:focus {\n  border-bottom-color: green;\n}\n#general-block-list .checkbox {\n  margin-bottom: 0.2em;\n}\n#general-block-list .checkbox label {\n  color: #212529;\n  font-size: 14px;\n  text-transform: capitalize;\n  line-height: 1.5;\n}\n#general-block-list .collapsible .card.open,\n.accordion .card.open {\n  box-shadow: 0 3px 12px 0 rgba(0, 0, 0, 0.1) !important;\n  border-radius: 0.267rem !important;\n}\n#text-editor-settings-1 .ql-picker-options,\n#text-editor-1 .ql-picker-options {\n  max-height: 350px;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n  --vs-colors--lightest: rgba(60, 60, 60, 0.26);\n  --vs-colors--light: rgba(60, 60, 60, 0.5);\n  --vs-colors--dark: #333;\n  --vs-colors--darkest: rgba(0, 0, 0, 0.15);\n  --vs-search-input-color: inherit;\n  --vs-search-input-placeholder-color: inherit;\n  --vs-font-size: 1rem;\n  --vs-line-height: 1.4;\n  --vs-state-disabled-bg: rgb(248, 248, 248);\n  --vs-state-disabled-color: var(--vs-colors--light);\n  --vs-state-disabled-controls-color: var(--vs-colors--light);\n  --vs-state-disabled-cursor: not-allowed;\n  --vs-border-color: var(--vs-colors--lightest);\n  --vs-border-width: 1px;\n  --vs-border-style: solid;\n  --vs-border-radius: 4px;\n  --vs-actions-padding: 4px 6px 0 3px;\n  --vs-controls-color: var(--vs-colors--light);\n  --vs-controls-size: 1;\n  --vs-controls--deselect-text-shadow: 0 1px 0 #fff;\n  --vs-selected-bg: #f0f0f0;\n  --vs-selected-color: var(--vs-colors--dark);\n  --vs-selected-border-color: var(--vs-border-color);\n  --vs-selected-border-style: var(--vs-border-style);\n  --vs-selected-border-width: var(--vs-border-width);\n  --vs-dropdown-bg: #fff;\n  --vs-dropdown-color: inherit;\n  --vs-dropdown-z-index: 1000;\n  --vs-dropdown-min-width: 160px;\n  --vs-dropdown-max-height: 350px;\n  --vs-dropdown-box-shadow: 0px 3px 6px 0px var(--vs-colors--darkest);\n  --vs-dropdown-option-bg: #000;\n  --vs-dropdown-option-color: var(--vs-dropdown-color);\n  --vs-dropdown-option-padding: 3px 20px;\n  --vs-dropdown-option--active-bg: #5897fb;\n  --vs-dropdown-option--active-color: #fff;\n  --vs-dropdown-option--deselect-bg: #fb5858;\n  --vs-dropdown-option--deselect-color: #fff;\n  --vs-transition-timing-function: cubic-bezier(1, -0.115, 0.975, 0.855);\n  --vs-transition-duration: 0.15s;\n}\n.v-select {\n  position: relative;\n  font-family: inherit;\n}\n.v-select,\n.v-select * {\n  box-sizing: border-box;\n}\n:root {\n  --vs-transition-timing-function: cubic-bezier(1, 0.5, 0.8, 1);\n  --vs-transition-duration: 0.15s;\n}\n@keyframes vSelectSpinner {\n0% {\n    transform: rotate(0);\n}\nto {\n    transform: rotate(360deg);\n}\n}\n.vs__fade-enter-active,\n.vs__fade-leave-active {\n  pointer-events: none;\n  transition: opacity var(--vs-transition-duration) var(--vs-transition-timing-function);\n}\n.vs__fade-enter,\n.vs__fade-leave-to {\n  opacity: 0;\n}\n:root {\n  --vs-disabled-bg: var(--vs-state-disabled-bg);\n  --vs-disabled-color: var(--vs-state-disabled-color);\n  --vs-disabled-cursor: var(--vs-state-disabled-cursor);\n}\n.vs--disabled .vs__dropdown-toggle,\n.vs--disabled .vs__clear,\n.vs--disabled .vs__search,\n.vs--disabled .vs__selected,\n.vs--disabled .vs__open-indicator {\n  cursor: var(--vs-disabled-cursor);\n  background-color: var(--vs-disabled-bg);\n}\n.v-select[dir=rtl] .vs__actions {\n  padding: 0 3px 0 6px;\n}\n.v-select[dir=rtl] .vs__clear {\n  margin-left: 6px;\n  margin-right: 0;\n}\n.v-select[dir=rtl] .vs__deselect {\n  margin-left: 0;\n  margin-right: 2px;\n}\n.v-select[dir=rtl] .vs__dropdown-menu {\n  text-align: right;\n}\n.vs__dropdown-toggle {\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  display: flex;\n  padding: 0 0 4px;\n  background: none;\n  border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);\n  border-radius: var(--vs-border-radius);\n  white-space: normal;\n}\n.vs__selected-options {\n  display: flex;\n  flex-basis: 100%;\n  flex-grow: 1;\n  flex-wrap: wrap;\n  padding: 0 2px;\n  position: relative;\n}\n.vs__actions {\n  display: flex;\n  align-items: center;\n  padding: var(--vs-actions-padding);\n}\n.vs--searchable .vs__dropdown-toggle {\n  cursor: text;\n}\n.vs--unsearchable .vs__dropdown-toggle {\n  cursor: pointer;\n}\n.vs--open .vs__dropdown-toggle {\n  border-bottom-color: transparent;\n  border-bottom-left-radius: 0;\n  border-bottom-right-radius: 0;\n}\n.vs__open-indicator {\n  fill: var(--vs-controls-color);\n  transform: scale(var(--vs-controls-size));\n  transition: transform var(--vs-transition-duration) var(--vs-transition-timing-function);\n  transition-timing-function: var(--vs-transition-timing-function);\n}\n.vs--open .vs__open-indicator {\n  transform: rotate(180deg) scale(var(--vs-controls-size));\n}\n.vs--loading .vs__open-indicator {\n  opacity: 0;\n}\n.vs__clear {\n  fill: var(--vs-controls-color);\n  padding: 0;\n  border: 0;\n  background-color: transparent;\n  cursor: pointer;\n  margin-right: 8px;\n}\n.vs__dropdown-menu {\n  display: block;\n  box-sizing: border-box;\n  position: absolute;\n  top: calc(100% - var(--vs-border-width));\n  left: 0;\n  z-index: var(--vs-dropdown-z-index);\n  padding: 5px 0;\n  margin: 0;\n  width: 100%;\n  max-height: var(--vs-dropdown-max-height);\n  min-width: var(--vs-dropdown-min-width);\n  overflow-y: auto;\n  box-shadow: var(--vs-dropdown-box-shadow);\n  border: var(--vs-border-width) var(--vs-border-style) var(--vs-border-color);\n  border-top-style: none;\n  border-radius: 0 0 var(--vs-border-radius) var(--vs-border-radius);\n  text-align: left;\n  list-style: none;\n  background: var(--vs-dropdown-bg);\n  color: var(--vs-dropdown-color);\n}\n.vs__no-options {\n  text-align: center;\n}\n.vs__dropdown-option {\n  line-height: 1.42857143;\n  display: block;\n  padding: var(--vs-dropdown-option-padding);\n  clear: both;\n  color: var(--vs-dropdown-option-color);\n  white-space: nowrap;\n  cursor: pointer;\n}\n.vs__dropdown-option--highlight {\n  background: var(--vs-dropdown-option--active-bg);\n  color: var(--vs-dropdown-option--active-color);\n}\n.vs__dropdown-option--deselect {\n  background: var(--vs-dropdown-option--deselect-bg);\n  color: var(--vs-dropdown-option--deselect-color);\n}\n.vs__dropdown-option--disabled {\n  background: var(--vs-state-disabled-bg);\n  color: var(--vs-state-disabled-color);\n  cursor: var(--vs-state-disabled-cursor);\n}\n.vs__selected {\n  display: flex;\n  align-items: center;\n  background-color: var(--vs-selected-bg);\n  border: var(--vs-selected-border-width) var(--vs-selected-border-style) var(--vs-selected-border-color);\n  border-radius: var(--vs-border-radius);\n  color: var(--vs-selected-color);\n  line-height: var(--vs-line-height);\n  margin: 4px 2px 0;\n  padding: 0 0.25em;\n  z-index: 0;\n}\n.vs__deselect {\n  display: inline-flex;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  margin-left: 4px;\n  padding: 0;\n  border: 0;\n  cursor: pointer;\n  background: none;\n  fill: var(--vs-controls-color);\n  text-shadow: var(--vs-controls--deselect-text-shadow);\n}\n.vs--single .vs__selected {\n  background-color: transparent;\n  border-color: transparent;\n}\n.vs--single.vs--open .vs__selected,\n.vs--single.vs--loading .vs__selected {\n  position: absolute;\n  opacity: 0.4;\n}\n.vs--single.vs--searching .vs__selected {\n  display: none;\n}\n.vs__search::-webkit-search-cancel-button {\n  display: none;\n}\n.vs__search::-webkit-search-decoration,\n.vs__search::-webkit-search-results-button,\n.vs__search::-webkit-search-results-decoration,\n.vs__search::-ms-clear {\n  display: none;\n}\n.vs__search,\n.vs__search:focus {\n  color: var(--vs-search-input-color);\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  line-height: var(--vs-line-height);\n  font-size: var(--vs-font-size);\n  border: 1px solid transparent;\n  border-left: none;\n  outline: none;\n  margin: 4px 0 0;\n  padding: 0 7px;\n  background: none;\n  box-shadow: none;\n  width: 0;\n  max-width: 100%;\n  flex-grow: 1;\n  z-index: 1;\n}\n.vs__search::-moz-placeholder {\n  color: var(--vs-search-input-placeholder-color);\n}\n.vs__search::placeholder {\n  color: var(--vs-search-input-placeholder-color);\n}\n.vs--unsearchable .vs__search {\n  opacity: 1;\n}\n.vs--unsearchable:not(.vs--disabled) .vs__search {\n  cursor: pointer;\n}\n.vs--single.vs--searching:not(.vs--open):not(.vs--loading) .vs__search {\n  opacity: 0.2;\n}\n.vs__spinner {\n  align-self: center;\n  opacity: 0;\n  font-size: 5px;\n  text-indent: -9999em;\n  overflow: hidden;\n  border-top: 0.9em solid rgba(100, 100, 100, 0.1);\n  border-right: 0.9em solid rgba(100, 100, 100, 0.1);\n  border-bottom: 0.9em solid rgba(100, 100, 100, 0.1);\n  border-left: 0.9em solid rgba(60, 60, 60, 0.45);\n  transform: translateZ(0) scale(var(--vs-controls--spinner-size, var(--vs-controls-size)));\n  animation: vSelectSpinner 1.1s infinite linear;\n  transition: opacity 0.1s;\n}\n.vs__spinner,\n.vs__spinner:after {\n  border-radius: 50%;\n  width: 5em;\n  height: 5em;\n  transform: scale(var(--vs-controls--spinner-size, var(--vs-controls-size)));\n}\n.vs--loading .vs__spinner {\n  opacity: 1;\n}\n\n/* component style */\n.vue-slider-disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n}\n\n/* rail style */\n.vue-slider-rail {\n  background-color: #ccc;\n  border-radius: 15px;\n}\n\n/* process style */\n.vue-slider-process {\n  background-color: #3498db;\n  border-radius: 15px;\n}\n\n/* mark style */\n.vue-slider-mark {\n  z-index: 4;\n}\n.vue-slider-mark:first-child .vue-slider-mark-step, .vue-slider-mark:last-child .vue-slider-mark-step {\n  display: none;\n}\n.vue-slider-mark-step {\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  background-color: rgba(0, 0, 0, 0.16);\n}\n.vue-slider-mark-label {\n  font-size: 14px;\n  white-space: nowrap;\n}\n/* dot style */\n.vue-slider-dot-handle {\n  cursor: pointer;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  background-color: #fff;\n  box-sizing: border-box;\n  box-shadow: 0.5px 0.5px 2px 1px rgba(0, 0, 0, 0.32);\n}\n.vue-slider-dot-handle-focus {\n  box-shadow: 0px 0px 1px 2px rgba(52, 152, 219, 0.36);\n}\n.vue-slider-dot-handle-disabled {\n  cursor: not-allowed;\n  background-color: #ccc;\n}\n.vue-slider-dot-tooltip-inner {\n  font-size: 14px;\n  white-space: nowrap;\n  padding: 2px 5px;\n  min-width: 20px;\n  text-align: center;\n  color: #fff;\n  border-radius: 5px;\n  border-color: #3498db;\n  background-color: #3498db;\n  box-sizing: content-box;\n}\n.vue-slider-dot-tooltip-inner::after {\n  content: \"\";\n  position: absolute;\n}\n.vue-slider-dot-tooltip-inner-top::after {\n  top: 100%;\n  left: 50%;\n  transform: translate(-50%, 0);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-top-color: inherit;\n}\n.vue-slider-dot-tooltip-inner-bottom::after {\n  bottom: 100%;\n  left: 50%;\n  transform: translate(-50%, 0);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-bottom-color: inherit;\n}\n.vue-slider-dot-tooltip-inner-left::after {\n  left: 100%;\n  top: 50%;\n  transform: translate(0, -50%);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-left-color: inherit;\n}\n.vue-slider-dot-tooltip-inner-right::after {\n  right: 100%;\n  top: 50%;\n  transform: translate(0, -50%);\n  height: 0;\n  width: 0;\n  border-color: transparent;\n  border-style: solid;\n  border-width: 5px;\n  border-right-color: inherit;\n}\n.vue-slider-dot-tooltip-wrapper {\n  opacity: 0;\n  transition: all 0.3s;\n}\n.vue-slider-dot-tooltip-wrapper-show {\n  opacity: 1;\n}\n#general-block-list .vs__selected {\n  background-color: #5a8dee !important;\n  border-color: transparent !important;\n  color: #ffffff !important;\n  padding: 0.2rem 0.6rem 0.2rem 0.6rem !important;\n  height: 2em;\n}\n#general-block-list .vs__deselect {\n  fill: #000000 !important;\n  color: #000000 !important;\n}\n#general-block-list .vs__dropdown-option--selected {\n  color: #727e8c;\n  background: #ddd;\n}\n#general-block-list .vs__dropdown-menu {\n  height: 200px;\n}\n#general-block-list .webapp-form .form-group .vdpComponent input {\n  padding-left: 2.2em !important;\n  line-height: 1.4;\n  color: #475f7b;\n  background-color: #ffffff;\n  background-clip: padding-box;\n  border: 1px solid #dfe3e7;\n  border-radius: 0.267rem;\n}\n#general-block-list .vdpArrowPrev:after {\n  border-right-color: green;\n}\n#general-block-list .vdpArrowNext:after {\n  border-left-color: green;\n}\n#general-block-list .vdpCell.selectable:hover .vdpCellContent,\n#general-block-list .vdpCell.selected .vdpCellContent {\n  background: green;\n}\n#general-block-list .vdpCell.today {\n  color: green;\n}\n#general-block-list .vdpTimeUnit > input:hover,\n#general-block-list .vdpTimeUnit > input:focus {\n  border-bottom-color: green;\n}\n#general-block-list .checkbox {\n  margin-bottom: 0.2em;\n}\n#general-block-list .checkbox label {\n  color: #212529;\n  font-size: 14px;\n  text-transform: capitalize;\n  line-height: 1.5;\n}\n#general-block-list .collapsible .card.open,\n.accordion .card.open {\n  box-shadow: 0 3px 12px 0 rgba(0, 0, 0, 0.1) !important;\n  border-radius: 0.267rem !important;\n}\n#text-editor-settings-1 .ql-picker-options,\n#text-editor-1 .ql-picker-options {\n  max-height: 350px;\n}\n#general-block-list .zd-slider-row {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n  width: 100%;\n  padding-top: 24px;\n}\n#general-block-list .zd-slider-track {\n  flex: 1 1 auto;\n  min-width: 0;\n}\n#general-block-list .zd-slider-input-wrap {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  flex: 0 0 auto;\n}\n#general-block-list .zd-slider-number-input {\n  width: 96px;\n  min-width: 96px;\n  height: 36px;\n  text-align: right;\n}\n#general-block-list .zd-slider-unit {\n  font-size: 13px;\n  font-weight: 500;\n  color: #475569;\n  white-space: nowrap;\n  min-width: 46px;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -207763,7 +207962,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n/* ==========================================================================\n   Inventory — Internal Inspection. Shares the Disclosures checklist design.\n   ========================================================================== */\n/* Scoped by the section id: the root element's id is overridden by the\n   parent's fall-through `id` attribute. */\n#inventory-manage-internal-inspection-section .dc-page {\n  padding: 8px 20px 96px;\n  color: #0f172a;\n}\n#inventory-manage-internal-inspection-section .dc-header {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 16px;\n  flex-wrap: wrap;\n  margin-bottom: 16px;\n}\n#inventory-manage-internal-inspection-section .dc-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  height: 36px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n}\n#inventory-manage-internal-inspection-section .dc-btn i {\n  font-size: 16px;\n  position: static;\n  top: 0;\n}\n#inventory-manage-internal-inspection-section .dc-btn-ghost {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n}\n#inventory-manage-internal-inspection-section .dc-btn-ghost:hover {\n  background: #f8fafc;\n  color: #0f172a;\n  border-color: #cbd5e1;\n}\n#inventory-manage-internal-inspection-section .dc-card {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 12px;\n  padding: 16px 18px 18px;\n  margin-bottom: 16px;\n}\n#inventory-manage-internal-inspection-section .dc-card-head {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  margin-bottom: 14px;\n  padding-bottom: 12px;\n  border-bottom: 1px solid #f1f5f9;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 8px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 17px;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--0 {\n  background: #eff6ff;\n  color: #2563eb;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--1 {\n  background: #f5f3ff;\n  color: #7c3aed;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--2 {\n  background: #ecfdf5;\n  color: #059669;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--3 {\n  background: #fff7ed;\n  color: #ea580c;\n}\n#inventory-manage-internal-inspection-section .dc-card-title {\n  font-size: 15px;\n  font-weight: 600;\n  margin: 0;\n  color: #0f172a;\n}\n#inventory-manage-internal-inspection-section .dc-grid {\n  display: grid;\n  grid-template-columns: repeat(12, minmax(0, 1fr));\n  gap: 12px 16px;\n  align-items: start;\n}\n#inventory-manage-internal-inspection-section .dc-item {\n  min-width: 0;\n  width: 100%;\n  max-width: 100%;\n  flex: none;\n  padding-left: 0;\n  padding-right: 0;\n}\n#inventory-manage-internal-inspection-section .dc-item--full {\n  grid-column: span 12;\n}\n#inventory-manage-internal-inspection-section .dc-item--half {\n  grid-column: span 6;\n}\n#inventory-manage-internal-inspection-section .dc-item--quarter {\n  grid-column: span 3;\n}\n@media (max-width: 1199px) {\n#inventory-manage-internal-inspection-section .dc-item--quarter {\n    grid-column: span 6;\n}\n}\n@media (max-width: 767px) {\n#inventory-manage-internal-inspection-section .dc-item--half,\n#inventory-manage-internal-inspection-section .dc-item--quarter {\n    grid-column: span 12;\n}\n}\n#inventory-manage-internal-inspection-section .dc-label {\n  display: block;\n  font-size: 12px;\n  font-weight: 500;\n  color: #475569;\n  margin-bottom: 6px;\n}\n#inventory-manage-internal-inspection-section .dc-input,\n#inventory-manage-internal-inspection-section .dc-select,\n#inventory-manage-internal-inspection-section .dc-textarea {\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  font-size: 13px;\n  color: #0f172a;\n  background: #ffffff;\n  box-shadow: none;\n}\n#inventory-manage-internal-inspection-section .dc-input:focus,\n#inventory-manage-internal-inspection-section .dc-select:focus,\n#inventory-manage-internal-inspection-section .dc-textarea:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n}\n#inventory-manage-internal-inspection-section .dc-input,\n#inventory-manage-internal-inspection-section .dc-select {\n  height: 36px;\n}\n#inventory-manage-internal-inspection-section .dc-textarea {\n  min-height: 104px;\n  line-height: 1.55;\n  padding: 10px 12px;\n  resize: vertical;\n}\n#inventory-manage-internal-inspection-section .dc-statement-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n#inventory-manage-internal-inspection-section .dc-statement-actions {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  flex-wrap: wrap;\n}\n#inventory-manage-internal-inspection-section .dc-btn-sm {\n  height: 32px;\n  padding: 0 12px;\n  font-size: 12px;\n}\n#inventory-manage-internal-inspection-section .dc-btn-sm i {\n  font-size: 15px;\n}\n#inventory-manage-internal-inspection-section .dc-template-cta .btn {\n  height: 32px;\n  padding: 0 12px;\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  border-radius: 8px;\n  background: #eff6ff !important;\n  border: 1px solid #bfdbfe !important;\n  color: #2563eb !important;\n  box-shadow: none !important;\n}\n#inventory-manage-internal-inspection-section .dc-template-cta .btn i {\n  position: static;\n  top: 0;\n  font-size: 16px;\n}\n#inventory-manage-internal-inspection-section .dc-template-cta .btn:hover {\n  background: #dbeafe !important;\n}\n#inventory-manage-internal-inspection-section .dc-choice {\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  padding: 10px 12px;\n  background: #f8fafc;\n  transition: border-color 0.15s, background 0.15s;\n}\n#inventory-manage-internal-inspection-section .dc-choice-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  flex-wrap: wrap;\n}\n#inventory-manage-internal-inspection-section .dc-choice-text {\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 180px;\n  min-width: 0;\n}\n#inventory-manage-internal-inspection-section .dc-question {\n  font-size: 13px;\n  font-weight: 500;\n  color: #1e293b;\n}\n#inventory-manage-internal-inspection-section .dc-choice .dc-select {\n  width: 180px;\n  flex-shrink: 0;\n}\n#inventory-manage-internal-inspection-section .dc-segmented {\n  display: inline-flex;\n  flex-shrink: 0;\n  padding: 3px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  gap: 2px;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn {\n  min-width: 46px;\n  height: 28px;\n  padding: 0 10px;\n  border: 0;\n  border-radius: 6px;\n  background: transparent;\n  color: #64748b;\n  font-size: 12px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: background 0.15s, color 0.15s;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn:hover {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn:focus {\n  outline: none;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-active {\n  color: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-yes {\n  background: #2563eb;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-no {\n  background: #334155;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-na {\n  background: #94a3b8;\n}\n#inventory-manage-internal-inspection-section .dc-additional {\n  margin-top: 10px;\n  background: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-btn-primary {\n  background: #2563eb;\n  border: 1px solid #2563eb;\n  color: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-btn-primary:hover {\n  background: #1d4ed8;\n  border-color: #1d4ed8;\n  color: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-header--split {\n  justify-content: space-between;\n  align-items: flex-start;\n}\n#inventory-manage-internal-inspection-section .dc-header-actions {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-shrink: 0;\n}\n#inventory-manage-internal-inspection-section .dc-notice {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  margin: 0;\n  padding: 10px 14px;\n  border: 1px solid #fecaca;\n  border-radius: 10px;\n  background: #fef2f2;\n  color: #b91c1c;\n  font-size: 13px;\n  line-height: 1.5;\n}\n#inventory-manage-internal-inspection-section .dc-notice i {\n  font-size: 17px;\n  margin-top: 1px;\n}\n#inventory-manage-internal-inspection-section .dc-notice strong {\n  font-weight: 500;\n}\n#inventory-manage-internal-inspection-section .dc-choice-stack {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n#inventory-manage-internal-inspection-section.dc-page {\n  padding: 0 0 24px;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n/* ==========================================================================\n   Inventory — Internal Inspection. Shares the Disclosures checklist design.\n   ========================================================================== */\n/* Scoped by the section id: the root element's id is overridden by the\n   parent's fall-through `id` attribute. */\n#inventory-manage-internal-inspection-section .dc-page {\n  padding: 8px 20px 96px;\n  color: #0f172a;\n}\n#inventory-manage-internal-inspection-section .dc-header {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 16px;\n  flex-wrap: wrap;\n  margin-bottom: 16px;\n}\n#inventory-manage-internal-inspection-section .dc-btn {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  height: 36px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  cursor: pointer;\n}\n#inventory-manage-internal-inspection-section .dc-btn i {\n  font-size: 16px;\n  position: static;\n  top: 0;\n}\n#inventory-manage-internal-inspection-section .dc-btn-ghost {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  color: #475569;\n}\n#inventory-manage-internal-inspection-section .dc-btn-ghost:hover {\n  background: #f8fafc;\n  color: #0f172a;\n  border-color: #cbd5e1;\n}\n#inventory-manage-internal-inspection-section .dc-card {\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 12px;\n  padding: 16px 18px 18px;\n  margin-bottom: 16px;\n}\n#inventory-manage-internal-inspection-section .dc-card-head {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  margin-bottom: 14px;\n  padding-bottom: 12px;\n  border-bottom: 1px solid #f1f5f9;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon {\n  width: 32px;\n  height: 32px;\n  border-radius: 8px;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 17px;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--0 {\n  background: #eff6ff;\n  color: #2563eb;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--1 {\n  background: #f5f3ff;\n  color: #7c3aed;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--2 {\n  background: #ecfdf5;\n  color: #059669;\n}\n#inventory-manage-internal-inspection-section .dc-card-icon--3 {\n  background: #fff7ed;\n  color: #ea580c;\n}\n#inventory-manage-internal-inspection-section .dc-card-title {\n  font-size: 15px;\n  font-weight: 600;\n  margin: 0;\n  color: #0f172a;\n}\n#inventory-manage-internal-inspection-section .dc-grid {\n  display: grid;\n  grid-template-columns: repeat(12, minmax(0, 1fr));\n  gap: 12px 16px;\n  align-items: start;\n}\n#inventory-manage-internal-inspection-section .dc-item {\n  min-width: 0;\n  width: 100%;\n  max-width: 100%;\n  flex: none;\n  margin: 0 !important;\n  padding-left: 0;\n  padding-right: 0;\n  overflow: hidden;\n}\n#inventory-manage-internal-inspection-section .dc-item--full {\n  grid-column: span 12;\n}\n#inventory-manage-internal-inspection-section .dc-item--half {\n  grid-column: span 6;\n}\n#inventory-manage-internal-inspection-section .dc-item--quarter {\n  grid-column: span 3;\n}\n@media (max-width: 1199px) {\n#inventory-manage-internal-inspection-section .dc-item--quarter {\n    grid-column: span 6;\n}\n}\n@media (max-width: 767px) {\n#inventory-manage-internal-inspection-section .dc-item--half,\n#inventory-manage-internal-inspection-section .dc-item--quarter {\n    grid-column: span 12;\n}\n}\n#inventory-manage-internal-inspection-section .dc-label {\n  display: block;\n  font-size: 12px;\n  font-weight: 500;\n  color: #475569;\n  margin-bottom: 6px;\n}\n#inventory-manage-internal-inspection-section .dc-input,\n#inventory-manage-internal-inspection-section .dc-select,\n#inventory-manage-internal-inspection-section .dc-textarea {\n  width: 100%;\n  min-width: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  font-size: 13px;\n  color: #0f172a;\n  background: #ffffff;\n  box-shadow: none;\n}\n#inventory-manage-internal-inspection-section .dc-input:focus,\n#inventory-manage-internal-inspection-section .dc-select:focus,\n#inventory-manage-internal-inspection-section .dc-textarea:focus {\n  border-color: #2563eb;\n  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);\n}\n#inventory-manage-internal-inspection-section .dc-input,\n#inventory-manage-internal-inspection-section .dc-select {\n  height: 36px;\n}\n#inventory-manage-internal-inspection-section .dc-textarea {\n  min-height: 104px;\n  line-height: 1.55;\n  padding: 10px 12px;\n  resize: vertical;\n}\n#inventory-manage-internal-inspection-section .dc-statement-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n#inventory-manage-internal-inspection-section .dc-statement-actions {\n  display: inline-flex;\n  align-items: center;\n  gap: 8px;\n  flex-wrap: wrap;\n}\n#inventory-manage-internal-inspection-section .dc-btn-sm {\n  height: 32px;\n  padding: 0 12px;\n  font-size: 12px;\n}\n#inventory-manage-internal-inspection-section .dc-btn-sm i {\n  font-size: 15px;\n}\n#inventory-manage-internal-inspection-section .dc-template-cta .btn {\n  height: 32px;\n  padding: 0 12px;\n  display: inline-flex;\n  align-items: center;\n  font-size: 12px;\n  border-radius: 8px;\n  background: #eff6ff !important;\n  border: 1px solid #bfdbfe !important;\n  color: #2563eb !important;\n  box-shadow: none !important;\n}\n#inventory-manage-internal-inspection-section .dc-template-cta .btn i {\n  position: static;\n  top: 0;\n  font-size: 16px;\n}\n#inventory-manage-internal-inspection-section .dc-template-cta .btn:hover {\n  background: #dbeafe !important;\n}\n#inventory-manage-internal-inspection-section .dc-choice {\n  border: 1px solid #e2e8f0;\n  border-radius: 10px;\n  padding: 10px 12px;\n  background: #f8fafc;\n  transition: border-color 0.15s, background 0.15s;\n}\n#inventory-manage-internal-inspection-section .dc-choice-row {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  flex-wrap: wrap;\n}\n#inventory-manage-internal-inspection-section .dc-choice-text {\n  display: flex;\n  flex-direction: column;\n  flex: 1 1 180px;\n  min-width: 0;\n}\n#inventory-manage-internal-inspection-section .dc-question {\n  font-size: 13px;\n  font-weight: 500;\n  color: #1e293b;\n}\n#inventory-manage-internal-inspection-section .dc-choice .dc-select {\n  width: 180px;\n  flex-shrink: 0;\n}\n#inventory-manage-internal-inspection-section .dc-segmented {\n  display: inline-flex;\n  flex-shrink: 0;\n  padding: 3px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0;\n  border-radius: 8px;\n  gap: 2px;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn {\n  min-width: 46px;\n  height: 28px;\n  padding: 0 10px;\n  border: 0;\n  border-radius: 6px;\n  background: transparent;\n  color: #64748b;\n  font-size: 12px;\n  font-weight: 500;\n  cursor: pointer;\n  transition: background 0.15s, color 0.15s;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn:hover {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn:focus {\n  outline: none;\n  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-active {\n  color: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-yes {\n  background: #2563eb;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-no {\n  background: #334155;\n}\n#inventory-manage-internal-inspection-section .dc-seg-btn.is-na {\n  background: #94a3b8;\n}\n#inventory-manage-internal-inspection-section .dc-additional {\n  margin-top: 10px;\n  background: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-btn-primary {\n  background: #2563eb;\n  border: 1px solid #2563eb;\n  color: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-btn-primary:hover {\n  background: #1d4ed8;\n  border-color: #1d4ed8;\n  color: #ffffff;\n}\n#inventory-manage-internal-inspection-section .dc-header--split {\n  justify-content: space-between;\n  align-items: flex-start;\n}\n#inventory-manage-internal-inspection-section .dc-header-actions {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  flex-shrink: 0;\n}\n#inventory-manage-internal-inspection-section .dc-notice {\n  display: flex;\n  align-items: flex-start;\n  gap: 8px;\n  margin: 0;\n  padding: 10px 14px;\n  border: 1px solid #fecaca;\n  border-radius: 10px;\n  background: #fef2f2;\n  color: #b91c1c;\n  font-size: 13px;\n  line-height: 1.5;\n}\n#inventory-manage-internal-inspection-section .dc-notice i {\n  font-size: 17px;\n  margin-top: 1px;\n}\n#inventory-manage-internal-inspection-section .dc-notice strong {\n  font-weight: 500;\n}\n#inventory-manage-internal-inspection-section .dc-choice-stack {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n#inventory-manage-internal-inspection-section.dc-page {\n  padding: 0 0 24px;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -207931,7 +208130,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ".zd-inventory-settings-page {\n  background: #f8fafc;\n}\n.zd-inventory-settings-page .zd-settings-shell {\n  display: flex;\n  align-items: stretch;\n  min-height: calc(100vh - 68px);\n  background: #f8fafc;\n  border-top: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .sidebar-left {\n  width: 248px;\n  min-width: 248px;\n  background: #ffffff;\n  border-right: 1px solid #e2e8f0 !important;\n  flex-shrink: 0;\n}\n.zd-inventory-settings-page .sidebar-left .sidebar,\n.zd-inventory-settings-page .sidebar-left .todo-sidebar,\n.zd-inventory-settings-page .sidebar-left .todo-app-menu {\n  width: 100%;\n  margin: 0 !important;\n  padding: 0 !important;\n  position: static !important;\n  height: auto !important;\n}\n.zd-inventory-settings-page .sidebar-left .border-bottom {\n  border-bottom: 1px solid #e2e8f0 !important;\n  height: 60px !important;\n  min-height: 60px !important;\n  max-height: 60px !important;\n  box-sizing: border-box !important;\n  display: flex !important;\n  align-items: center !important;\n  padding: 0 1.25rem !important;\n  margin: 0 !important;\n}\n.zd-inventory-settings-page .sidebar-left h3.content-header-title {\n  float: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  font-size: 1.05rem !important;\n  font-weight: 700 !important;\n  color: #0f172a !important;\n  letter-spacing: -0.01em;\n  text-align: left;\n}\n.zd-inventory-settings-page .sidebar-left .sidebar-menu-list {\n  padding: 0.75rem !important;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab {\n  display: flex;\n  flex-direction: column;\n  gap: 4px;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 0.65rem 0.9rem;\n  border-radius: 8px;\n  font-size: 0.9rem;\n  font-weight: 500;\n  color: #475569;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link i {\n  font-size: 1.15rem;\n  color: #64748b;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link:hover {\n  background: #f1f5f9;\n  color: #0f172a;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link:hover i {\n  color: #0f172a;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link.active {\n  background: #eff6ff !important;\n  color: #2563eb !important;\n  font-weight: 600;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link.active i {\n  color: #2563eb !important;\n}\n.zd-inventory-settings-page .content-right {\n  flex: 1 1 auto;\n  min-width: 0;\n  background: #f8fafc;\n}\n.zd-inventory-settings-page .content-right .todo-app-list,\n.zd-inventory-settings-page .content-right #team-form,\n.zd-inventory-settings-page .content-right .tab-content,\n.zd-inventory-settings-page .content-right .tab-pane {\n  width: 100%;\n  margin: 0 !important;\n  padding: 0 !important;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom {\n  background: #ffffff;\n  border-bottom: 1px solid #e2e8f0 !important;\n  height: 60px !important;\n  min-height: 60px !important;\n  max-height: 60px !important;\n  box-sizing: border-box !important;\n  display: flex !important;\n  align-items: center !important;\n  padding: 0 1.75rem !important;\n  margin: 0 !important;\n  position: sticky;\n  top: 0;\n  z-index: 15;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom > form,\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom > .row {\n  width: 100%;\n  margin: 0;\n  align-items: center;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom .row {\n  align-items: center;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom .title-sizeincrease-font {\n  font-size: 1.2rem !important;\n  font-weight: 700 !important;\n  color: #0f172a !important;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom ul {\n  margin-bottom: 0;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom .btn {\n  height: 36px;\n  padding: 0 1.15rem;\n  border-radius: 8px;\n  font-size: 0.875rem;\n  font-weight: 600;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list {\n  padding: 1.5rem 1.75rem 3rem !important;\n  background: #f8fafc !important;\n  height: auto !important;\n  max-height: none !important;\n  border: none !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .content-wrapper.border-bottom {\n  background: #ffffff;\n  border: 1px solid #e2e8f0 !important;\n  border-radius: 12px;\n  padding: 1.5rem !important;\n  margin-bottom: 1.25rem !important;\n  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);\n}\n.zd-inventory-settings-page .content-right .list-right-task-list h6.text-danger {\n  display: flex;\n  align-items: center;\n  background: #fffbeb;\n  border: 1px solid #fde68a;\n  color: #92400e !important;\n  border-radius: 8px;\n  padding: 0.65rem 1rem;\n  font-size: 0.82rem !important;\n  font-weight: 500;\n  margin-bottom: 1.25rem !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .col-md-4 > label {\n  font-size: 0.84rem;\n  font-weight: 600;\n  color: #334155;\n  min-height: 38px;\n  display: flex;\n  align-items: center;\n  margin-bottom: 0;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .form-control,\n.zd-inventory-settings-page .content-right .list-right-task-list .custom-select {\n  height: 38px;\n  border: 1px solid #cbd5e1;\n  border-radius: 8px;\n  font-size: 0.875rem;\n  color: #0f172a;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .form-control:focus,\n.zd-inventory-settings-page .content-right .list-right-task-list .custom-select:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .quill-editor {\n  width: 100%;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .text-right {\n  display: flex;\n  justify-content: flex-end;\n  gap: 0.65rem;\n  margin-bottom: 1rem;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication {\n  padding: 16px 24px 30px !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-locations,\n.zd-inventory-settings-page .content-right #image-setting > .content-wrapper:not(.border-bottom),\n.zd-inventory-settings-page .content-right #locations-setting > .content-wrapper:not(.border-bottom) {\n  padding: 1.5rem 1.75rem 2rem !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication .list-image-content {\n  height: calc(100vh - 168px) !important;\n  max-height: none !important;\n  overflow: auto !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate {\n  margin-top: 1rem;\n  padding: 0.25rem 0;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .pagination,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .pagination {\n  display: flex !important;\n  justify-content: flex-end !important;\n  align-items: center !important;\n  gap: 6px !important;\n  margin: 0 !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item {\n  padding: 0 !important;\n  margin: 0 !important;\n  border: none !important;\n  background: transparent !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item .page-link,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item .page-link {\n  min-width: 32px;\n  height: 32px;\n  padding: 0 10px !important;\n  border-radius: 8px !important;\n  border: 1px solid #e2e8f0 !important;\n  background: #ffffff !important;\n  color: #334155 !important;\n  font-size: 13px !important;\n  font-weight: 500 !important;\n  display: inline-flex !important;\n  align-items: center !important;\n  justify-content: center !important;\n  box-shadow: none !important;\n  transition: all 0.15s ease;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item .page-link:hover,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item .page-link:hover {\n  background: #f1f5f9 !important;\n  border-color: #cbd5e1 !important;\n  color: #0f172a !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item.active .page-link,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item.active .page-link {\n  background: #2563eb !important;\n  border-color: #2563eb !important;\n  color: #ffffff !important;\n  font-weight: 600 !important;\n  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item.disabled .page-link,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item.disabled .page-link {\n  opacity: 0.45 !important;\n  background: #f8fafc !important;\n  color: #94a3b8 !important;\n  cursor: not-allowed !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table,\n.zd-inventory-settings-page .content-right .list-image-content table {\n  background: #ffffff;\n  border-radius: 10px;\n  overflow: hidden;\n  border: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table thead tr,\n.zd-inventory-settings-page .content-right .list-image-content table thead tr {\n  background: #f8fafc !important;\n  border-bottom: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table thead tr th,\n.zd-inventory-settings-page .content-right .list-image-content table thead tr th {\n  font-size: 11.5px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.04em;\n  color: #475569;\n  padding: 0.75rem 1rem !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table tbody tr,\n.zd-inventory-settings-page .content-right .list-image-content table tbody tr {\n  border-bottom: 1px solid #f1f5f9;\n  transition: background-color 0.15s ease;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table tbody tr:hover,\n.zd-inventory-settings-page .content-right .list-image-content table tbody tr:hover {\n  background: #f8fafc;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table tbody tr td,\n.zd-inventory-settings-page .content-right .list-image-content table tbody tr td {\n  padding: 0.75rem 1rem !important;\n  vertical-align: middle;\n}\n@media (max-width: 991px) {\n.zd-inventory-settings-page .zd-settings-shell {\n    flex-direction: column;\n}\n.zd-inventory-settings-page .sidebar-left {\n    width: 100%;\n    min-width: 100%;\n    border-right: none !important;\n    border-bottom: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab {\n    flex-direction: row;\n    overflow-x: auto;\n}\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ".zd-inventory-settings-page {\n  background: #f8fafc;\n}\n.zd-inventory-settings-page .btn {\n  border-radius: 0.267rem !important;\n}\n@media (min-width: 992px) {\n.zd-inventory-settings-page {\n    height: 100vh !important;\n    overflow: hidden !important;\n    display: flex;\n    flex-direction: column;\n    padding-top: 4rem !important;\n    padding-bottom: 0 !important;\n}\n.zd-inventory-settings-page > .content-body,\n.zd-inventory-settings-page > .content-body > .content-wrapper,\n.zd-inventory-settings-page > .content-body > .content-wrapper > .grid-list-form {\n    flex: 1 1 auto;\n    min-height: 0;\n    display: flex;\n    flex-direction: column;\n    overflow: hidden;\n    padding: 0 !important;\n    margin: 0 !important;\n}\n}\n.zd-inventory-settings-page .zd-settings-shell {\n  display: flex;\n  align-items: stretch;\n  gap: 20px;\n  padding: 16px 24px 0;\n  background: #f8fafc;\n  flex: 1 1 auto;\n  min-height: 0;\n  overflow: hidden;\n}\n.zd-inventory-settings-page .sidebar-left {\n  width: 224px;\n  min-width: 224px;\n  flex: 0 0 224px;\n  background: #ffffff;\n  border: 1px solid #e2e8f0 !important;\n  border-radius: 12px;\n  padding: 12px 8px;\n  align-self: flex-start;\n  max-height: calc(100% - 20px);\n  overflow-y: auto;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);\n}\n.zd-inventory-settings-page .sidebar-left .sidebar,\n.zd-inventory-settings-page .sidebar-left .todo-sidebar,\n.zd-inventory-settings-page .sidebar-left .todo-app-menu {\n  width: 100%;\n  margin: 0 !important;\n  padding: 0 !important;\n  position: static !important;\n  height: auto !important;\n  background: transparent !important;\n  border: none !important;\n}\n.zd-inventory-settings-page .sidebar-left .zd-side-nav__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 4px 12px 10px;\n  margin-bottom: 6px;\n  border-bottom: 1px solid #f1f5f9;\n  font-size: 12px;\n  font-weight: 700;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  color: #64748b;\n}\n.zd-inventory-settings-page .sidebar-left .zd-side-nav__header i {\n  font-size: 16px;\n  color: #94a3b8;\n}\n.zd-inventory-settings-page .sidebar-left .sidebar-menu-list,\n.zd-inventory-settings-page .sidebar-left .list-grid {\n  padding: 0 !important;\n  margin: 0 !important;\n  height: auto !important;\n  max-height: none !important;\n  overflow: visible !important;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 9px 12px;\n  border-radius: 8px;\n  font-size: 13.5px;\n  font-weight: 500;\n  color: #475569;\n  transition: background-color 0.15s ease, color 0.15s ease;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link i {\n  font-size: 17px;\n  color: #94a3b8;\n  flex-shrink: 0;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link:hover {\n  background: #f8fafc;\n  color: #0f172a;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link:hover i {\n  color: #475569;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link.active {\n  background: #eff6ff !important;\n  color: #2563eb !important;\n  font-weight: 600;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab .nav-link.active i {\n  color: #2563eb !important;\n}\n.zd-inventory-settings-page .content-right {\n  flex: 1 1 auto;\n  min-width: 0;\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  background: transparent;\n}\n.zd-inventory-settings-page .content-right .todo-app-list,\n.zd-inventory-settings-page .content-right #team-form,\n.zd-inventory-settings-page .content-right .tab-content {\n  width: 100%;\n  flex: 1 1 auto;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n  margin: 0 !important;\n  padding: 0 !important;\n}\n.zd-inventory-settings-page .content-right .tab-pane {\n  width: 100%;\n  margin: 0 !important;\n  padding: 0 !important;\n  min-height: 0;\n}\n.zd-inventory-settings-page .content-right .tab-pane.active {\n  flex: 1 1 auto;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom {\n  flex: 0 0 auto;\n  background: #ffffff;\n  border: 1px solid #e2e8f0 !important;\n  border-radius: 12px !important;\n  min-height: 48px !important;\n  height: auto !important;\n  box-sizing: border-box !important;\n  display: flex !important;\n  align-items: center !important;\n  padding: 8px 18px !important;\n  margin: 0 0 14px 0 !important;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);\n  position: static;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom > form,\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom > .row {\n  width: 100%;\n  margin: 0;\n  align-items: center;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom .row {\n  align-items: center;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom .title-sizeincrease-font {\n  font-size: 14.5px !important;\n  font-weight: 600 !important;\n  color: #0f172a !important;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom ul {\n  margin-bottom: 0;\n}\n.zd-inventory-settings-page .content-right .tab-pane > .content-wrapper.border-bottom .btn {\n  height: 32px;\n  padding: 0 14px;\n  border-radius: 8px;\n  font-size: 13px;\n  font-weight: 500;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list,\n.zd-inventory-settings-page .content-right .list-right-task-syndication,\n.zd-inventory-settings-page .content-right .list-right-task-locations,\n.zd-inventory-settings-page .content-right #image-setting > .content-wrapper:not(.border-bottom),\n.zd-inventory-settings-page .content-right #locations-setting > .content-wrapper:not(.border-bottom) {\n  flex: 1 1 auto;\n  min-height: 0;\n  overflow-y: auto !important;\n  overflow-x: hidden;\n  padding: 0 0 2.5rem !important;\n  background: transparent !important;\n  height: auto !important;\n  max-height: none !important;\n  border: none !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .content-wrapper.border-bottom {\n  background: #ffffff;\n  border: 1px solid #e2e8f0 !important;\n  border-radius: 12px;\n  padding: 1.5rem !important;\n  margin-bottom: 1.25rem !important;\n  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);\n}\n.zd-inventory-settings-page .content-right .list-right-task-list h6.text-danger {\n  display: flex;\n  align-items: center;\n  background: #fffbeb;\n  border: 1px solid #fde68a;\n  color: #92400e !important;\n  border-radius: 8px;\n  padding: 0.65rem 1rem;\n  font-size: 0.82rem !important;\n  font-weight: 500;\n  margin-bottom: 1.25rem !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .col-md-4 > label {\n  font-size: 0.84rem;\n  font-weight: 600;\n  color: #334155;\n  min-height: 38px;\n  display: flex;\n  align-items: center;\n  margin-bottom: 0;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .form-control,\n.zd-inventory-settings-page .content-right .list-right-task-list .custom-select {\n  height: 38px;\n  border: 1px solid #cbd5e1;\n  border-radius: 8px;\n  font-size: 0.875rem;\n  color: #0f172a;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .form-control:focus,\n.zd-inventory-settings-page .content-right .list-right-task-list .custom-select:focus {\n  border-color: #3b82f6;\n  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .quill-editor {\n  width: 100%;\n}\n.zd-inventory-settings-page .content-right .list-right-task-list .text-right {\n  display: flex;\n  justify-content: flex-end;\n  gap: 0.65rem;\n  margin-bottom: 1rem;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication .list-image-content {\n  height: auto !important;\n  max-height: none !important;\n  overflow: visible !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate {\n  margin-top: 1rem;\n  padding: 0.25rem 0;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .pagination,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .pagination {\n  display: flex !important;\n  justify-content: flex-end !important;\n  align-items: center !important;\n  gap: 6px !important;\n  margin: 0 !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item {\n  padding: 0 !important;\n  margin: 0 !important;\n  border: none !important;\n  background: transparent !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item .page-link,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item .page-link {\n  min-width: 32px;\n  height: 32px;\n  padding: 0 10px !important;\n  border-radius: 8px !important;\n  border: 1px solid #e2e8f0 !important;\n  background: #ffffff !important;\n  color: #334155 !important;\n  font-size: 13px !important;\n  font-weight: 500 !important;\n  display: inline-flex !important;\n  align-items: center !important;\n  justify-content: center !important;\n  box-shadow: none !important;\n  transition: all 0.15s ease;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item .page-link:hover,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item .page-link:hover {\n  background: #f1f5f9 !important;\n  border-color: #cbd5e1 !important;\n  color: #0f172a !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item.active .page-link,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item.active .page-link {\n  background: #2563eb !important;\n  border-color: #2563eb !important;\n  color: #ffffff !important;\n  font-weight: 600 !important;\n  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;\n}\n.zd-inventory-settings-page .content-right .dataTables_paginate .page-item.disabled .page-link,\n.zd-inventory-settings-page .content-right #table-extended-transactions_paginate .page-item.disabled .page-link {\n  opacity: 0.45 !important;\n  background: #f8fafc !important;\n  color: #94a3b8 !important;\n  cursor: not-allowed !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table,\n.zd-inventory-settings-page .content-right .list-image-content table {\n  background: #ffffff;\n  border-radius: 10px;\n  overflow: hidden;\n  border: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table thead tr,\n.zd-inventory-settings-page .content-right .list-image-content table thead tr {\n  background: #f8fafc !important;\n  border-bottom: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table thead tr th,\n.zd-inventory-settings-page .content-right .list-image-content table thead tr th {\n  font-size: 11.5px;\n  font-weight: 700;\n  text-transform: uppercase;\n  letter-spacing: 0.04em;\n  color: #475569;\n  padding: 0.75rem 1rem !important;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table tbody tr,\n.zd-inventory-settings-page .content-right .list-image-content table tbody tr {\n  border-bottom: 1px solid #f1f5f9;\n  transition: background-color 0.15s ease;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table tbody tr:hover,\n.zd-inventory-settings-page .content-right .list-image-content table tbody tr:hover {\n  background: #f8fafc;\n}\n.zd-inventory-settings-page .content-right .list-right-task-syndication table tbody tr td,\n.zd-inventory-settings-page .content-right .list-image-content table tbody tr td {\n  padding: 0.75rem 1rem !important;\n  vertical-align: middle;\n}\n@media (max-width: 991px) {\n.zd-inventory-settings-page .zd-settings-shell {\n    flex-direction: column;\n}\n.zd-inventory-settings-page .sidebar-left {\n    width: 100%;\n    min-width: 100%;\n    border-right: none !important;\n    border-bottom: 1px solid #e2e8f0;\n}\n.zd-inventory-settings-page .sidebar-left .team-setting-tab {\n    flex-direction: row;\n    overflow-x: auto;\n}\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -208123,7 +208322,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n/* ==========================================================================\n   Sidebar — modern dark navigation. Scoped to #main-menu.zd-sidebar.\n   ========================================================================== */\n#main-menu.zd-sidebar {\n  --sb-bg: #161b26;\n  --sb-bg-2: #1c2230;\n  --sb-text: #c3cad6;\n  --sb-text-strong: #ffffff;\n  --sb-muted: #6b7486;\n  --sb-hover: rgba(255, 255, 255, 0.06);\n  --sb-active-bg: rgba(90, 141, 238, 0.16);\n  --sb-active: #8fb2ff;\n  --sb-accent: #5a8dee;\n  display: flex !important;\n  flex-direction: column !important;\n  height: 100vh !important;\n  overflow: hidden !important;\n  overflow-y: hidden !important;\n  overflow-x: hidden !important;\n  background: var(--sb-bg) !important;\n  border-right: 1px solid rgba(255, 255, 255, 0.04);\n  box-shadow: none;\n  /* Brand row */\n  /* Vertically centre the logo + pin toggle inside the brand row\n     (the theme's margins pushed the logo past the bottom border). */\n  /* Section headings */\n  /* Items */\n  /* Support actions */\n  /* User profile footer (fixed at bottom of sidebar) */\n}\n#main-menu.zd-sidebar .navbar-header {\n  flex-shrink: 0;\n  display: flex;\n  align-items: center;\n  height: 68px !important;\n  padding: 0 1rem 0 1.25rem !important;\n  background: var(--sb-bg);\n  border-bottom: 1px solid rgba(255, 255, 255, 0.06);\n}\n#main-menu.zd-sidebar .navbar-header > ul.nav {\n  flex: 1 1 auto;\n  display: flex;\n  align-items: center;\n  height: 100%;\n  margin: 0;\n}\n#main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-item {\n  display: flex;\n  align-items: center;\n  height: 100%;\n  margin: 0 !important;\n}\n#main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-toggle {\n  margin-left: auto !important;\n}\n#main-menu.zd-sidebar .navbar-header .navbar-brand {\n  display: flex;\n  align-items: center;\n  margin: 0 !important;\n  padding: 0 !important;\n}\n#main-menu.zd-sidebar .navbar-header .navbar-brand img {\n  position: static !important;\n  left: 0 !important;\n  top: 0 !important;\n  width: 112px !important;\n  height: auto;\n  display: block;\n}\n#main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn {\n  position: relative;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 36px;\n  height: 36px;\n  padding: 0 !important;\n  margin: 0 !important;\n  border-radius: 10px;\n  cursor: pointer;\n  transition: background-color 0.16s ease, transform 0.16s ease;\n}\n#main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn:hover {\n  background: rgba(255, 255, 255, 0.1);\n}\n#main-menu.zd-sidebar .shadow-bottom {\n  display: none !important;\n}\n#main-menu.zd-sidebar .modern-nav-toggle i {\n  color: var(--sb-muted) !important;\n  transition: color 0.15s;\n}\n#main-menu.zd-sidebar .modern-nav-toggle:hover i,\n#main-menu.zd-sidebar .modern-nav-toggle.active i {\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .main-menu-content {\n  flex: 1 1 auto;\n  height: auto !important;\n  min-height: 0 !important;\n  overflow-y: auto !important;\n  overflow-x: hidden !important;\n  padding-bottom: 1rem;\n  /* Hide PerfectScrollbar so there is never a duplicate scrollbar */\n  /* Single clean modern scrollbar */\n}\n#main-menu.zd-sidebar .main-menu-content .ps__rail-y,\n#main-menu.zd-sidebar .main-menu-content .ps__rail-x {\n  display: none !important;\n  opacity: 0 !important;\n  visibility: hidden !important;\n  pointer-events: none !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar {\n  width: 5px !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar-track {\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar-thumb {\n  background: rgba(255, 255, 255, 0.16) !important;\n  border-radius: 5px !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar-thumb:hover {\n  background: rgba(255, 255, 255, 0.3) !important;\n}\n#main-menu.zd-sidebar .navigation {\n  background: transparent !important;\n  padding-top: 0.25rem;\n}\n#main-menu.zd-sidebar .navigation > .navigation-header {\n  margin: 1.4rem 0 0.4rem 1.6rem !important;\n  padding: 0 !important;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > .navigation-header span {\n  color: var(--sb-muted) !important;\n  font-size: 0.68rem !important;\n  font-weight: 600 !important;\n  letter-spacing: 0.09em !important;\n  text-transform: uppercase;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item {\n  margin: 1px 0.75rem !important;\n  border-radius: 10px;\n  background: transparent !important;\n  /* Active route */\n  /* Locked / unavailable modules */\n  /* Sub menus (Super / Import settings) */\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a {\n  position: relative;\n  display: flex !important;\n  align-items: center;\n  gap: 0.15rem;\n  min-height: 40px;\n  padding: 0.55rem 0.8rem !important;\n  border-radius: 10px !important;\n  color: var(--sb-text) !important;\n  background: transparent !important;\n  font-size: 0.92rem;\n  font-weight: 500;\n  line-height: 1.2;\n  transition: background 0.15s, color 0.15s;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a > i:first-child {\n  flex-shrink: 0;\n  width: 22px;\n  margin-right: 0.75rem !important;\n  font-size: 1.25rem !important;\n  line-height: 1;\n  color: var(--sb-muted) !important;\n  transition: color 0.15s;\n  /* keep icons still; the theme's bx-tada animation is distracting in a list */\n  animation: none !important;\n  transform: none !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a .menu-title {\n  display: inline-flex;\n  align-items: center;\n  justify-content: space-between;\n  flex: 1 1 auto;\n  min-width: 0;\n  color: inherit !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a .bxs-lock {\n  font-size: 0.95rem !important;\n  color: var(--sb-muted) !important;\n  opacity: 0.8;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item:hover > a {\n  background: var(--sb-hover) !important;\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item:hover > a > i:first-child {\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item.active > a, #main-menu.zd-sidebar .navigation > li.nav-item.router-link-exact-active > a {\n  background: var(--sb-active-bg) !important;\n  color: var(--sb-text-strong) !important;\n  box-shadow: none !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item.active > a > i:first-child, #main-menu.zd-sidebar .navigation > li.nav-item.router-link-exact-active > a > i:first-child {\n  color: var(--sb-active) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item.active > a::before, #main-menu.zd-sidebar .navigation > li.nav-item.router-link-exact-active > a::before {\n  content: \"\";\n  position: absolute;\n  left: -0.75rem;\n  top: 8px;\n  bottom: 8px;\n  width: 3px;\n  border-radius: 0 3px 3px 0;\n  background: var(--sb-accent);\n}\n#main-menu.zd-sidebar .navigation > li.nav-item[disabled=true] > a, #main-menu.zd-sidebar .navigation > li.nav-item[style*=not-allowed] > a {\n  color: var(--sb-muted) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item[disabled=true] > a:hover, #main-menu.zd-sidebar .navigation > li.nav-item[style*=not-allowed] > a:hover {\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul {\n  margin: 0.15rem 0 0.25rem;\n  padding: 0;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li > a {\n  display: flex !important;\n  align-items: center;\n  padding: 0.45rem 0.8rem 0.45rem 2.4rem !important;\n  border-radius: 8px;\n  color: var(--sb-text) !important;\n  font-size: 0.87rem;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li > a i {\n  margin-right: 0.5rem;\n  color: var(--sb-muted) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li > a:hover {\n  background: var(--sb-hover) !important;\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li.active > a,\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li.router-link-exact-active > a {\n  color: var(--sb-active) !important;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .zd-menu-action > a {\n  cursor: pointer;\n}\n#main-menu.zd-sidebar .zd-menu-badge {\n  margin-left: auto;\n  padding: 0.1rem 0.45rem;\n  border-radius: 999px;\n  background: rgba(40, 199, 111, 0.16);\n  color: #5fd99a;\n  font-size: 0.68rem;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer {\n  flex-shrink: 0;\n  margin-top: auto;\n  padding: 1rem 1.25rem 1.25rem;\n  border-top: 1px solid rgba(255, 255, 255, 0.06);\n  background: var(--sb-bg);\n  display: flex;\n  flex-direction: column;\n  gap: 0.85rem;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-info {\n  display: flex;\n  align-items: center;\n  gap: 0.75rem;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-avatar {\n  width: 40px;\n  height: 40px;\n  min-width: 40px;\n  border-radius: 50%;\n  overflow: hidden;\n  background: #5a8dee;\n  color: #ffffff;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-weight: 600;\n  font-size: 0.95rem;\n  flex-shrink: 0;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-avatar img {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-details {\n  display: flex;\n  flex-direction: column;\n  min-width: 0;\n  overflow: hidden;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-details .zd-sidebar-user-name {\n  color: var(--sb-text-strong);\n  font-weight: 600;\n  font-size: 0.92rem;\n  line-height: 1.25;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-details .zd-sidebar-user-role {\n  color: var(--sb-muted);\n  font-size: 0.78rem;\n  line-height: 1.2;\n  margin-top: 2px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.65rem;\n  color: var(--sb-text);\n  font-size: 0.88rem;\n  font-weight: 500;\n  text-decoration: none;\n  transition: color 0.15s;\n  width: -moz-fit-content;\n  width: fit-content;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout i {\n  font-size: 1.2rem;\n  color: var(--sb-text);\n  transition: color 0.15s;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout:hover {\n  color: var(--sb-text-strong);\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout:hover i {\n  color: var(--sb-text-strong);\n}\n#main-menu.zd-sidebar .zd-sidebar-version-footer {\n  padding: 0.85rem 1.25rem;\n  border-top: 1px solid var(--sb-border, rgba(255, 255, 255, 0.08));\n  color: var(--sb-muted, #94a3b8);\n  font-size: 0.75rem;\n  font-weight: 500;\n  letter-spacing: 0.01em;\n  flex-shrink: 0;\n  text-align: left;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#main-menu.zd-sidebar .zd-sidebar-version-footer .zd-sidebar-version-short {\n  display: none;\n}\n\n/* Collapsed (icon-only) mode: stay collapsed on hover, expand/collapse only via header toggle */\nbody.menu-collapsed #main-menu.zd-sidebar,\nbody.menu-collapsed #main-menu.zd-sidebar:hover,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded {\n  width: 68px !important;\n  min-width: 68px !important;\n  max-width: 68px !important;\n  overflow: visible !important;\n  /* show only the logo mark centered; on header hover swap to Show Menu toggle icon + tooltip */\n}\nbody.menu-collapsed #main-menu.zd-sidebar .zd-sidebar-version-footer,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .zd-sidebar-version-footer,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .zd-sidebar-version-footer {\n  padding: 0.75rem 0.25rem;\n  text-align: center;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .zd-sidebar-version-footer .zd-sidebar-version-full,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .zd-sidebar-version-footer .zd-sidebar-version-full,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .zd-sidebar-version-footer .zd-sidebar-version-full {\n  display: none;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .zd-sidebar-version-footer .zd-sidebar-version-short,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .zd-sidebar-version-footer .zd-sidebar-version-short,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .zd-sidebar-version-footer .zd-sidebar-version-short {\n  display: inline;\n  font-size: 0.68rem;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header {\n  width: 100% !important;\n  padding: 0 !important;\n  justify-content: center;\n  position: relative;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header > ul.nav,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header > ul.nav {\n  justify-content: center;\n  flex: 0 0 auto;\n  position: relative;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-item.mr-auto,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav > li.nav-item.mr-auto,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header > ul.nav > li.nav-item.mr-auto {\n  margin-right: 0 !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header > ul.nav > li.nav-toggle {\n  position: absolute;\n  inset: 0;\n  display: flex !important;\n  align-items: center;\n  justify-content: center;\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.15s ease;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .navbar-brand {\n  width: 46px;\n  overflow: hidden;\n  transition: opacity 0.15s ease;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .navbar-brand img,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .navbar-brand img,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .navbar-brand img {\n  width: 112px !important;\n  max-width: none !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .zd-sidebar-toggle-btn,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .zd-sidebar-toggle-btn {\n  width: 40px;\n  height: 40px;\n  background: rgba(255, 255, 255, 0.12);\n  border-radius: 10px;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn::after,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .zd-sidebar-toggle-btn::after,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .zd-sidebar-toggle-btn::after {\n  content: \"Show Menu\";\n  position: absolute;\n  top: calc(100% + 8px);\n  left: 50%;\n  transform: translateX(-25%);\n  padding: 6px 12px;\n  border-radius: 8px;\n  background: #232838;\n  color: #ffffff;\n  font-size: 0.82rem;\n  font-weight: 500;\n  white-space: nowrap;\n  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.15s ease;\n  z-index: 1080;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn:hover::after,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .zd-sidebar-toggle-btn:hover::after,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .zd-sidebar-toggle-btn:hover::after {\n  opacity: 1;\n}\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar:hover:hover .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded:hover .navbar-header .navbar-brand {\n  opacity: 0;\n}\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar:hover:hover .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded:hover .navbar-header > ul.nav > li.nav-toggle {\n  opacity: 1;\n  pointer-events: auto;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > .navigation-header,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > .navigation-header,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > .navigation-header {\n  margin-left: 0 !important;\n  text-align: center;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item {\n  margin: 1px 0.5rem !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a {\n  justify-content: center;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a > i:first-child,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a > i:first-child,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a > i:first-child {\n  margin-right: 0 !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a .menu-title,\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a .zd-menu-badge,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a .menu-title,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a .zd-menu-badge,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a .menu-title,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a .zd-menu-badge {\n  display: none !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a::before,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a::before,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a::before {\n  left: -0.5rem;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "@charset \"UTF-8\";\n/* ==========================================================================\n   Sidebar — modern dark navigation. Scoped to #main-menu.zd-sidebar.\n   ========================================================================== */\n#main-menu.zd-sidebar {\n  --sb-bg: #161b26;\n  --sb-bg-2: #1c2230;\n  --sb-text: #c3cad6;\n  --sb-text-strong: #ffffff;\n  --sb-muted: #6b7486;\n  --sb-hover: rgba(255, 255, 255, 0.06);\n  --sb-active-bg: rgba(90, 141, 238, 0.16);\n  --sb-active: #8fb2ff;\n  --sb-accent: #5a8dee;\n  display: flex !important;\n  flex-direction: column !important;\n  height: 100vh !important;\n  overflow: hidden !important;\n  overflow-y: hidden !important;\n  overflow-x: hidden !important;\n  background: var(--sb-bg) !important;\n  border-right: 1px solid rgba(255, 255, 255, 0.04);\n  box-shadow: none;\n  /* Brand row */\n  /* Vertically centre the logo + pin toggle inside the brand row\n     (the theme's margins pushed the logo past the bottom border). */\n  /* Section headings */\n  /* Items */\n  /* Support actions */\n  /* User profile footer (fixed at bottom of sidebar) */\n}\n#main-menu.zd-sidebar .navbar-header {\n  flex-shrink: 0;\n  display: flex;\n  align-items: center;\n  height: 68px !important;\n  padding: 0 1rem 0 1.25rem !important;\n  background: var(--sb-bg);\n  border-bottom: 1px solid rgba(255, 255, 255, 0.06);\n}\n#main-menu.zd-sidebar .navbar-header > ul.nav {\n  flex: 1 1 auto;\n  display: flex;\n  align-items: center;\n  height: 100%;\n  margin: 0;\n}\n#main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-item {\n  display: flex;\n  align-items: center;\n  height: 100%;\n  margin: 0 !important;\n}\n#main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-toggle {\n  margin-left: auto !important;\n}\n#main-menu.zd-sidebar .navbar-header .navbar-brand {\n  display: flex;\n  align-items: center;\n  margin: 0 !important;\n  padding: 0 !important;\n}\n#main-menu.zd-sidebar .navbar-header .navbar-brand img {\n  position: static !important;\n  left: 0 !important;\n  top: 0 !important;\n  width: 112px !important;\n  height: auto;\n  display: block;\n}\n#main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn {\n  position: relative;\n  display: flex;\n  position: relative;\n  align-items: center;\n  justify-content: center;\n  width: 36px;\n  height: 36px;\n  padding: 0 !important;\n  margin: 0 !important;\n  border-radius: 10px;\n  cursor: pointer;\n  transition: background-color 0.16s ease, transform 0.16s ease;\n}\n#main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn::after {\n  content: attr(data-tooltip);\n  position: absolute;\n  top: calc(100% + 8px);\n  right: 0;\n  padding: 6px 12px;\n  border-radius: 8px;\n  background: #232838;\n  color: #ffffff;\n  font-size: 0.82rem;\n  font-weight: 500;\n  white-space: nowrap;\n  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.15s ease;\n  z-index: 1080;\n}\n#main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn:hover {\n  background: rgba(255, 255, 255, 0.1);\n}\n#main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn:hover::after {\n  opacity: 1;\n}\n#main-menu.zd-sidebar .shadow-bottom {\n  display: none !important;\n}\n#main-menu.zd-sidebar .modern-nav-toggle i {\n  color: var(--sb-muted) !important;\n  transition: color 0.15s;\n}\n#main-menu.zd-sidebar .modern-nav-toggle:hover i,\n#main-menu.zd-sidebar .modern-nav-toggle.active i {\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .main-menu-content {\n  flex: 1 1 auto;\n  height: auto !important;\n  min-height: 0 !important;\n  overflow-y: auto !important;\n  overflow-x: hidden !important;\n  padding-bottom: 1rem;\n  /* Hide PerfectScrollbar so there is never a duplicate scrollbar */\n  /* Single clean modern scrollbar */\n}\n#main-menu.zd-sidebar .main-menu-content .ps__rail-y,\n#main-menu.zd-sidebar .main-menu-content .ps__rail-x {\n  display: none !important;\n  opacity: 0 !important;\n  visibility: hidden !important;\n  pointer-events: none !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar {\n  width: 5px !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar-track {\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar-thumb {\n  background: rgba(255, 255, 255, 0.16) !important;\n  border-radius: 5px !important;\n}\n#main-menu.zd-sidebar .main-menu-content::-webkit-scrollbar-thumb:hover {\n  background: rgba(255, 255, 255, 0.3) !important;\n}\n#main-menu.zd-sidebar .navigation {\n  background: transparent !important;\n  padding-top: 0.25rem;\n}\n#main-menu.zd-sidebar .navigation > .navigation-header {\n  margin: 1.4rem 0 0.4rem 1.6rem !important;\n  padding: 0 !important;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > .navigation-header span {\n  color: var(--sb-muted) !important;\n  font-size: 0.68rem !important;\n  font-weight: 600 !important;\n  letter-spacing: 0.09em !important;\n  text-transform: uppercase;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item {\n  margin: 1px 0.75rem !important;\n  border-radius: 10px;\n  background: transparent !important;\n  /* Active route */\n  /* Locked / unavailable modules */\n  /* Sub menus (Super / Import settings) */\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a {\n  position: relative;\n  display: flex !important;\n  align-items: center;\n  gap: 0.15rem;\n  min-height: 40px;\n  padding: 0.55rem 0.8rem !important;\n  border-radius: 10px !important;\n  color: var(--sb-text) !important;\n  background: transparent !important;\n  font-size: 0.92rem;\n  font-weight: 500;\n  line-height: 1.2;\n  transition: background 0.15s, color 0.15s;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a > i:first-child {\n  flex-shrink: 0;\n  width: 22px;\n  margin-right: 0.75rem !important;\n  font-size: 1.25rem !important;\n  line-height: 1;\n  color: var(--sb-muted) !important;\n  transition: color 0.15s;\n  /* keep icons still; the theme's bx-tada animation is distracting in a list */\n  animation: none !important;\n  transform: none !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a .menu-title {\n  display: inline-flex;\n  align-items: center;\n  justify-content: space-between;\n  flex: 1 1 auto;\n  min-width: 0;\n  color: inherit !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > a .bxs-lock {\n  font-size: 0.95rem !important;\n  color: var(--sb-muted) !important;\n  opacity: 0.8;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item:hover > a {\n  background: var(--sb-hover) !important;\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item:hover > a > i:first-child {\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item.active > a, #main-menu.zd-sidebar .navigation > li.nav-item.router-link-exact-active > a {\n  background: var(--sb-active-bg) !important;\n  color: var(--sb-text-strong) !important;\n  box-shadow: none !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item.active > a > i:first-child, #main-menu.zd-sidebar .navigation > li.nav-item.router-link-exact-active > a > i:first-child {\n  color: var(--sb-active) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item.active > a::before, #main-menu.zd-sidebar .navigation > li.nav-item.router-link-exact-active > a::before {\n  content: \"\";\n  position: absolute;\n  left: -0.75rem;\n  top: 8px;\n  bottom: 8px;\n  width: 3px;\n  border-radius: 0 3px 3px 0;\n  background: var(--sb-accent);\n}\n#main-menu.zd-sidebar .navigation > li.nav-item[disabled=true] > a, #main-menu.zd-sidebar .navigation > li.nav-item[style*=not-allowed] > a {\n  color: var(--sb-muted) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item[disabled=true] > a:hover, #main-menu.zd-sidebar .navigation > li.nav-item[style*=not-allowed] > a:hover {\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul {\n  margin: 0.15rem 0 0.25rem;\n  padding: 0;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li > a {\n  display: flex !important;\n  align-items: center;\n  padding: 0.45rem 0.8rem 0.45rem 2.4rem !important;\n  border-radius: 8px;\n  color: var(--sb-text) !important;\n  font-size: 0.87rem;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li > a i {\n  margin-right: 0.5rem;\n  color: var(--sb-muted) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li > a:hover {\n  background: var(--sb-hover) !important;\n  color: var(--sb-text-strong) !important;\n}\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li.active > a,\n#main-menu.zd-sidebar .navigation > li.nav-item > ul li.router-link-exact-active > a {\n  color: var(--sb-active) !important;\n  background: transparent !important;\n}\n#main-menu.zd-sidebar .zd-menu-action > a {\n  cursor: pointer;\n}\n#main-menu.zd-sidebar .zd-menu-badge {\n  margin-left: auto;\n  padding: 0.1rem 0.45rem;\n  border-radius: 999px;\n  background: rgba(40, 199, 111, 0.16);\n  color: #5fd99a;\n  font-size: 0.68rem;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer {\n  flex-shrink: 0;\n  margin-top: auto;\n  padding: 1rem 1.25rem 1.25rem;\n  border-top: 1px solid rgba(255, 255, 255, 0.06);\n  background: var(--sb-bg);\n  display: flex;\n  flex-direction: column;\n  gap: 0.85rem;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-info {\n  display: flex;\n  align-items: center;\n  gap: 0.75rem;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-avatar {\n  width: 40px;\n  height: 40px;\n  min-width: 40px;\n  border-radius: 50%;\n  overflow: hidden;\n  background: #5a8dee;\n  color: #ffffff;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-weight: 600;\n  font-size: 0.95rem;\n  flex-shrink: 0;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-avatar img {\n  width: 100%;\n  height: 100%;\n  -o-object-fit: cover;\n     object-fit: cover;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-details {\n  display: flex;\n  flex-direction: column;\n  min-width: 0;\n  overflow: hidden;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-details .zd-sidebar-user-name {\n  color: var(--sb-text-strong);\n  font-weight: 600;\n  font-size: 0.92rem;\n  line-height: 1.25;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-user-details .zd-sidebar-user-role {\n  color: var(--sb-muted);\n  font-size: 0.78rem;\n  line-height: 1.2;\n  margin-top: 2px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.65rem;\n  color: var(--sb-text);\n  font-size: 0.88rem;\n  font-weight: 500;\n  text-decoration: none;\n  transition: color 0.15s;\n  width: -moz-fit-content;\n  width: fit-content;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout i {\n  font-size: 1.2rem;\n  color: var(--sb-text);\n  transition: color 0.15s;\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout:hover {\n  color: var(--sb-text-strong);\n}\n#main-menu.zd-sidebar .zd-sidebar-user-footer .zd-sidebar-logout:hover i {\n  color: var(--sb-text-strong);\n}\n#main-menu.zd-sidebar .zd-sidebar-version-footer {\n  padding: 0.85rem 1.25rem;\n  border-top: 1px solid var(--sb-border, rgba(255, 255, 255, 0.08));\n  color: var(--sb-muted, #94a3b8);\n  font-size: 0.75rem;\n  font-weight: 500;\n  letter-spacing: 0.01em;\n  flex-shrink: 0;\n  text-align: left;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n#main-menu.zd-sidebar .zd-sidebar-version-footer .zd-sidebar-version-short {\n  display: none;\n}\n\n/* Collapsed (icon-only) mode: stay collapsed on hover, expand/collapse only via header toggle */\nbody.menu-collapsed #main-menu.zd-sidebar,\nbody.menu-collapsed #main-menu.zd-sidebar:hover,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded {\n  width: 68px !important;\n  min-width: 68px !important;\n  max-width: 68px !important;\n  overflow: visible !important;\n  /* show only the logo mark centered; on header hover swap to Show Menu toggle icon + tooltip */\n}\nbody.menu-collapsed #main-menu.zd-sidebar .zd-sidebar-version-footer,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .zd-sidebar-version-footer,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .zd-sidebar-version-footer {\n  padding: 0.75rem 0.25rem;\n  text-align: center;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .zd-sidebar-version-footer .zd-sidebar-version-full,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .zd-sidebar-version-footer .zd-sidebar-version-full,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .zd-sidebar-version-footer .zd-sidebar-version-full {\n  display: none;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .zd-sidebar-version-footer .zd-sidebar-version-short,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .zd-sidebar-version-footer .zd-sidebar-version-short,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .zd-sidebar-version-footer .zd-sidebar-version-short {\n  display: inline;\n  font-size: 0.68rem;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header {\n  width: 100% !important;\n  padding: 0 !important;\n  justify-content: center;\n  position: relative;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header > ul.nav,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header > ul.nav {\n  justify-content: center;\n  flex: 0 0 auto;\n  position: relative;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-item.mr-auto,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav > li.nav-item.mr-auto,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header > ul.nav > li.nav-item.mr-auto {\n  margin-right: 0 !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header > ul.nav > li.nav-toggle {\n  position: absolute;\n  inset: 0;\n  display: flex !important;\n  align-items: center;\n  justify-content: center;\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.15s ease;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .navbar-brand {\n  width: 46px;\n  overflow: hidden;\n  transition: opacity 0.15s ease;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .navbar-brand img,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .navbar-brand img,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .navbar-brand img {\n  width: 112px !important;\n  max-width: none !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .zd-sidebar-toggle-btn,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .zd-sidebar-toggle-btn {\n  width: 40px;\n  height: 40px;\n  background: rgba(255, 255, 255, 0.12);\n  border-radius: 10px;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn::after,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .zd-sidebar-toggle-btn::after,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .zd-sidebar-toggle-btn::after {\n  content: \"Show Menu\";\n  position: absolute;\n  top: calc(100% + 8px);\n  left: 50%;\n  right: auto;\n  transform: translateX(-25%);\n  padding: 6px 12px;\n  border-radius: 8px;\n  background: #232838;\n  color: #ffffff;\n  font-size: 0.82rem;\n  font-weight: 500;\n  white-space: nowrap;\n  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.15s ease;\n  z-index: 1080;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navbar-header .zd-sidebar-toggle-btn:hover::after,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .zd-sidebar-toggle-btn:hover::after,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navbar-header .zd-sidebar-toggle-btn:hover::after {\n  opacity: 1;\n}\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar:hover:hover .navbar-header .navbar-brand,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded:hover .navbar-header .navbar-brand {\n  opacity: 0;\n}\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar:hover:hover .navbar-header > ul.nav > li.nav-toggle,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded:hover .navbar-header > ul.nav > li.nav-toggle {\n  opacity: 1;\n  pointer-events: auto;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > .navigation-header,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > .navigation-header,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > .navigation-header {\n  margin-left: 0 !important;\n  text-align: center;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item {\n  margin: 1px 0.5rem !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a {\n  justify-content: center;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a > i:first-child,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a > i:first-child,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a > i:first-child {\n  margin-right: 0 !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a .menu-title,\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a .zd-menu-badge,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a .menu-title,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a .zd-menu-badge,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a .menu-title,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a .zd-menu-badge {\n  display: none !important;\n}\nbody.menu-collapsed #main-menu.zd-sidebar .navigation > li.nav-item > a::before,\nbody.menu-collapsed #main-menu.zd-sidebar:hover .navigation > li.nav-item > a::before,\nbody.menu-collapsed #main-menu.zd-sidebar.expanded .navigation > li.nav-item > a::before {\n  left: -0.5rem;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -209899,7 +210098,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n/* ==========================================================================\n   Top bar — modern styling. Scoped to .zd-topbar; height kept at 45px so\n   page offsets across the app are unchanged.\n   ========================================================================== */\n.zd-topbar.header-navbar {\n  background: #ffffff !important;\n  /* inset line instead of a border so the bar stays exactly 45px tall */\n  box-shadow: inset 0 -1px 0 #e6eaf0, 0 1px 2px rgba(15, 23, 42, 0.04);\n  min-height: 45px;\n}\n.zd-topbar .navbar-container {\n  background: transparent !important;\n  height: 45px;\n  display: flex;\n  align-items: center;\n}\n.zd-topbar .navbar-collapse {\n  height: 100%;\n  align-items: center;\n}\n.zd-topbar .bookmark-wrapper,\n.zd-topbar .bookmark-icons,\n.zd-topbar .zd-actions {\n  display: flex;\n  align-items: center;\n  height: 100%;\n}\n\n/* Left: quick-access icons */\n.zd-topbar .bookmark-icons {\n  gap: 0.25rem;\n  margin-left: 0.25rem;\n}\n.zd-topbar .zd-icon-item {\n  position: relative;\n  margin: 0 !important;\n}\n.zd-topbar .zd-icon-item > a,\n.zd-topbar a.zd-icon-item,\n.zd-topbar .zd-icon-item {\n  position: relative;\n  display: inline-flex !important;\n  align-items: center;\n  justify-content: center;\n  width: 36px;\n  height: 36px;\n  border-radius: 10px;\n  border: 1px solid transparent;\n  color: #475569;\n  cursor: pointer;\n  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;\n}\n.zd-topbar .zd-icon-item:hover,\n.zd-topbar .zd-icon-item.active {\n  background: #eff6ff;\n  border-color: #dbeafe;\n  color: #2563eb;\n}\n.zd-topbar .zd-icon-item .ficon {\n  font-size: 1.3rem;\n  color: inherit;\n  margin: 0;\n  position: static;\n  top: 0;\n}\n.zd-topbar .zd-icon-item > a {\n  width: 100%;\n  height: 100%;\n  color: inherit;\n}\n.zd-topbar .zd-count {\n  top: -5px !important;\n  right: -6px !important;\n  /* flex-centre the number; theme .badge padding/line-height pushed it down and clipped it */\n  display: inline-flex !important;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  min-width: 18px;\n  height: 18px;\n  padding: 0 4px !important;\n  font-size: 0.65rem;\n  font-weight: 600;\n  line-height: 1 !important;\n  border: 2px solid #ffffff;\n  border-radius: 999px;\n}\n.zd-topbar .zd-topbar-page-title {\n  font-size: 1.25rem;\n  font-weight: 700;\n  color: #0f172a;\n  letter-spacing: -0.02em;\n  line-height: 1.2;\n  margin-left: 0.25rem;\n}\n\n/* Right: text actions */\n.zd-topbar .zd-actions {\n  gap: 0.35rem;\n  align-items: center;\n}\n.zd-topbar .zd-actions > .nav-item {\n  display: inline-flex;\n  align-items: center;\n}\n.zd-topbar .zd-action.dropdown-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.4rem;\n  height: 34px;\n  padding: 0 0.8rem;\n  border-radius: 8px;\n  color: #4b5563;\n  font-size: 0.9rem;\n  font-weight: 500;\n  letter-spacing: 0;\n  text-transform: none;\n  white-space: nowrap;\n  background: transparent;\n  transition: background 0.15s, color 0.15s;\n}\n.zd-topbar .zd-action.dropdown-item i {\n  margin: 0 !important;\n  font-size: 1.15rem;\n  color: #8a94a6;\n  vertical-align: middle;\n  position: static;\n  top: 0;\n  transition: color 0.15s;\n}\n.zd-topbar .zd-action.dropdown-item:hover,\n.zd-topbar .zd-action.dropdown-item:focus {\n  background: #f1f4f8;\n  color: #1f2937;\n}\n.zd-topbar .zd-action.dropdown-item:hover i {\n  color: #5a8dee;\n}\n.zd-topbar .zd-action--primary.dropdown-item {\n  background: #e3f6e8;\n  color: #1e8a43;\n}\n.zd-topbar .zd-action--primary.dropdown-item i {\n  color: #1e8a43;\n}\n.zd-topbar .zd-action--primary.dropdown-item:hover,\n.zd-topbar .zd-action--primary.dropdown-item:focus {\n  background: #cdeed7;\n  color: #176b34;\n}\n.zd-topbar .zd-action--primary.dropdown-item:hover i {\n  color: #176b34;\n}\n.zd-topbar .zd-action--danger.dropdown-item {\n  background: #fde6e6;\n  color: #c23434;\n}\n.zd-topbar .zd-action--danger.dropdown-item i {\n  color: #c23434;\n}\n.zd-topbar .zd-action--danger.dropdown-item:hover {\n  background: #fbd3d3;\n  color: #a12626;\n}\n\n/* Call button */\n.zd-topbar .zd-call-item {\n  display: inline-flex !important;\n  align-items: center;\n  justify-content: center;\n  width: 36px;\n  height: 36px;\n  border-radius: 10px;\n  border: 1px solid transparent;\n  color: #475569;\n  cursor: pointer;\n  margin-right: 0;\n  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;\n&:hover {\n    background: #eff6ff;\n    border-color: #dbeafe;\n    color: #2563eb;\n}\ni.ficon,\n  i {\n    font-size: 1.3rem;\n    color: inherit;\n    line-height: 1;\n    position: static;\n    top: 0;\n}\n}\n\n/* User chip */\n.zd-topbar .zd-user-item {\n  margin-left: 0.5rem;\n  padding-left: 0.75rem;\n  border-left: 1px solid #e2e8f0;\n  height: 28px;\n}\n.zd-topbar .zd-user.nav-link {\n  display: inline-flex !important;\n  align-items: center;\n  gap: 0.5rem;\n  height: 36px;\n  padding: 0 0.7rem 0 0.25rem !important;\n  border-radius: 999px;\n  border: 1px solid #e2e8f0;\n  background: #f8fafc;\n  color: #0f172a !important;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-transform: none;\n  transition: background 0.15s ease, border-color 0.15s ease;\n}\n.zd-topbar .zd-user.nav-link:hover {\n  background: #f1f5f9;\n  border-color: #cbd5e1;\n}\n.zd-topbar .zd-user.dropdown-toggle::after {\n  display: none;\n}\n.zd-topbar .zd-user-avatar {\n  width: 28px;\n  height: 28px;\n  border-radius: 50%;\n  background: #eef4ff;\n  color: #2f62d6;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 0.75rem;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n.zd-topbar .zd-user-name {\n  max-width: 160px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.zd-topbar .zd-user-chevron {\n  font-size: 1.1rem;\n  color: #8a94a6;\n}\n.zd-topbar .zd-user-menu {\n  min-width: 220px;\n  margin-top: 8px !important;\n  border: 1px solid #e6eaf0;\n  border-radius: 12px;\n  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);\n  padding-top: 0.35rem;\n  overflow: hidden;\n}\n.zd-topbar .zd-user-menu .dropdown-item {\n  display: flex;\n  align-items: center;\n  padding: 0.55rem 1rem;\n  font-size: 0.9rem;\n  color: #374151;\n}\n.zd-topbar .zd-user-menu .dropdown-item i {\n  font-size: 1.1rem;\n  color: #8a94a6;\n}\n.zd-topbar .zd-user-menu .dropdown-item:hover {\n  background: #f6f8fb;\n  color: #1f2937;\n}\n.zd-topbar .zd-user-menu .dropdown-item:last-child {\n  border-top: 1px solid #eef1f5;\n  color: #c23434;\n}\n.zd-topbar .zd-user-menu .dropdown-item:last-child i {\n  color: #c23434;\n}\n@media (max-width: 1199.98px) {\n.zd-topbar .zd-action.dropdown-item {\n    padding: 0 0.55rem;\n    font-size: 0.85rem;\n}\n}\n.integration-connector {\n  display: flex;\n  align-items: center;\n}\n.connector-line {\n  display: inline-block;\n  width: 22px;\n  height: 2px;\n  background-color: #28c76f;\n  border-radius: 2px;\n}\n.connector-icon {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 28px;\n  height: 28px;\n  margin: 0 8px;\n  background: rgba(40, 199, 111, 0.12);\n  color: #155724;\n  border: 1px solid rgba(40, 199, 111, 0.3);\n  border-radius: 50%;\n  font-size: 14px;\n  font-weight: 600;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n/* ==========================================================================\n   Top bar — modern styling. Scoped to .zd-topbar; height kept at 45px so\n   page offsets across the app are unchanged.\n   ========================================================================== */\n.zd-topbar.header-navbar {\n  background: #ffffff !important;\n  border-bottom: 1px solid #e2e8f0 !important;\n  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);\n  min-height: 45px;\n}\n.zd-topbar .navbar-container {\n  background: transparent !important;\n  height: 45px;\n  display: flex;\n  align-items: center;\n}\n.zd-topbar .navbar-collapse {\n  height: 100%;\n  align-items: center;\n}\n.zd-topbar .bookmark-wrapper,\n.zd-topbar .bookmark-icons,\n.zd-topbar .zd-actions {\n  display: flex;\n  align-items: center;\n  height: 100%;\n}\n\n/* Left: quick-access icons */\n.zd-topbar .bookmark-icons {\n  gap: 0.25rem;\n  margin-left: 0.25rem;\n}\n.zd-topbar .zd-icon-item {\n  position: relative;\n  margin: 0 !important;\n}\n.zd-topbar .zd-icon-item > a,\n.zd-topbar a.zd-icon-item,\n.zd-topbar .zd-icon-item {\n  position: relative;\n  display: inline-flex !important;\n  align-items: center;\n  justify-content: center;\n  width: 36px;\n  height: 36px;\n  border-radius: 10px;\n  border: 1px solid transparent;\n  color: #475569;\n  cursor: pointer;\n  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;\n}\n.zd-topbar .zd-icon-item:hover,\n.zd-topbar .zd-icon-item.active {\n  background: #eff6ff;\n  border-color: #dbeafe;\n  color: #2563eb;\n}\n.zd-topbar .zd-icon-item .ficon {\n  font-size: 1.3rem;\n  color: inherit;\n  margin: 0;\n  position: static;\n  top: 0;\n}\n.zd-topbar .zd-icon-item > a {\n  width: 100%;\n  height: 100%;\n  color: inherit;\n}\n.zd-topbar .zd-count {\n  top: -5px !important;\n  right: -6px !important;\n  /* flex-centre the number; theme .badge padding/line-height pushed it down and clipped it */\n  display: inline-flex !important;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  min-width: 18px;\n  height: 18px;\n  padding: 0 4px !important;\n  font-size: 0.65rem;\n  font-weight: 600;\n  line-height: 1 !important;\n  border: 2px solid #ffffff;\n  border-radius: 999px;\n}\n.zd-topbar .zd-topbar-page-title {\n  font-size: 1.25rem;\n  font-weight: 700;\n  color: #0f172a;\n  letter-spacing: -0.02em;\n  line-height: 1.2;\n  margin-left: 0.25rem;\n}\n\n/* Right: text actions */\n.zd-topbar .zd-actions {\n  gap: 0.35rem;\n  align-items: center;\n}\n.zd-topbar .zd-actions > .nav-item {\n  display: inline-flex;\n  align-items: center;\n}\n.zd-topbar .zd-action.dropdown-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 0.4rem;\n  height: 34px;\n  padding: 0 0.8rem;\n  border-radius: 8px;\n  color: #4b5563;\n  font-size: 0.9rem;\n  font-weight: 500;\n  letter-spacing: 0;\n  text-transform: none;\n  white-space: nowrap;\n  background: transparent;\n  transition: background 0.15s, color 0.15s;\n}\n.zd-topbar .zd-action.dropdown-item i {\n  margin: 0 !important;\n  font-size: 1.15rem;\n  color: #8a94a6;\n  vertical-align: middle;\n  position: static;\n  top: 0;\n  transition: color 0.15s;\n}\n.zd-topbar .zd-action.dropdown-item:hover,\n.zd-topbar .zd-action.dropdown-item:focus {\n  background: #f1f4f8;\n  color: #1f2937;\n}\n.zd-topbar .zd-action.dropdown-item:hover i {\n  color: #5a8dee;\n}\n.zd-topbar .zd-action--primary.dropdown-item {\n  background: #e3f6e8;\n  color: #1e8a43;\n}\n.zd-topbar .zd-action--primary.dropdown-item i {\n  color: #1e8a43;\n}\n.zd-topbar .zd-action--primary.dropdown-item:hover,\n.zd-topbar .zd-action--primary.dropdown-item:focus {\n  background: #cdeed7;\n  color: #176b34;\n}\n.zd-topbar .zd-action--primary.dropdown-item:hover i {\n  color: #176b34;\n}\n.zd-topbar .zd-action--danger.dropdown-item {\n  background: #fde6e6;\n  color: #c23434;\n}\n.zd-topbar .zd-action--danger.dropdown-item i {\n  color: #c23434;\n}\n.zd-topbar .zd-action--danger.dropdown-item:hover {\n  background: #fbd3d3;\n  color: #a12626;\n}\n\n/* Call button */\n.zd-topbar .zd-call-item {\n  display: inline-flex !important;\n  align-items: center;\n  justify-content: center;\n  width: 36px;\n  height: 36px;\n  border-radius: 10px;\n  border: 1px solid transparent;\n  color: #475569;\n  cursor: pointer;\n  margin-right: 0;\n  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;\n&:hover {\n    background: #eff6ff;\n    border-color: #dbeafe;\n    color: #2563eb;\n}\ni.ficon,\n  i {\n    font-size: 1.3rem;\n    color: inherit;\n    line-height: 1;\n    position: static;\n    top: 0;\n}\n}\n\n/* User chip */\n.zd-topbar .zd-user-item {\n  margin-left: 0.5rem;\n  padding-left: 0.75rem;\n  border-left: 1px solid #e2e8f0;\n  height: 28px;\n}\n.zd-topbar .zd-user.nav-link {\n  display: inline-flex !important;\n  align-items: center;\n  gap: 0.5rem;\n  height: 36px;\n  padding: 0 0.7rem 0 0.25rem !important;\n  border-radius: 999px;\n  border: 1px solid #e2e8f0;\n  background: #f8fafc;\n  color: #0f172a !important;\n  font-size: 0.875rem;\n  font-weight: 600;\n  text-transform: none;\n  transition: background 0.15s ease, border-color 0.15s ease;\n}\n.zd-topbar .zd-user.nav-link:hover {\n  background: #f1f5f9;\n  border-color: #cbd5e1;\n}\n.zd-topbar .zd-user.dropdown-toggle::after {\n  display: none;\n}\n.zd-topbar .zd-user-avatar {\n  width: 28px;\n  height: 28px;\n  border-radius: 50%;\n  background: #eef4ff;\n  color: #2f62d6;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 0.75rem;\n  font-weight: 600;\n  letter-spacing: 0.02em;\n}\n.zd-topbar .zd-user-name {\n  max-width: 160px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.zd-topbar .zd-user-chevron {\n  font-size: 1.1rem;\n  color: #8a94a6;\n}\n.zd-topbar .zd-user-menu {\n  min-width: 220px;\n  margin-top: 8px !important;\n  border: 1px solid #e6eaf0;\n  border-radius: 12px;\n  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);\n  padding-top: 0.35rem;\n  overflow: hidden;\n}\n.zd-topbar .zd-user-menu .dropdown-item {\n  display: flex;\n  align-items: center;\n  padding: 0.55rem 1rem;\n  font-size: 0.9rem;\n  color: #374151;\n}\n.zd-topbar .zd-user-menu .dropdown-item i {\n  font-size: 1.1rem;\n  color: #8a94a6;\n}\n.zd-topbar .zd-user-menu .dropdown-item:hover {\n  background: #f6f8fb;\n  color: #1f2937;\n}\n.zd-topbar .zd-user-menu .dropdown-item:last-child {\n  border-top: 1px solid #eef1f5;\n  color: #c23434;\n}\n.zd-topbar .zd-user-menu .dropdown-item:last-child i {\n  color: #c23434;\n}\n@media (max-width: 1199.98px) {\n.zd-topbar .zd-action.dropdown-item {\n    padding: 0 0.55rem;\n    font-size: 0.85rem;\n}\n}\n.integration-connector {\n  display: flex;\n  align-items: center;\n}\n.connector-line {\n  display: inline-block;\n  width: 22px;\n  height: 2px;\n  background-color: #28c76f;\n  border-radius: 2px;\n}\n.connector-icon {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 28px;\n  height: 28px;\n  margin: 0 8px;\n  background: rgba(40, 199, 111, 0.12);\n  color: #155724;\n  border: 1px solid rgba(40, 199, 111, 0.3);\n  border-radius: 50%;\n  font-size: 14px;\n  font-weight: 600;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

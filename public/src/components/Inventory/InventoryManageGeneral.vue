@@ -1139,39 +1139,29 @@
                                   >
                                 </div>
                                 <div class="col-md-8 form-group">
-                                  <div id="slider-input">
-                                    <fieldset>
-                                      <div class="input-group">
-                                        <!-- <div class="mr-1 slider-space-r" id="slider-with-input"></div> -->
-                                        <vue-slider
-                                          :height="10"
-                                          style="padding-top: 3em"
-                                          :interval="0.01"
-                                          class="col-8"
-                                          :tooltip="'always'"
-                                          :tooltip-formatter="'{value} %'"
-                                          v-model="form.downpayment"
-                                        />
-                                        <span
-                                          class="col-4"
-                                          style="margin-top: 0.5em"
-                                          ><input
-                                            min="0"
-                                            max="100"
-                                            type="number"
-                                            step="0.01"
-                                            @keyup="changeDownpayment()"
-                                            style="
-                                              width: 60%;
-                                              display: inline-block;
-                                              margin-right: 1em;
-                                            "
-                                            v-model="form.downpayment"
-                                            class="form-control"
-                                          />%</span
-                                        >
-                                      </div>
-                                    </fieldset>
+                                  <div class="zd-slider-row">
+                                    <div class="zd-slider-track">
+                                      <vue-slider
+                                        :height="8"
+                                        width="100%"
+                                        :interval="0.01"
+                                        :tooltip="'always'"
+                                        :tooltip-formatter="'{value} %'"
+                                        v-model="form.downpayment"
+                                      />
+                                    </div>
+                                    <div class="zd-slider-input-wrap">
+                                      <input
+                                        min="0"
+                                        max="100"
+                                        type="number"
+                                        step="0.01"
+                                        @keyup="changeDownpayment()"
+                                        v-model="form.downpayment"
+                                        class="form-control zd-slider-number-input"
+                                      />
+                                      <span class="zd-slider-unit">%</span>
+                                    </div>
                                   </div>
                                 </div>
                                 <div class="col-md-4">
@@ -1181,38 +1171,29 @@
                                   >
                                 </div>
                                 <div class="col-md-8 form-group">
-                                  <div id="slider-input">
-                                    <fieldset>
-                                      <div class="input-group">
-                                        <vue-slider
-                                          :height="10"
-                                          style="padding-top: 3em"
-                                          :interval="0.01"
-                                          class="col-8"
-                                          :tooltip="'always'"
-                                          :tooltip-formatter="'{value} %'"
-                                          v-model="form.interest_rate"
-                                        />
-                                        <span
-                                          class="col-4"
-                                          style="margin-top: 0.5em"
-                                          ><input
-                                            min="0"
-                                            max="100"
-                                            type="number"
-                                            step="0.01"
-                                            @keyup="changeInterestRate()"
-                                            style="
-                                              width: 60%;
-                                              display: inline-block;
-                                              margin-right: 1em;
-                                            "
-                                            v-model="form.interest_rate"
-                                            class="form-control"
-                                          />%</span
-                                        >
-                                      </div>
-                                    </fieldset>
+                                  <div class="zd-slider-row">
+                                    <div class="zd-slider-track">
+                                      <vue-slider
+                                        :height="8"
+                                        width="100%"
+                                        :interval="0.01"
+                                        :tooltip="'always'"
+                                        :tooltip-formatter="'{value} %'"
+                                        v-model="form.interest_rate"
+                                      />
+                                    </div>
+                                    <div class="zd-slider-input-wrap">
+                                      <input
+                                        min="0"
+                                        max="100"
+                                        type="number"
+                                        step="0.01"
+                                        @keyup="changeInterestRate()"
+                                        v-model="form.interest_rate"
+                                        class="form-control zd-slider-number-input"
+                                      />
+                                      <span class="zd-slider-unit">%</span>
+                                    </div>
                                   </div>
                                 </div>
                                 <div class="col-md-4">
@@ -1222,38 +1203,29 @@
                                   >
                                 </div>
                                 <div class="col-md-8 form-group">
-                                  <div id="slider-input">
-                                    <fieldset>
-                                      <div class="input-group">
-                                        <vue-slider
-                                          :height="10"
-                                          style="padding-top: 3em"
-                                          :max="96"
-                                          class="col-8"
-                                          :tooltip="'always'"
-                                          :tooltip-formatter="'{value} Months'"
-                                          v-model="form.term"
-                                        />
-                                        <span
-                                          class="col-4"
-                                          style="margin-top: 0.5em"
-                                          ><input
-                                            min="0"
-                                            max="100"
-                                            type="number"
-                                            step="1"
-                                            @keyup="changeTerm()"
-                                            style="
-                                              width: 60%;
-                                              display: inline-block;
-                                              margin-right: 1em;
-                                            "
-                                            v-model="form.term"
-                                            class="form-control"
-                                          />Month</span
-                                        >
-                                      </div>
-                                    </fieldset>
+                                  <div class="zd-slider-row">
+                                    <div class="zd-slider-track">
+                                      <vue-slider
+                                        :height="8"
+                                        width="100%"
+                                        :max="96"
+                                        :tooltip="'always'"
+                                        :tooltip-formatter="'{value} Months'"
+                                        v-model="form.term"
+                                      />
+                                    </div>
+                                    <div class="zd-slider-input-wrap">
+                                      <input
+                                        min="0"
+                                        max="100"
+                                        type="number"
+                                        step="1"
+                                        @keyup="changeTerm()"
+                                        v-model="form.term"
+                                        class="form-control zd-slider-number-input"
+                                      />
+                                      <span class="zd-slider-unit">Months</span>
+                                    </div>
                                   </div>
                                 </div>
                                 <div class="col-md-4">
@@ -3067,5 +3039,40 @@ export default {
 #text-editor-settings-1 .ql-picker-options,
 #text-editor-1 .ql-picker-options {
   max-height: 350px;
+}
+
+#general-block-list .zd-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding-top: 24px;
+}
+
+#general-block-list .zd-slider-track {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#general-block-list .zd-slider-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+#general-block-list .zd-slider-number-input {
+  width: 96px;
+  min-width: 96px;
+  height: 36px;
+  text-align: right;
+}
+
+#general-block-list .zd-slider-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+  min-width: 46px;
 }
 </style>

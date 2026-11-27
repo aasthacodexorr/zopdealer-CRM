@@ -82,8 +82,10 @@
     width: 100%;
     max-width: 100%;
     flex: none;
+    margin: 0 !important;
     padding-left: 0;
     padding-right: 0;
+    overflow: hidden;
   }
   .dc-item--full { grid-column: span 12; }
   .dc-item--half { grid-column: span 6; }
@@ -106,6 +108,10 @@
   .dc-input,
   .dc-select,
   .dc-textarea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 13px;

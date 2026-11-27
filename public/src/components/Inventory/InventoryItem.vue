@@ -58,16 +58,44 @@
         {{ vehicleFullTitle }}
       </div>
       <div class="vehicle-sub-meta">
-        <span
-          class="vin-meta copyable-text"
-          :title="'Click to copy VIN: ' + item.vin"
-          @click.stop="copyVin"
-        >
-          VIN {{ item.vin || '—' }}
+        <span class="vin-meta-wrap">
+          <span
+            class="vin-meta copyable-text"
+            :title="'Click to copy VIN: ' + item.vin"
+            @click.stop="copyVin"
+          >
+            VIN {{ item.vin || '—' }}
+          </span>
+          <button
+            v-if="item.vin"
+            type="button"
+            class="zd-inline-copy-btn"
+            title="Copy VIN"
+            aria-label="Copy VIN"
+            @click.stop="copyVin"
+          >
+            <i class="bx bx-copy"></i>
+          </button>
         </span>
         <span class="meta-dot">•</span>
-        <span class="stock-meta" :title="'Stock #: ' + item.stock_no">
-          {{ item.stock_no || '—' }}
+        <span class="stock-meta-wrap">
+          <span
+            class="stock-meta copyable-text"
+            :title="'Click to copy Stock #: ' + item.stock_no"
+            @click.stop="copyStockNo"
+          >
+            {{ item.stock_no || '—' }}
+          </span>
+          <button
+            v-if="item.stock_no"
+            type="button"
+            class="zd-inline-copy-btn"
+            title="Copy Stock #"
+            aria-label="Copy Stock #"
+            @click.stop="copyStockNo"
+          >
+            <i class="bx bx-copy"></i>
+          </button>
         </span>
       </div>
     </td>
@@ -125,26 +153,46 @@
       </span>
     </td>
 
-    <!-- 12. Website / VDP Link (Opens in new tab) -->
+    <!-- 12. Website / VDP Link (Opens dealer website VDP in new tab) -->
     <td class="col-action-btn text-center" @click.stop>
-      <button
-        type="button"
+      <a
+        v-if="vdpHref"
+        :href="vdpHref"
+        target="_blank"
+        rel="noopener noreferrer"
         class="table-icon-btn btn-vdp"
-        title="Open VDP in new tab"
-        @click="openInventoryNewTab(item.inventory_id)"
+        title="View on Website"
       >
         <i class="bx bx-link-external"></i>
+      </a>
+      <button
+        v-else
+        type="button"
+        class="table-icon-btn btn-vdp"
+        :disabled="vdp_loading"
+        title="View on Website"
+        @click="openWebsiteVdp"
+      >
+        <i :class="vdp_loading ? 'bx bx-loader-alt bx-spin' : 'bx bx-link-external'"></i>
       </button>
+    </td>
+
+    <!-- 15. Modified At -->
+    <td class="col-modified-at text-muted-sm" :title="item.updated_at || item.modified_at || ''">
+      <template v-if="formattedModifiedDate !== '—'">
+        <div class="zd-date-line">{{ formattedModifiedDate }}</div>
+        <div v-if="formattedModifiedTime" class="zd-time-line">{{ formattedModifiedTime }}</div>
+      </template>
+      <template v-else>—</template>
     </td>
 
     <!-- 9. Creation Date -->
     <td class="col-creation-date" :title="item.created_at || ''">
-      {{ formattedCreatedAt }}
-    </td>
-
-    <!-- 15. Modified At (Preserved column not in image) -->
-    <td class="col-modified-at text-muted-sm" :title="item.updated_at || item.modified_at || ''">
-      {{ formattedModifiedAt }}
+      <template v-if="formattedCreatedDate !== '—'">
+        <div class="zd-date-line">{{ formattedCreatedDate }}</div>
+        <div v-if="formattedCreatedTime" class="zd-time-line">{{ formattedCreatedTime }}</div>
+      </template>
+      <template v-else>—</template>
     </td>
 
     </template>
@@ -227,6 +275,8 @@ export default {
   data() {
     return {
       checkValue: "0",
+      vdp_loading: false,
+      resolved_page_url: "",
     };
   },
   watch: {
@@ -371,22 +421,47 @@ export default {
       }
       return "—";
     },
-    formattedCreatedAt() {
+    vdpHref() {
+      return this.resolved_page_url || (this.item && this.item.page_url) || "";
+    },
+    formattedCreatedDate() {
       const dt = this.item.created_at;
       if (!dt) return "—";
       try {
-        return moment(dt).format("MMM D, YYYY");
+        const m = moment(dt);
+        return m.isValid() ? m.format("MM/DD/YYYY") : dt;
       } catch (e) {
         return dt;
       }
     },
-    formattedModifiedAt() {
+    formattedCreatedTime() {
+      const dt = this.item.created_at;
+      if (!dt || !String(dt).includes(":")) return "";
+      try {
+        const m = moment(dt);
+        return m.isValid() ? m.format("hh:mm A") : "";
+      } catch (e) {
+        return "";
+      }
+    },
+    formattedModifiedDate() {
       const dt = this.item.updated_at || this.item.modified_at;
       if (!dt) return "—";
       try {
-        return moment(dt).format("MMM D, YYYY");
+        const m = moment(dt);
+        return m.isValid() ? m.format("MM/DD/YYYY") : dt;
       } catch (e) {
         return dt;
+      }
+    },
+    formattedModifiedTime() {
+      const dt = this.item.updated_at || this.item.modified_at;
+      if (!dt || !String(dt).includes(":")) return "";
+      try {
+        const m = moment(dt);
+        return m.isValid() ? m.format("hh:mm A") : "";
+      } catch (e) {
+        return "";
       }
     },
     lastSyncDate() {
@@ -454,6 +529,11 @@ export default {
         this.$helpers.doCopy(this, this.item.vin);
       }
     },
+    copyStockNo() {
+      if (this.item.stock_no) {
+        this.$helpers.doCopy(this, this.item.stock_no);
+      }
+    },
     onImageError(e) {
       const fallback = this.placeholder_image || "/app-assets/images/slider/01.jpg";
       const cdn = (window.global && window.global.cdn) ? window.global.cdn : "";
@@ -489,6 +569,35 @@ export default {
         params: { id: id },
       });
       window.open(routeData.href, "_blank");
+    },
+    async openWebsiteVdp() {
+      const directUrl = this.vdpHref;
+      if (directUrl) {
+        window.open(directUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+      if (!this.item || !this.item.inventory_id || this.vdp_loading) return;
+      this.vdp_loading = true;
+      try {
+        const { data } = await axios({
+          method: "get",
+          url: `${window.location.origin}/api/business/inventory/show/${this.item.inventory_id}`,
+          headers: {
+            Authorization: "Bearer " + window.$cookies.get("_token"),
+          },
+        });
+        if (data && data.page_url) {
+          this.resolved_page_url = data.page_url;
+          window.open(data.page_url, "_blank", "noopener,noreferrer");
+          return;
+        }
+      } catch (e) {}
+      finally {
+        this.vdp_loading = false;
+      }
+      const toast = new Toast("Website URL is not available for this vehicle.");
+      toast.fail("Website URL is not available for this vehicle.");
+      toast.close();
     },
     async openCarfax() {
       if (this.item.carfax_url) {
@@ -678,6 +787,38 @@ export default {
 
   &:hover .custom-chk-box {
     border-color: #94a3b8;
+  }
+}
+
+.vin-meta-wrap,
+.stock-meta-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.zd-inline-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.15s ease, background-color 0.15s ease;
+
+  i {
+    font-size: 12.5px;
+  }
+
+  &:hover {
+    color: #2563eb;
+    background: #eff6ff;
   }
 }
 
@@ -912,7 +1053,8 @@ export default {
   min-width: 110px;
 }
 
-.col-created-at {
+.col-created-at,
+.col-creation-date {
   width: 105px;
   min-width: 105px;
   font-size: 12.5px;
@@ -924,6 +1066,22 @@ export default {
   min-width: 105px;
   font-size: 12px;
   color: #64748b;
+}
+
+.col-creation-date,
+.col-modified-at {
+  line-height: 1.35;
+  .zd-date-line {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #334155;
+    white-space: nowrap;
+  }
+  .zd-time-line {
+    font-size: 11px;
+    color: #64748b;
+    white-space: nowrap;
+  }
 }
 
 .col-last-sync {

@@ -357,7 +357,17 @@
             <i class="bx bx-globe preview-doc-icon text-primary"></i>
             <span class="preview-doc-name">Website / VDP</span>
           </div>
+          <a
+            v-if="formData.page_url || (item && item.page_url)"
+            :href="formData.page_url || item.page_url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="preview-doc-view-link"
+          >
+            View <i class="bx bx-link-external ml-50"></i>
+          </a>
           <button
+            v-else
             type="button"
             class="preview-doc-view-link"
             @click="openVdpInNewTab"
@@ -757,8 +767,36 @@ export default {
       if (!text || text === "—") return;
       this.$helpers.doCopy(this, text);
     },
-    openVdpInNewTab() {
-      this.$emit("open-vdp", this.item.inventory_id);
+    async openVdpInNewTab() {
+      const directUrl = (this.formData && this.formData.page_url) || (this.item && this.item.page_url);
+      if (directUrl) {
+        window.open(directUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+      if (this.item && this.item.inventory_id) {
+        try {
+          const { data } = await axios({
+            method: "get",
+            url: `${window.location.origin}/api/business/inventory/show/${this.item.inventory_id}`,
+            headers: {
+              Authorization: "Bearer " + window.$cookies.get("_token"),
+            },
+          });
+          if (data && data.page_url) {
+            this.formData.page_url = data.page_url;
+            window.open(data.page_url, "_blank", "noopener,noreferrer");
+            return;
+          }
+        } catch (e) {}
+      }
+      this.$swal({
+        showConfirmButton: false,
+        icon: "info",
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        title: "Website URL is not available for this vehicle.",
+      });
     },
     async openCarfaxReport() {
       // Find Carfax in files

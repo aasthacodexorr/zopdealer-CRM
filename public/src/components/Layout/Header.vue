@@ -1584,11 +1584,16 @@ export default {
     ...mapGetters("calendarView", ["getTodayCount"]),
     ...mapGetters("leadResponseView", ["getLoadState"]),
     pageTitle() {
-      if (this.$route && this.$route.name === "inventory-list") {
+      if (
+        this.$route &&
+        (this.$route.name === "inventory-list" ||
+          this.$route.name === "inventory-update" ||
+          this.$route.name === "inventory-create")
+      ) {
         return "Inventory";
       }
-      if (this.$route && this.$route.name === "inventory-update") {
-        return "Inventory Update";
+      if (this.$route && this.$route.name === "inventory-settings") {
+        return "Inventory Settings";
       }
       return "";
     },
@@ -2190,8 +2195,8 @@ export default {
    ========================================================================== */
 .zd-topbar.header-navbar {
   background: #ffffff !important;
-  /* inset line instead of a border so the bar stays exactly 45px tall */
-  box-shadow: inset 0 -1px 0 #e6eaf0, 0 1px 2px rgba(15, 23, 42, 0.04);
+  border-bottom: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   min-height: 45px;
 }
 .zd-topbar .navbar-container {

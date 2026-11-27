@@ -73,7 +73,6 @@
               <div
                 class="dc-item dc-item--quarter"
                 :key="`checkpoint_div_${index}`"
-                :class="checkpoint.css_class"
                 v-if="checkpoint.type === `InputField`"
               >
                 <label class="dc-label" :for="`checkpoint_${index}`">{{ checkpoint.question }}</label>
@@ -89,7 +88,6 @@
               <!-- button group : START -->
               <div
                 class="dc-item dc-item--half dc-choice"
-                :class="checkpoint.css_class"
                 :key="`checkpoint_div_${index}`"
                 v-if="checkpoint.type === `Switch`"
               >

@@ -13,17 +13,9 @@
                 <div class="todo-sidebar d-flex">
                   <!-- todo app menu -->
                   <div class="todo-app-menu">
-                    <div class="form-group text-center border-bottom mb-0">
-                      <!-- new task button -->
-                      <div class="row w-100 m-0">
-                        <div class="col-md-12 col-12 p-0">
-                          <h3
-                            class="content-header-title mb-0"
-                          >
-                            Inventory Settings
-                          </h3>
-                        </div>
-                      </div>
+                    <div class="zd-side-nav__header">
+                      <span>Sections</span>
+                      <i class="bx bx-list-ul"></i>
                     </div>
                     <!-- sidebar list start -->
                     <div class="sidebar-menu-list p-0">
@@ -58,7 +50,7 @@
                           <li class="nav-item m-0">
                             <a
                               class="nav-link"
-                              id="team-pill-2"
+                              id="team-pill-3"
                               data-toggle="pill"
                               href="#syndication-setting"
                               aria-expanded="false"
@@ -70,7 +62,7 @@
                           <li class="nav-item m-0">
                             <a
                               class="nav-link"
-                              id="team-pill-2"
+                              id="team-pill-4"
                               data-toggle="pill"
                               href="#locations-setting"
                               aria-expanded="false"
@@ -133,20 +125,54 @@ export default {
 .zd-inventory-settings-page {
   background: #f8fafc;
 
+  .btn {
+    border-radius: 0.267rem !important;
+  }
+
+  @media (min-width: 992px) {
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    padding-top: 4rem !important;
+    padding-bottom: 0 !important;
+
+    > .content-body,
+    > .content-body > .content-wrapper,
+    > .content-body > .content-wrapper > .grid-list-form {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  }
+
   .zd-settings-shell {
     display: flex;
     align-items: stretch;
-    min-height: calc(100vh - 68px);
+    gap: 20px;
+    padding: 16px 24px 0;
     background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .sidebar-left {
-    width: 248px;
-    min-width: 248px;
+    width: 224px;
+    min-width: 224px;
+    flex: 0 0 224px;
     background: #ffffff;
-    border-right: 1px solid #e2e8f0 !important;
-    flex-shrink: 0;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px;
+    padding: 12px 8px;
+    align-self: flex-start;
+    max-height: calc(100% - 20px);
+    overflow-y: auto;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 
     .sidebar,
     .todo-sidebar,
@@ -156,62 +182,66 @@ export default {
       padding: 0 !important;
       position: static !important;
       height: auto !important;
+      background: transparent !important;
+      border: none !important;
     }
 
-    .border-bottom {
-      border-bottom: 1px solid #e2e8f0 !important;
-      height: 60px !important;
-      min-height: 60px !important;
-      max-height: 60px !important;
-      box-sizing: border-box !important;
-      display: flex !important;
-      align-items: center !important;
-      padding: 0 1.25rem !important;
-      margin: 0 !important;
+    .zd-side-nav__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 12px 10px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #64748b;
+
+      i {
+        font-size: 16px;
+        color: #94a3b8;
+      }
     }
 
-    h3.content-header-title {
-      float: none !important;
+    .sidebar-menu-list,
+    .list-grid {
       padding: 0 !important;
       margin: 0 !important;
-      font-size: 1.05rem !important;
-      font-weight: 700 !important;
-      color: #0f172a !important;
-      letter-spacing: -0.01em;
-      text-align: left;
-    }
-
-    .sidebar-menu-list {
-      padding: 0.75rem !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
     }
 
     .team-setting-tab {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
 
       .nav-link {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 0.65rem 0.9rem;
+        padding: 9px 12px;
         border-radius: 8px;
-        font-size: 0.9rem;
+        font-size: 13.5px;
         font-weight: 500;
         color: #475569;
         transition: background-color 0.15s ease, color 0.15s ease;
 
         i {
-          font-size: 1.15rem;
-          color: #64748b;
+          font-size: 17px;
+          color: #94a3b8;
+          flex-shrink: 0;
         }
 
         &:hover {
-          background: #f1f5f9;
+          background: #f8fafc;
           color: #0f172a;
 
           i {
-            color: #0f172a;
+            color: #475569;
           }
         }
 
@@ -231,31 +261,54 @@ export default {
   .content-right {
     flex: 1 1 auto;
     min-width: 0;
-    background: #f8fafc;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: transparent;
 
     .todo-app-list,
     #team-form,
-    .tab-content,
-    .tab-pane {
+    .tab-content {
       width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       margin: 0 !important;
       padding: 0 !important;
     }
 
+    .tab-pane {
+      width: 100%;
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: 0;
+
+      &.active {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+    }
+
     .tab-pane > .content-wrapper.border-bottom {
+      flex: 0 0 auto;
       background: #ffffff;
-      border-bottom: 1px solid #e2e8f0 !important;
-      height: 60px !important;
-      min-height: 60px !important;
-      max-height: 60px !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      min-height: 48px !important;
+      height: auto !important;
       box-sizing: border-box !important;
       display: flex !important;
       align-items: center !important;
-      padding: 0 1.75rem !important;
-      margin: 0 !important;
-      position: sticky;
-      top: 0;
-      z-index: 15;
+      padding: 8px 18px !important;
+      margin: 0 0 14px 0 !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+      position: static;
 
       > form,
       > .row {
@@ -269,8 +322,8 @@ export default {
       }
 
       .title-sizeincrease-font {
-        font-size: 1.2rem !important;
-        font-weight: 700 !important;
+        font-size: 14.5px !important;
+        font-weight: 600 !important;
         color: #0f172a !important;
       }
 
@@ -279,23 +332,34 @@ export default {
       }
 
       .btn {
-        height: 36px;
-        padding: 0 1.15rem;
+        height: 32px;
+        padding: 0 14px;
         border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 500;
         display: inline-flex;
         align-items: center;
         justify-content: center;
       }
     }
 
-    .list-right-task-list {
-      padding: 1.5rem 1.75rem 3rem !important;
-      background: #f8fafc !important;
+    .list-right-task-list,
+    .list-right-task-syndication,
+    .list-right-task-locations,
+    #image-setting > .content-wrapper:not(.border-bottom),
+    #locations-setting > .content-wrapper:not(.border-bottom) {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      padding: 0 0 2.5rem !important;
+      background: transparent !important;
       height: auto !important;
       max-height: none !important;
       border: none !important;
+    }
+
+    .list-right-task-list {
 
       .content-wrapper.border-bottom {
         background: #ffffff;
@@ -355,20 +419,10 @@ export default {
       }
     }
 
-    .list-right-task-syndication {
-      padding: 16px 24px 30px !important;
-    }
-
-    .list-right-task-locations,
-    #image-setting > .content-wrapper:not(.border-bottom),
-    #locations-setting > .content-wrapper:not(.border-bottom) {
-      padding: 1.5rem 1.75rem 2rem !important;
-    }
-
     .list-right-task-syndication .list-image-content {
-      height: calc(100vh - 168px) !important;
+      height: auto !important;
       max-height: none !important;
-      overflow: auto !important;
+      overflow: visible !important;
     }
 
     .dataTables_paginate,
